@@ -757,17 +757,17 @@ namespace Engine
              }
             else
              {
-               throw Types::TypedOperationException("Array Index Out-of-Bounds.");
+               throw Types::TypedOperationException("Float is not a valid precision.");
              }
           }
          else
           {
-            throw Types::TypedOperationException("Error indexing with non-Float.");
+            throw Types::TypedOperationException("Error trying to convert non-Float to precision.");
           }
        }
       else
        {
-         throw Types::TypedOperationException("Error indexing into non-Array.");
+         throw Types::TypedOperationException("Error trying to set precision on non-Float.");
        }
     }
 

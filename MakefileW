@@ -1,0 +1,192 @@
+#Merkfile for BC-DeciCalc
+
+CCP := x86_64-w64-mingw32-g++
+
+CFLAGS += -Wall -Wextra -Wpedantic
+
+B_INCLUDE := -IBCNum -IBackwards/include
+F_INCLUDE := $(B_INCLUDE) -IForwards/include
+
+ifeq "$(MAKECMDGOALS)" "release"
+   CFLAGS += -O2
+   BFLAGS += -s -static
+endif
+
+ifeq "$(MAKECMDGOALS)" "debug"
+   CFLAGS += -O0 -g
+endif
+
+.PHONY: all clean release debug
+all: bin/DeciCalc.exe
+
+
+clean:
+	rm bin/*.exe | true
+	rm lib/* | true
+	rm -rf obj/* | true
+
+release: all
+
+
+debug: all
+
+
+bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/Screen.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
+	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/*.a -lncurses -lgmp
+
+obj/main.o: Curses/main.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -IOddsAndEnds -c -o obj/main.o Curses/main.cpp
+
+obj/Screen.o: Curses/Screen.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -IOddsAndEnds -c -o obj/Screen.o Curses/Screen.cpp
+
+obj/GetAndSet.o: OddsAndEnds/GetAndSet.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/GetAndSet.o OddsAndEnds/GetAndSet.cpp
+
+obj/LibraryLoader.o: OddsAndEnds/LibraryLoader.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/LibraryLoader.o OddsAndEnds/LibraryLoader.cpp
+
+obj/SaveFile.o: OddsAndEnds/SaveFile.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/SaveFile.o OddsAndEnds/SaveFile.cpp
+
+obj/StdLib.o: OddsAndEnds/StdLib.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/StdLib.o OddsAndEnds/StdLib.cpp
+
+
+lib/libbcnum.a: obj/libbcnum/Integer.o obj/libbcnum/Fixed.o | lib
+	x86_64-w64-mingw32-ar -rsc lib/libbcnum.a obj/libbcnum/*.o
+
+obj/libbcnum/Integer.o: BCNum/Integer.cpp | obj/libbcnum
+	$(CCP) $(CFLAGS) -DGMP_STATIC_COMPILATION -c -o obj/libbcnum/Integer.o BCNum/Integer.cpp
+
+obj/libbcnum/Fixed.o: BCNum/Fixed.cpp | obj/libbcnum
+	$(CCP) $(CFLAGS) -c -o obj/libbcnum/Fixed.o BCNum/Fixed.cpp
+
+
+lib/Backwards.a: obj/Backwards/CallingContext.o obj/Backwards/ConstantsSingleton.o obj/Backwards/Expression.o obj/Backwards/Statement.o obj/Backwards/StdLib.o obj/Backwards/BufferedGenericInput.o obj/Backwards/Lexer.o obj/Backwards/LineBufferedStreamInput.o obj/Backwards/StringInput.o obj/Backwards/ContextBuilder.o obj/Backwards/DebuggerHook.o obj/Backwards/Eval.o obj/Backwards/Parser.o obj/Backwards/SymbolTable.o obj/Backwards/ArrayValue.o obj/Backwards/CellRangeValue.o obj/Backwards/CellRefValue.o obj/Backwards/DictionaryValue.o obj/Backwards/FloatValue.o obj/Backwards/FunctionValue.o obj/Backwards/NilValue.o obj/Backwards/StringValue.o obj/Backwards/ValueType.o | lib
+	x86_64-w64-mingw32-ar -rsc lib/Backwards.a obj/Backwards/*.o
+
+obj/Backwards/CallingContext.o: Backwards/src/Engine/CallingContext.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/CallingContext.o Backwards/src/Engine/CallingContext.cpp
+
+obj/Backwards/ConstantsSingleton.o: Backwards/src/Engine/ConstantsSingleton.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/ConstantsSingleton.o Backwards/src/Engine/ConstantsSingleton.cpp
+
+obj/Backwards/Expression.o: Backwards/src/Engine/Expression.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/Expression.o Backwards/src/Engine/Expression.cpp
+
+obj/Backwards/Statement.o: Backwards/src/Engine/Statement.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/Statement.o Backwards/src/Engine/Statement.cpp
+
+obj/Backwards/StdLib.o: Backwards/src/Engine/StdLib.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/StdLib.o Backwards/src/Engine/StdLib.cpp
+
+obj/Backwards/BufferedGenericInput.o: Backwards/src/Input/BufferedGenericInput.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/BufferedGenericInput.o Backwards/src/Input/BufferedGenericInput.cpp
+
+obj/Backwards/Lexer.o: Backwards/src/Input/Lexer.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/Lexer.o Backwards/src/Input/Lexer.cpp
+
+obj/Backwards/LineBufferedStreamInput.o: Backwards/src/Input/LineBufferedStreamInput.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/LineBufferedStreamInput.o Backwards/src/Input/LineBufferedStreamInput.cpp
+
+obj/Backwards/StringInput.o: Backwards/src/Input/StringInput.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/StringInput.o Backwards/src/Input/StringInput.cpp
+
+obj/Backwards/ContextBuilder.o: Backwards/src/Parser/ContextBuilder.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/ContextBuilder.o Backwards/src/Parser/ContextBuilder.cpp
+
+obj/Backwards/DebuggerHook.o: Backwards/src/Parser/DebuggerHook.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/DebuggerHook.o Backwards/src/Parser/DebuggerHook.cpp
+
+obj/Backwards/Eval.o: Backwards/src/Parser/Eval.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/Eval.o Backwards/src/Parser/Eval.cpp
+
+obj/Backwards/Parser.o: Backwards/src/Parser/Parser.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/Parser.o Backwards/src/Parser/Parser.cpp
+
+obj/Backwards/SymbolTable.o: Backwards/src/Parser/SymbolTable.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/SymbolTable.o Backwards/src/Parser/SymbolTable.cpp
+
+obj/Backwards/ArrayValue.o: Backwards/src/Types/ArrayValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/ArrayValue.o Backwards/src/Types/ArrayValue.cpp
+
+obj/Backwards/CellRangeValue.o: Backwards/src/Types/CellRangeValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/CellRangeValue.o Backwards/src/Types/CellRangeValue.cpp
+
+obj/Backwards/CellRefValue.o: Backwards/src/Types/CellRefValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/CellRefValue.o Backwards/src/Types/CellRefValue.cpp
+
+obj/Backwards/DictionaryValue.o: Backwards/src/Types/DictionaryValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/DictionaryValue.o Backwards/src/Types/DictionaryValue.cpp
+
+obj/Backwards/FloatValue.o: Backwards/src/Types/FloatValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/FloatValue.o Backwards/src/Types/FloatValue.cpp
+
+obj/Backwards/FunctionValue.o: Backwards/src/Types/FunctionValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/FunctionValue.o Backwards/src/Types/FunctionValue.cpp
+
+obj/Backwards/NilValue.o: Backwards/src/Types/NilValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/NilValue.o Backwards/src/Types/NilValue.cpp
+
+obj/Backwards/StringValue.o: Backwards/src/Types/StringValue.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/StringValue.o Backwards/src/Types/StringValue.cpp
+
+obj/Backwards/ValueType.o: Backwards/src/Types/ValueType.cpp | obj/Backwards
+	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/ValueType.o Backwards/src/Types/ValueType.cpp
+
+
+lib/Forwards.a: obj/Forwards/CallingContext.o obj/Forwards/CellRangeExpand.o obj/Forwards/CellRefEval.o obj/Forwards/Expression.o obj/Forwards/Lexer.o obj/Forwards/Parser.o obj/Forwards/SpreadSheet.o obj/Forwards/CellRangeValue.o obj/Forwards/CellRefValue.o obj/Forwards/FloatValue.o obj/Forwards/NilValue.o obj/Forwards/StringValue.o | lib
+	x86_64-w64-mingw32-ar -rsc lib/Forwards.a obj/Forwards/*.o
+
+obj/Forwards/CallingContext.o: Forwards/src/Engine/CallingContext.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CallingContext.o Forwards/src/Engine/CallingContext.cpp
+
+obj/Forwards/CellRangeExpand.o: Forwards/src/Engine/CellRangeExpand.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CellRangeExpand.o Forwards/src/Engine/CellRangeExpand.cpp
+
+obj/Forwards/CellRefEval.o: Forwards/src/Engine/CellRefEval.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CellRefEval.o Forwards/src/Engine/CellRefEval.cpp
+
+obj/Forwards/Expression.o: Forwards/src/Engine/Expression.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/Expression.o Forwards/src/Engine/Expression.cpp
+
+obj/Forwards/Lexer.o: Forwards/src/Input/Lexer.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/Lexer.o Forwards/src/Input/Lexer.cpp
+
+obj/Forwards/Parser.o: Forwards/src/Parser/Parser.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/Parser.o Forwards/src/Parser/Parser.cpp
+
+obj/Forwards/SpreadSheet.o: Forwards/src/Parser/SpreadSheet.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/SpreadSheet.o Forwards/src/Parser/SpreadSheet.cpp
+
+obj/Forwards/CellRangeValue.o: Forwards/src/Types/CellRangeValue.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CellRangeValue.o Forwards/src/Types/CellRangeValue.cpp
+
+obj/Forwards/CellRefValue.o: Forwards/src/Types/CellRefValue.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CellRefValue.o Forwards/src/Types/CellRefValue.cpp
+
+obj/Forwards/FloatValue.o: Forwards/src/Types/FloatValue.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/FloatValue.o Forwards/src/Types/FloatValue.cpp
+
+obj/Forwards/NilValue.o: Forwards/src/Types/NilValue.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/NilValue.o Forwards/src/Types/NilValue.cpp
+
+obj/Forwards/StringValue.o: Forwards/src/Types/StringValue.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/StringValue.o Forwards/src/Types/StringValue.cpp
+
+
+bin:
+	mkdir bin
+
+lib:
+	mkdir lib
+
+obj/libbcnum:
+	mkdir -p obj/libbcnum
+
+obj/Backwards:
+	mkdir -p obj/Backwards
+
+obj/Forwards:
+	mkdir -p obj/Forwards

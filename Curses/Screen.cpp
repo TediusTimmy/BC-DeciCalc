@@ -498,7 +498,7 @@ int ProcessInput(SharedData& data)
        }
       else if ((c == KEY_BACKSPACE) || (c == '\b') || (c == 0177))
        {
-         if ("" != curCell->currentInput)
+         if (("" != curCell->currentInput) && (0U != data.editChar))
           {
             if (data.editChar == curCell->currentInput.size())
              {

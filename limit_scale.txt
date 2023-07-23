@@ -1,0 +1,7 @@
+set SETSCALE to function (x) is
+   set temp to EvalCell(x[0])
+   if temp < 10001 then
+      return SetDefaultPrecision(temp)
+   end
+   return SetDefaultPrecision(-1)
+end

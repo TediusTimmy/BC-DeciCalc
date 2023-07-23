@@ -158,6 +158,7 @@ namespace Engine
          context.pushCell(&newFrame);
             // Evaluate the new cell.
          context.topCell()->cell->inEvaluation = true;
+         context.topCell()->cell->recursed = false;
          OUT = value->evaluate(context);
          context.topCell()->cell->inEvaluation = false;
             // If we are doing regular evaluation passes, set this as the current value.

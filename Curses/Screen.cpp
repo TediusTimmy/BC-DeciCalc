@@ -123,6 +123,7 @@ void InitScreen(void)
    init_pair(2, COLOR_BLACK, COLOR_WHITE);
    init_pair(3, COLOR_WHITE, COLOR_BLACK);
    init_pair(4, COLOR_BLUE, COLOR_BLACK);
+   init_pair(5, COLOR_WHITE, COLOR_RED);
  }
 
 void UpdateScreen(SharedData& data)
@@ -166,7 +167,7 @@ void UpdateScreen(SharedData& data)
           }
          else
           {
-            attron(COLOR_PAIR(3));
+            attron(COLOR_PAIR(5));
             for (int i = x - 21; i > 0; --i) addch(' ');
             attron(COLOR_PAIR(2));
           }
@@ -333,12 +334,16 @@ void UpdateScreen(SharedData& data)
           {
             if ((data.c_col == cc) && (data.c_row == cr))
              {
-               attron(COLOR_PAIR(2));
+               attron(COLOR_PAIR(1));
                if (false == data.inputMode)
                 {
                   mx = (2 * cx + nextWidth) / 2; // Middle of the cell
                   my = j;
                 }
+             }
+            else if ((data.c_col == cc) || (data.c_row == cr))
+             {
+               attron(COLOR_PAIR(2));
              }
             else
              {
@@ -348,6 +353,10 @@ void UpdateScreen(SharedData& data)
             Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(cc, cr);
             if (nullptr != curCell)
              {
+               if (true == curCell->recursed)
+                {
+                  attron(COLOR_PAIR(5));
+                }
                if (nullptr != curCell->previousValue)
                 {
                   std::string content = curCell->previousValue->toString(data.c_col, data.c_row);
@@ -376,8 +385,9 @@ void UpdateScreen(SharedData& data)
                    }
                   printw("%s", content.c_str());
                 }
-               else if ("" != curCell->currentInput)
+               else if (("" != curCell->currentInput) || (nullptr != curCell->value.get()))
                 {
+                  attron(COLOR_PAIR(5));
                   for (int i = 0; i < static_cast<int>((nextWidth - 3) >> 1); ++i) addch(' ');
                   std::string temp = "***";
                   if (temp.size() > static_cast<size_t>(nextWidth)) temp = temp.substr(0U, nextWidth);
@@ -601,6 +611,7 @@ int ProcessInput(SharedData& data)
       else if ((c == '\n') || (c == '\r') || (c == KEY_ENTER))
        {
          data.inputMode = false;
+         curCell->previousValue.reset();
          data.context->theSheet->recalc(*data.context);
        }
       else if ((KEY_DOWN == c) || (KEY_UP == c) || (KEY_NPAGE == c) || (KEY_PPAGE == c))

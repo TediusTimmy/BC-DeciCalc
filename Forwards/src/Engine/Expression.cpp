@@ -172,6 +172,7 @@ namespace Engine
           {
             result = std::make_shared<Types::NilValue>();
           }
+         cell->recursed = true;
          return result;
        }
 
@@ -367,7 +368,7 @@ namespace Engine
              }
             else
              {
-               constructMessage("Divide by zero.");
+               constructMessage("Divide by zero");
              }
             break;
          case Types::NIL:

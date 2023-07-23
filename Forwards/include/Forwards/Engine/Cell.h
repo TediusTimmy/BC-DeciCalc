@@ -57,8 +57,9 @@ namespace Engine
       std::shared_ptr<Types::ValueType> previousValue;
       size_t previousGeneration;
       bool inEvaluation;
+      bool recursed;
 
-      Cell() : type(ERROR), previousGeneration(0U), inEvaluation(false) { }
+      Cell() : type(ERROR), previousGeneration(0U), inEvaluation(false), recursed(false) { }
     };
 
  } // namespace Engine

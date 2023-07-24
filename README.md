@@ -40,3 +40,16 @@ The following functions have been modified/removed/added:
 * NAN - removed
 * GETSCALE - gets the scale setting
 * SETSCALE - sets the scale setting
+
+New Standard Library
+--------------------
+
+The following functions are provided. EXP, SQRT, and LOG draw heavy inspiration from GNU bc's implementation of the same. I have no idea how ungodly precise POW makes arguments to produce good results.
+
+* EXP - The base of the natural logarithms raised to the argument power
+* LOG - The natural logarithm
+* SQRT - Square root
+* RAISE - The first argument raised to an integer power second argument
+* POW - The first argument raised to an arbitrary power second argument
+* PMT - (interest rate per repayment period; repayment periods; present value)
+

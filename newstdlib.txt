@@ -1,0 +1,259 @@
+set Exp to function (x) is
+
+   set sign to 0
+      (* exp(-x) == 1/exp(x) *)
+   if x < 0 then
+      set sign to 1
+      set x to -x
+   end
+
+   set scale to GetDefaultPrecision()
+      (* 0.44 is approx 1 / ln(10),
+         which appears to be a good estimate of the number of extra digits needed
+         as we square the summand about x times *)
+   set workingScale to scale + SetPrecision(Floor(0.44 * x); 0) + 1
+   set loops to 0
+
+      (* the scale manipulations I stole from GNU bc *)
+   call SetDefaultPrecision(GetPrecision(x) + 1)
+      (* Very common argument reduction: e^x == (e^(x/2))^2 *)
+   while x > 1 do
+      set loops to loops + 1
+      set x to x / 2
+      call SetDefaultPrecision(GetDefaultPrecision() + 1)
+   end
+
+      (* initialize variables *)
+   call SetDefaultPrecision(workingScale)
+   set sum to 0
+   set sumPrev to 1
+   set xn to 1
+   set nfact to 1
+   set n to 1
+
+      (* the Maclaurin series approximation for e^x *)
+   while sum <> sumPrev do
+      set sumPrev to sum
+      set sum to sum + xn / nfact
+      set xn to xn * x
+      set nfact to nfact * n
+      set n to n + 1
+   end
+
+      (* un-reduce the argument *)
+   while loops > 0 do
+      set loops to loops - 1
+      set sum to sum * sum
+   end
+
+      (* reset working scale and return *)
+   call SetDefaultPrecision(scale)
+   if sign then
+      return 1 / sum
+   end
+   return SetPrecision(sum; scale)
+end
+
+set EXP to function (x) is
+   return Exp(EvalCell(x[0]))
+end
+
+
+   (* raise an integer to a positive integer power
+      this function doesn't check its inputs and is, thus, not API *)
+set IntPow to function (x; y) is
+   set scale to GetDefaultPrecision()
+   set result to 1
+   set x to SetPrecision(x; 0)
+   set y to SetPrecision(y; 1)
+   call SetDefaultPrecision(1)
+
+   while y do
+      set y to y * .5
+      if 0 <> y - Floor(y) then
+         set result to result * x
+      end
+      set y to Floor(y)
+      set x to x * x
+   end
+
+   call SetDefaultPrecision(scale)
+   return result
+end
+
+   (* raise a number to an integer power *)
+set Raise to function (x; y) is
+
+   set sign to 0
+      (* x^-y == 1/x^y *)
+   if y < 0 then
+      set sign to 1
+      set y to -y
+   end
+
+   if 0 <> y - Floor(y) then
+      call Fatal("power is not integer")
+   end
+
+   set result to 0
+   set scaler to 1
+   if 0 <> GetPrecision(x) then
+      set scaler to GetPrecision(x)
+      set x to SetPrecision(x * IntPow(10; scaler); 0)
+      set scaler to IntPow(10; scaler * y)
+   end
+   set result to IntPow(x; y)
+
+   if sign then
+      return scaler / result
+   end
+   return result / scaler
+end
+
+set RAISE to function (x) is
+   return Raise(EvalCell(x[0]); EvalCell(x[1]))
+end
+
+
+   (* This is the function I was analyzing when I decided
+      I needed to rework how cells get computed. *)
+set Sqrt to function (x) is
+   if x < 0 then
+      call Fatal("imaginary result")
+   end
+
+   set scale to GetDefaultPrecision()
+   call SetDefaultPrecision(scale + 1)
+
+   set fx to 1
+   if x > fx then
+      set length to Length(ToString(x)) - GetPrecision(x) - 1
+      set fx to IntPow(10; Floor(length / 2))
+   end
+
+      (* If you use (fx^2 + x) / (2fx) then you may get stuck in a loop
+         (and that loop isn't very accurate) *)
+   set last to x
+   while 0 <> last - fx do
+      set last to fx
+         (* This is much more numerically stable than dividing by 2fx *)
+      set fx to (fx + x / fx) * .5
+   end
+
+   call SetDefaultPrecision(scale)
+   return SetPrecision(fx; scale)
+end
+
+set SQRT to function (x) is
+   return Sqrt(EvalCell(x[0]))
+end
+
+
+set Log to function (x) is
+   if x <= 0 then
+      call Fatal("domain error")
+   end
+
+   set scale to GetDefaultPrecision()
+   call SetDefaultPrecision(scale + 2)
+
+   set factor to 2
+   set extra to 0
+   while x >= 2 | x <= .5 do
+      set extra to extra + .5
+      call SetDefaultPrecision(scale + 2 + Floor(extra))
+      set factor to factor * 2
+      set x to Sqrt(x)
+   end
+
+   set n to (x - 1) / (x + 1)
+   set sum to n
+   set n2 to n * n
+   set i to 3
+   set change to 1
+   while change do
+      set n to n * n2
+      set change to n / i
+      set sum to sum + change
+      set i to i + 2
+   end
+
+   set sum to sum * factor
+
+   call SetDefaultPrecision(scale)
+   return SetPrecision(sum; scale)
+end
+
+set LOG to function (x) is
+   return Log(EvalCell(x[0]))
+end
+
+
+   (* raise a number to an arbitrary power
+      I don't trust it yet to give a correctly-rounded,
+      full-scale result from arbitrary inputs. *)
+set Pow to function (x; y) is
+   if 0 = y then
+      return SetPrecision(1; GetDefaultPrecision())
+   end
+   if 0 = x then
+      return SetPrecision(0; GetDefaultPrecision())
+   end
+
+   if 0 = y - Floor(y) then
+      return Raise(x; y)
+   end
+
+   if x < 0 then
+      call Fatal("power is not integer")
+   end
+
+   set scale to GetDefaultPrecision()
+   set extra to Ceil((GetPrecision(x) + GetPrecision(y)) * y)
+
+   call SetDefaultPrecision(scale + extra)
+
+   set result to Exp(Log(x) * y)
+
+   call SetDefaultPrecision(scale)
+   return SetPrecision(result; scale)
+end
+
+set POW to function (x) is
+   return Pow(EvalCell(x[0]); EvalCell(x[1]))
+end
+
+
+(*
+   Arg1 - interest rate per period
+   Arg2 - periods
+   Arg3 - present value
+
+   Say a $100,000 loan at 7.5% for 5 years would be:
+      @PMT( 7.5 / 100 / 12 ; 5 * 12 ; 100000 )
+   Note that the calculation is sensitive to the scale of the interest rate,
+   and the function tries to save you.
+   Say you use 0.00625, with a scale of 2 for the final result:
+      0.00625   gives 2003.81
+      0.006250  gives 2003.80
+      0.0062500 gives 2003.79 (which appears to be the correct result)
+*)
+set PMT to function (x) is
+
+      (* The calculation is sensitive to the scale of the interest rate. *)
+   set scale to GetDefaultPrecision()
+   if scale < 20 then
+      call SetDefaultPrecision(20)
+   end
+   set R to EvalCell(x[0])
+   call SetDefaultPrecision(scale)
+
+   set n to EvalCell(x[1])
+   set Pv to EvalCell(x[2])
+
+   call SetDefaultPrecision(GetPrecision(R))
+   set temp to Raise(1 + R; n)
+   call SetDefaultPrecision(scale)
+
+   return (Pv * R * temp) / (temp - 1)
+end

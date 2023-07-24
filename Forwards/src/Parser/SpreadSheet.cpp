@@ -112,7 +112,7 @@ namespace Engine
       CellFrame newFrame (cell, col, row);
 
          // If we have already evaluated this cell this generation, stop.
-      if ((context.generation == cell->previousGeneration) && (context.inUserInput == rethrow))
+      if (context.generation == cell->previousGeneration)
        {
          OUT = cell->previousValue;
          return result;
@@ -161,18 +161,16 @@ namespace Engine
          context.topCell()->cell->recursed = false;
          OUT = value->evaluate(context);
          context.topCell()->cell->inEvaluation = false;
-            // If we are doing regular evaluation passes, set this as the current value.
-         if (false == context.inUserInput)
-          {
-            context.topCell()->cell->previousGeneration = context.generation;
-            context.topCell()->cell->previousValue = OUT;
-          }
+         context.topCell()->cell->previousGeneration = context.generation;
+         context.topCell()->cell->previousValue = OUT;
          context.popCell();
        }
       catch (const std::exception& e)
        {
          result = e.what();
          context.topCell()->cell->inEvaluation = false;
+         context.topCell()->cell->previousGeneration = context.generation;
+         context.topCell()->cell->previousValue = OUT;
          context.popCell();
          if (true == rethrow)
           {

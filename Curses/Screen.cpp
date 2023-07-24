@@ -196,6 +196,7 @@ void UpdateScreen(SharedData& data)
          if ((Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
           {
             data.context->inUserInput = true;
+            --data.context->generation;
             std::shared_ptr<Forwards::Types::ValueType> result;
             std::string content = data.context->theSheet->computeCell(*data.context, result, data.c_col, data.c_row, false);
             if (nullptr != result.get())

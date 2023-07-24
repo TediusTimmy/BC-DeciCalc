@@ -1199,6 +1199,7 @@ TEST(EngineTests, testFinalConst)
    res = B4->evaluate(context);
    ASSERT_TRUE(typeid(Forwards::Types::NilValue) == typeid(*res.get()));
 
+   shet.sheet[1][1]->previousValue.reset();
    shet.sheet[1][1]->inEvaluation = true;
    res = A1->evaluate(context);
    ASSERT_TRUE(typeid(Forwards::Types::NilValue) == typeid(*res.get()));

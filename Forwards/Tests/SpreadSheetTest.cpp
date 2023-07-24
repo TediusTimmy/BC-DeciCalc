@@ -107,8 +107,8 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
 
    EXPECT_EQ(nullptr, cell->value.get()); // Post conditions: no change
    EXPECT_EQ(hello, cell->currentInput);
-   EXPECT_EQ(nullptr, cell->previousValue.get());
-   EXPECT_EQ(12U, cell->previousGeneration);
+   EXPECT_NE(nullptr, cell->previousValue.get()); // New post conditions : these are always updated.
+   EXPECT_EQ(1U, cell->previousGeneration);
 
    ASSERT_TRUE(typeid(Forwards::Types::StringValue) == typeid(*res.get())); // Returned hello
    EXPECT_EQ(hello, std::dynamic_pointer_cast<Forwards::Types::StringValue>(res)->value);
@@ -147,8 +147,7 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    EXPECT_EQ(nullptr, cell->previousValue.get());
    EXPECT_EQ(6U, cell->previousGeneration);
 
-   ASSERT_TRUE(typeid(Forwards::Types::StringValue) == typeid(*res.get())); // Returned hello
-   EXPECT_EQ(hello, std::dynamic_pointer_cast<Forwards::Types::StringValue>(res)->value);
+   ASSERT_EQ(nullptr, res.get());
  }
 
 TEST(EngineTests, testSpreadSheet_ParseCases)
@@ -183,8 +182,8 @@ TEST(EngineTests, testSpreadSheet_ParseCases)
 
    EXPECT_EQ(nullptr, cell->value.get()); // Post conditions: no change
    EXPECT_EQ("12 * 3", cell->currentInput);
-   EXPECT_EQ(nullptr, cell->previousValue.get());
-   EXPECT_EQ(0U, cell->previousGeneration);
+   EXPECT_NE(nullptr, cell->previousValue.get()); // New post conditions : these are always updated.
+   EXPECT_EQ(1U, cell->previousGeneration);
 
    ASSERT_TRUE(typeid(Forwards::Types::FloatValue) == typeid(*res.get())); // Returned 36.0
    EXPECT_EQ(BigInt::Fixed("36"), std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value);
@@ -224,6 +223,7 @@ TEST(EngineTests, testSpreadSheet_ExceptionCases)
    EXPECT_EQ("Error adding Float to String at 3", shet.computeCell(context, res, 1U, 1U, false));
    EXPECT_EQ(nullptr, res.get());
 
+   ++context.generation;
    EXPECT_THROW(shet.computeCell(context, res, 1U, 1U, true), Backwards::Types::TypedOperationException);
 
     {
@@ -256,6 +256,7 @@ TEST(EngineTests, testSpreadSheet_ExceptionCases)
 
       cell->currentInput = "@BAD";
 
+      ++context.generation;
       EXPECT_EQ("Error adding Float to String", shet.computeCell(context, res, 1U, 1U, false));
       EXPECT_EQ(nullptr, res.get());
     }

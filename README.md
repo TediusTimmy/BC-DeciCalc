@@ -7,6 +7,8 @@ POSIX rules: The scale of addition and subtraction is the max of the scale of th
 
 Differences from POSIX bc: The default rounding mode is ties to even, and all operations are rounded.
 
+New changes July 2023: I simplified the code to recalculate a cell. It no longer recurses nearly so much. Hopefully, the program will be more performant without too much of a loss in usability. Look at `AppKiller.html` for an example spreadsheet that really killed the program: it's a simple sheet to compute multiple iterations of Newton's Method.
+
 
 Limitations
 -----------

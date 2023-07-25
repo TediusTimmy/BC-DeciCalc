@@ -189,9 +189,7 @@ set LOG to function (x) is
 end
 
 
-   (* raise a number to an arbitrary power
-      I don't trust it yet to give a correctly-rounded,
-      full-scale result from arbitrary inputs. *)
+   (* raise a number to an arbitrary power *)
 set Pow to function (x; y) is
    if 0 = y then
       return SetPrecision(1; GetDefaultPrecision())
@@ -208,14 +206,26 @@ set Pow to function (x; y) is
       call Fatal("power is not integer")
    end
 
+   set sign to 0
+   if y < 0 then
+      set sign to 1
+      set y to -y
+   end
+
    set scale to GetDefaultPrecision()
-   set extra to Ceil((GetPrecision(x) + GetPrecision(y)) * y)
+   set yi to Floor(y)
+   call SetDefaultPrecision(scale + 2)
+   set ipart to Raise(x; yi)
+      (* To compute a correct multiplication, we need the same number of
+         fractional digits as we have integral digits *)
+   call SetDefaultPrecision(Length(ToString(ipart)) + Length(ToString(x)) - GetPrecision(x))
 
-   call SetDefaultPrecision(scale + extra)
-
-   set result to Exp(Log(x) * y)
+   set result to Exp(Log(x) * (y - Floor(y))) * ipart
 
    call SetDefaultPrecision(scale)
+   if sign then
+      return 1 / result
+   end
    return SetPrecision(result; scale)
 end
 

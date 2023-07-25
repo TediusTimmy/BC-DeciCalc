@@ -44,7 +44,7 @@ The following functions have been modified/removed/added:
 New Standard Library
 --------------------
 
-The following functions are provided. EXP, SQRT, and LOG draw heavy inspiration from GNU bc's implementation of the same. I have no idea how ungodly precise POW makes arguments to produce good results.
+The following functions are provided. EXP, SQRT, and LOG draw heavy inspiration from GNU bc's implementation of the same. I have no idea how ungodly precise POW makes arguments to produce good results (but I did make it a smaller number than my first attempt).
 
 * EXP - The base of the natural logarithms raised to the argument power
 * LOG - The natural logarithm

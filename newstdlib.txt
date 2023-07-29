@@ -243,10 +243,6 @@ end
       @PMT( 7.5 / 100 / 12 ; 5 * 12 ; 100000 )
    Note that the calculation is sensitive to the scale of the interest rate,
    and the function tries to save you.
-   Say you use 0.00625, with a scale of 2 for the final result:
-      0.00625   gives 2003.81
-      0.006250  gives 2003.80
-      0.0062500 gives 2003.79 (which appears to be the correct result)
 *)
 set PMT to function (x) is
 
@@ -262,6 +258,9 @@ set PMT to function (x) is
    set Pv to EvalCell(x[2])
 
    call SetDefaultPrecision(GetPrecision(R))
+   if GetDefaultPrecision() < 20 then
+      call SetDefaultPrecision(20)
+   end
    set temp to Raise(1 + R; n)
    call SetDefaultPrecision(scale)
 

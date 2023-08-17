@@ -209,8 +209,10 @@ set Pow to function (x; y) is
    set scale to GetDefaultPrecision()
    call SetDefaultPrecision(scale + 2)
 
+   set z to 0
    if x < 1 then
       call SetDefaultPrecision(scale + 4)
+      set z to x
       set x to 1 / x
       set y to -y
    end
@@ -227,6 +229,10 @@ set Pow to function (x; y) is
          fractional digits as we have integral digits *)
    call SetDefaultPrecision(Length(ToString(ipart)))
 
+   if z then
+      set x to 1 / z
+      set ipart to Raise(x; yi)
+   end
    set result to Exp(Log(x) * (y - yi)) * ipart
 
    call SetDefaultPrecision(scale)

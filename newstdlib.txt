@@ -206,26 +206,30 @@ set Pow to function (x; y) is
       call Fatal("power is not integer")
    end
 
-   set sign to 0
-   if y < 0 then
-      set sign to 1
+   set scale to GetDefaultPrecision()
+   call SetDefaultPrecision(scale + 2)
+
+   if x < 1 then
+      call SetDefaultPrecision(scale + 4)
+      set x to 1 / x
       set y to -y
    end
 
-   set scale to GetDefaultPrecision()
+   if y < 0 then
+      set result to Exp(y * Log(x))
+      call SetDefaultPrecision(scale)
+      return SetPrecision(result; scale)
+   end
+
    set yi to Floor(y)
-   call SetDefaultPrecision(scale + 2)
    set ipart to Raise(x; yi)
       (* To compute a correct multiplication, we need the same number of
          fractional digits as we have integral digits *)
-   call SetDefaultPrecision(Length(ToString(ipart)) + Length(ToString(x)) - GetPrecision(x))
+   call SetDefaultPrecision(Length(ToString(ipart)))
 
-   set result to Exp(Log(x) * (y - Floor(y))) * ipart
+   set result to Exp(Log(x) * (y - yi)) * ipart
 
    call SetDefaultPrecision(scale)
-   if sign then
-      return 1 / result
-   end
    return SetPrecision(result; scale)
 end
 

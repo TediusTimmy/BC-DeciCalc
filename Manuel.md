@@ -17,7 +17,7 @@ The rules for the number of digits past the decimal point that operations will r
 | Multiplication | `min(a + b, max(a, b, s))` |
 | Division | `s` |
 
-Exponentiation and remainder are not native operations in the spreadsheet. These rules allow repeated multiplication operations to converge on the global scale variable, while allowing parallel computations that have increased precision (so long as division isn't used). Also note that the number system is not closed under division, and that division throws an error, which kills all current processing, rather than returning an error value.
+Exponentiation and remainder are not native operations in the spreadsheet. These rules allow repeated multiplication operations to converge on the global scale variable, while allowing parallel computations that have increased precision (so long as division isn't used). Also note that the number system is not closed under division, and that division by zero throws an error, which kills all current processing, rather than returning an error value.
 
 The biggest difference between this implementation of BCMath and POSIX bc is that all operations are rounded. The default rounding mode is TIES TO EVEN. This can be changed (but it's not intuitive).
 
@@ -110,7 +110,7 @@ This adds some transcendental functions that I didn't want to include at first. 
 
 # Backwards
 
-All of the scripting utilizes this language called Backwards. All functions that are exposed to the spreadsheet must have a name that is ALL CAPS and contain no numbers or underscores. This function must take one argument, and the argument is the array of arguments. Note, that it does lazy evaluation, so only the arguments to a function call that the function explicitly asks for will be evaluated.
+All of the scripting utilizes this language called Backwards. All functions that are exposed to the spreadsheet must have a name that is ALL CAPS and contain no numbers or underscores. This function must take one argument, and the argument is the array of arguments. Note, that it does lazy evaluation, so only the arguments to a function call that the function explicitly asks for will be evaluated. Also, also note: there is no way for a function to change the value of a cell except by returning the value that the current cell ought to have; there is no way for a function to look up the value of an arbitrary cell, all cells that it is to consider MUST be passed to it.
 
 Example:  
 ```
@@ -122,7 +122,7 @@ set IF to function (x) is
 end
 ```
 
-Note that the call `@IF(3;5;1/0)` is completely valid. The 'then' clause will not be evaluated because it is never used, so the division-by-zero exception is never thrown.
+Note that the call `@IF(3;5;1/0)` is completely valid. The 'else' clause will not be evaluated because it is never used, so the division-by-zero exception is never thrown.
 
 ## The Language
 This is the language as implemented. Some of the GoogleTests have good examples, others, not so much.

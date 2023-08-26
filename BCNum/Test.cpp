@@ -719,3 +719,15 @@ TEST(FixedTests, testNewRoundFunction)
    test.fromString("200.8675");
    EXPECT_EQ("201.0000", test.roundToInteger(BigInt::ROUND_TIES_EVEN).toString());
  }
+
+TEST(FixedTests, testZeros)
+ {
+   BigInt::Fixed test (0LL, 2U);
+   EXPECT_EQ("0.00", test.toString());
+   test = -test;
+   EXPECT_EQ("0.00", test.toString());
+   EXPECT_EQ(0, test.roundToInteger().toInt());
+
+   test = BigInt::Fixed("10000000000000000000000000");
+   EXPECT_EQ(0, test.roundToInteger().toInt());
+ }

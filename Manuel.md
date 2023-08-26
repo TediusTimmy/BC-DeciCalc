@@ -48,7 +48,7 @@ Cons:
 
 ## Navigating the Spreadsheet
 
-Most of the navigation and commands are taken from the Unix tool `sc`. The tool `sc` was originally written with `vi` users in mind, and many choices reflect that.
+Most of the navigation and commands are taken from the Unix tool `sc`. The tool `sc` was originally written with `vi` users in mind, and many choices reflect that. The color scheme, and that F7 exits, is taken from WordPerfect.
 
 ### Commands
 * Arrow keys : navigate.

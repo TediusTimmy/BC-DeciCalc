@@ -7,7 +7,7 @@ To unpack the term "arbitrary-precision decimal fixed-point":
 * "decimal" means that math is performed in a manner consistent with it being done with ten digits (basically, how _you_ would probably do it)
 * "fixed-point" means that it handles fractional numbers by computing some 'fixed' number of digits past the decimal point (so, one-half is .500... and one-third is .333...)
 
-As the README states, "arbitrary" is probably somewhere in the hundred million digit range for a modern 64-bit computer.
+As the README states, "arbitrary" is probably somewhere in the hundred million digit range for a modern 32-bit computer (and probably your limit of patience for a 64-bit computer).
 
 The rules for the number of digits past the decimal point that operations will result in can be found in the POSIX standard for bc. This is notably different from how Java's BigDecimal handles results, which follows the rules of the language Rexx. In the bc environment, there is a global "scale" variable. This is kept (and is probably a bottleneck to the program ever running "fast"). The rules are, assuming two numbers `A` and `B`, which have scales `a` and `b`, respectively, and the global scale variable `s`:
 
@@ -20,6 +20,22 @@ The rules for the number of digits past the decimal point that operations will r
 Exponentiation and remainder are not native operations in the spreadsheet. These rules allow repeated multiplication operations to converge on the global scale variable, while allowing parallel computations that have increased precision (so long as division isn't used). Also note that the number system is not closed under division, and that division by zero throws an error, which kills all current processing, rather than returning an error value.
 
 The biggest difference between this implementation of BCMath and POSIX bc is that all operations are rounded. The default rounding mode is TIES TO EVEN. This can be changed (but it's not intuitive).
+
+
+#### Why fixed-point?
+
+If we look at the motivation behind [PEP 327](https://peps.python.org/pep-0327/#motivation), we see that one intent of implementing decimal was for monetary considerations. And that is why I went with fixed-point: the amount of wrapper code for doing money with arbitrary-precision fixed-point is less than that for doing money with arbitrary-precision floating-point. With fixed-point, you already know the scale that you care about, and you let the number grow in the direction you don't care about (you care about the number of digits to the right of the decimal point, and don't care how the number grows to the left). With floating-point, you have to check every operation for the inexact flag and raise the working precision in order to maintain your pennies.
+
+The other consideration I had was logarithmic encoding. If you look at [this issue](https://github.com/gavinhoward/bc/issues/66), the individual wants `((169287^137)^920)^13256118217109` or `169287^1670801140084418360`. The only way to handle that with most modern computers is by computing the logarithm. Or, you have Matt Parker's `pi^pi^pi^pi` [video](https://www.youtube.com/watch?v=BdHFLfv-ThQ). Or [Austin trying to compute the number of states of the Minecraft world](https://www.youtube.com/watch?v=kgveHrqM9KI). It is easier to deal with these numbers as the logarithm of the number. In this encoding, the scale of the number (the number of digits in the mantissa) is the precision of the significand in a floating-point number with an arbitrary-precision exponent. (And now you know why the significand of a floating-point number is often called the mantissa: this relationship.)
+
+The only real issue is that scale is not as intuitive for algorithms. Mainly significant figures: floating-point at the limit of precision better follows significant figures rules. Take the `Pow(x;y)` function. The naive approach is `Exp(y*Log(x))`. If you analyze the results of `Pow(1024;32.1)` (which is the EXACT value `2^321`) by increasing and decreasing the working scale, you find a direct link between the digits of scale and the correct digits of the result. If you are working in precision, as in arbitrary-precision floating-point, then this mathematical relationship just works. When working in scale, extra work needs to be done due to significant figures.
+
+Pros:
+* Better fit for money
+* Better fit for logarithmic encoding
+
+Cons:
+* Not as intuitive for significant figures
 
 
 ## Starting the Program

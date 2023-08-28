@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SAVEFILE_H
 #define SAVEFILE_H
 
-void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet*);
-void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet*);
+void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet*, const std::map<std::size_t, int>& map, int def);
+void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet*, std::map<std::size_t, int>& map);
 
 #endif /* SAVEFILE_H */

@@ -106,9 +106,9 @@ set INT to function (x) is
    set temp to EvalCell(x[0])
    if !IsNil(temp) then
       if temp < 0 then
-         set temp to Ceil(temp)
+         set temp to SetPrecision(Ceil(temp); 0)
       else
-         set temp to Floor(temp)
+         set temp to SetPrecision(Floor(temp); 0)
       end
    end
    return temp
@@ -117,7 +117,7 @@ end
 set ROUND to function (x) is
    set temp to EvalCell(x[0])
    if !IsNil(temp) then
-      set temp to Round(temp)
+      set temp to SetPrecision(Round(temp); 0)
    end
    return temp
 end

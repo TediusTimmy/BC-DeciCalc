@@ -63,6 +63,27 @@ int main (int argc, char ** argv)
 
    int file = LoadLibraries(argc, argv, context);
 
+
+   SharedData state;
+
+   state.c_row = 0U;
+   state.c_col = 0U;
+   state.tr_row = 0U;
+   state.tr_col = 0U;
+
+   state.inputMode = false;
+   state.insertMode = true;
+   state.useComma = false;
+
+   state.def_col_width = DEF_COLUMN_WIDTH;
+
+   state.yankedType = Forwards::Engine::ERROR;
+
+   state.context = &context;
+
+   state.saveRequested = false;
+
+
    std::string saveFileName = "untitled.html";
    if (file < argc)
     {
@@ -75,28 +96,8 @@ int main (int argc, char ** argv)
          saveFileName = argv[file];
        }
 
-      LoadFile(argv[file], &sheet);
+      LoadFile(argv[file], &sheet, state.col_widths);
     }
-
-   SharedData state;
-
-
-   state.c_row = 0U;
-   state.c_col = 0U;
-   state.tr_row = 0U;
-   state.tr_col = 0U;
-
-   state.inputMode = false;
-   state.insertMode = true;
-   state.useComma = false;
-
-   state.def_col_width = 9;
-
-   state.yankedType = Forwards::Engine::ERROR;
-
-   state.context = &context;
-
-   state.saveRequested = false;
 
 
    if (0U != sheet.max_row) // We loaded saved data, so recalculate the sheet.
@@ -112,7 +113,7 @@ int main (int argc, char ** argv)
       UpdateScreen(state);
       if (true == state.saveRequested)
        {
-         SaveFile(saveFileName, &sheet);
+         SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width);
          state.saveRequested = false;
        }
     }
@@ -120,8 +121,18 @@ int main (int argc, char ** argv)
 
    if (true == state.saveRequested)
     {
-      SaveFile(saveFileName, &sheet);
+      SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width);
       state.saveRequested = false;
+    }
+
+   if (false == logger.logs.empty())
+    {
+      std::cerr << "These messages were logged:" << std::endl;
+      for (const auto& bob : logger.logs)
+       {
+         std::cerr << bob << std::endl;
+       }
+      logger.logs.clear();
     }
 
    return 0;

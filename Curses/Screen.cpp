@@ -442,19 +442,26 @@ size_t CountColumns(SharedData& data, size_t fromHere, int x)
    return tc;
  }
 
-size_t CountColumnsLeft(SharedData& data, int x)
+size_t CountColumnsLeft(SharedData& data, size_t fromHere, int x)
  {
    size_t tc = 0U;
-   size_t cc = MAX_COL;
+   size_t cc = fromHere;
    int cx = 3;
    for (;;)
     {
       int nextWidth = getWidth(data.col_widths, cc, data.def_col_width);
-      --cc;
       if (cx + nextWidth <= x)
        {
          ++tc;
          cx += nextWidth;
+       }
+      else
+       {
+         break;
+       }
+      if (0U != cc)
+       {
+         --cc;
        }
       else
        {
@@ -652,7 +659,7 @@ int ProcessInput(SharedData& data)
       GetRC(temp, col, row);
       if ((-1 == col) || (-1 == row))
          break;
-      size_t cl = CountColumnsLeft(data, x);
+      size_t cl = CountColumnsLeft(data, MAX_COL, x);
       data.c_col = col;
       data.tr_col = col;
       data.c_row = row;
@@ -661,6 +668,7 @@ int ProcessInput(SharedData& data)
       if ((data.tr_row + y - 4) > MAX_ROW) data.tr_row = MAX_ROW - y + 5;
     }
       break;
+   case 'j':
    case KEY_DOWN:
       if (MAX_ROW != data.c_row)
        {
@@ -668,6 +676,7 @@ int ProcessInput(SharedData& data)
          if ((static_cast<int>(data.c_row - data.tr_row)) >= (y - 4)) ++data.tr_row;
        }
       break;
+   case 'k':
    case KEY_UP:
       if (0U != data.c_row)
        {
@@ -675,6 +684,7 @@ int ProcessInput(SharedData& data)
          if (data.c_row < data.tr_row) --data.tr_row;
        }
       break;
+   case 'h':
    case KEY_LEFT:
       if (0U != data.c_col)
        {
@@ -682,6 +692,7 @@ int ProcessInput(SharedData& data)
          if (data.c_col < data.tr_col) --data.tr_col;
        }
       break;
+   case 'l':
    case KEY_RIGHT:
       if (MAX_COL != data.c_col)
        {
@@ -689,6 +700,7 @@ int ProcessInput(SharedData& data)
          if ((data.c_col - data.tr_col) >= tc) ++data.tr_col;
        }
       break;
+   case 'J':
    case KEY_NPAGE:
       data.c_row += (y - 4);
       data.tr_row += (y - 4);
@@ -701,8 +713,9 @@ int ProcessInput(SharedData& data)
          data.tr_row = MAX_ROW - y + 5;
        }
       break;
+   case 'K':
    case KEY_PPAGE:
-      if (data.c_row < static_cast<size_t>((y - 4)))
+      if (data.c_row < static_cast<size_t>(y - 4))
        {
          data.c_row = 0U;
          data.tr_row = 0U;
@@ -711,6 +724,31 @@ int ProcessInput(SharedData& data)
        {
          data.c_row -= (y - 4);
          data.tr_row -= (y - 4);
+       }
+      break;
+   case 'H':
+       {
+         size_t cl = CountColumnsLeft(data, data.tr_col, x);
+         if (data.tr_col > cl)
+          {
+            data.tr_col -= cl;
+            data.c_col = data.tr_col;
+          }
+         else
+          {
+            data.c_col = 0;
+            data.tr_col = 0;
+          }
+       }
+      break;
+   case 'L':
+      data.tr_col += tc;
+      data.c_col = data.tr_col;
+      if (data.tr_col > MAX_COL)
+       {
+         size_t cl = CountColumnsLeft(data, MAX_COL, x);
+         data.c_col = MAX_COL;
+         data.tr_col = MAX_COL - cl + 1;
        }
       break;
    case KEY_HOME:
@@ -766,10 +804,22 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'd':
-      if ('d' == getch())
+      c = getch();
+      switch (c)
        {
+      case 'd':
          data.context->theSheet->removeCellAt(data.c_col, data.c_row);
          data.context->theSheet->recalc(*data.context);
+         break;
+      case 'c':
+         data.context->theSheet->sheet[data.c_col].clear();
+         break;
+      case 'r':
+         for (size_t i = 0U; i < data.context->theSheet->sheet.size(); ++i)
+          {
+            data.context->theSheet->removeCellAt(i, data.c_row);
+          }
+         break;
        }
       break;
    case 'y':
@@ -882,6 +932,67 @@ int ProcessInput(SharedData& data)
        }
       data.inputMode = true;
     }
+      break;
+   case ':':
+      c = getch();
+      switch (c)
+       {
+      case ')':
+         data.c_col = 0U;
+         data.tr_col = 0U;
+         break;
+      case '^':
+         data.c_row = 0U;
+         data.tr_row = 0U;
+         break;
+      case '$':
+       {
+         size_t maxCol = data.context->theSheet->sheet.size();
+         while (nullptr == data.context->theSheet->getCellAt(maxCol, data.c_row))
+          {
+            if (0U != maxCol)
+             {
+               --maxCol;
+             }
+            else
+             {
+               break;
+             }
+          }
+         data.c_col = maxCol;
+         data.tr_col = data.c_col - CountColumnsLeft(data, data.c_col, x) + 1;
+       }
+         break;
+      case '#':
+       {
+         size_t maxRow = 0U;
+         if (data.c_col < data.context->theSheet->sheet.size())
+          {
+            maxRow = data.context->theSheet->sheet[data.c_col].size();
+          }
+         while (nullptr == data.context->theSheet->getCellAt(data.c_col, maxRow))
+          {
+            if (0 != maxRow)
+             {
+               --maxRow;
+             }
+            else
+             {
+               break;
+             }
+          }
+         data.c_row = maxRow;
+         if (maxRow < static_cast<size_t>(y - 4))
+          {
+            data.tr_row = 0U;
+          }
+         else
+          {
+            data.tr_row = maxRow - y + 5;
+          }
+       }
+         break;
+       }
       break;
     }
 

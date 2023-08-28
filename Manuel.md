@@ -51,8 +51,9 @@ Cons:
 Most of the navigation and commands are taken from the Unix tool `sc`. The tool `sc` was originally written with `vi` users in mind, and many choices reflect that. The color scheme, and that F7 exits, is taken from WordPerfect.
 
 ### Commands
-* Arrow keys : navigate.
-* Page Up / Page Down : move to the next screen of rows.
+* Arrow keys : navigate. One can also use the vi keys `hjkl`.
+* Page Up / Page Down : move to the next screen of rows. One can also use `JK`.
+* `H` / `L` : move to the next screen of columns.
 * Home : goto cell A1
 * `g` : type in a cell name, then enter, and the current cell cursor will be moved to that cell. Note that you cannot see the cell name that you are typing.
 * `<` : start entering a label in this cell. Finish by pressing enter. (There are no centered or right-justified labels.)
@@ -61,15 +62,21 @@ Most of the navigation and commands are taken from the Unix tool `sc`. The tool 
 * `!` : recalculate the sheet
 * `W` : save the sheet
 * `dd` : delete the current cell
+* `dr` : delete all cells in the current row
+* `dc` : delete all cells in the current column
 * `yy` : copy the current cell
 * `pp` : paste the current cell
 * `e` : edit the current cell's contents
-* Shift left/right (also F9/F12) : widen or narrow the current column. Columns can be between 1 and 40 cells wide. This is not a saved setting.
+* Shift left/right (also F9/F12) : widen or narrow the current column. Columns can be between 1 and 40 cells wide.
 * `#` : Switch between column-major and row-major recalculation.
 * `$` : Switch between top-to-bottom and bottom-to-top recalculation.
 * `%` : Switch between left-to-right and right-to-left recalculation.
 * `,` : Toggle between using ',' and '.' as the decimal separator. This is not a saved setting.
 * `+` : If the current cell is empty, start entering a formula in this cell, else enter edit mode and append to this cell. If the current cell is a formula, append a '+' to the formula.
+* `:)` : Goto column A of the current row. (This is actually `0`, but I don't like lifting my finger from the shift key.)
+* `:$` : Goto the last column of the current row with meaningful data in it.
+* `:^` : Goto row 1 of the current column.
+* `:#` : Goto the last row of the current column with meaningful data in it.
 
 ### Edit Mode
 Edit mode is entered when you start entering a label or formula.
@@ -106,8 +113,8 @@ The following functions are all that is implemented. It is a curated list from t
 * COUNT (%)
 * AVERAGE (%) - literally SUM / COUNT
 * ABS - absolute value
-* INT - truncate to integer
-* ROUND - round to integer (ties away from zero)
+* INT - truncate to integer (return value has scale 0)
+* ROUND - round to integer (ties away from zero) (return value has scale 0)
 * GETSCALE - gets the scale setting
 * SETSCALE - sets the scale setting
 

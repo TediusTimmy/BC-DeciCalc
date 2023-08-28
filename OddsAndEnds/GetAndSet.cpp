@@ -42,13 +42,21 @@ int getWidth(const std::map<std::size_t, int>& map, std::size_t col, int def)
    return def;
  }
 
+void setWidth(std::map<std::size_t, int>& map, std::size_t col, int width)
+ {
+   if ((width >= MIN_COLUMN_WIDTH) && (width <= MAX_COLUMN_WIDTH))
+    {
+      map[col] = width;
+    }
+ }
+
 void incWidth(std::map<std::size_t, int>& map, std::size_t col, int def)
  {
    if (map.end() == map.find(col))
     {
       map[col] = def;
     }
-   if (40U != map[col])
+   if (MAX_COLUMN_WIDTH != map[col])
     {
       ++map[col];
     }
@@ -60,7 +68,7 @@ void decWidth(std::map<std::size_t, int>& map, std::size_t col, int def)
     {
       map[col] = def;
     }
-   if (1U != map[col])
+   if (MIN_COLUMN_WIDTH != map[col])
     {
       --map[col];
     }

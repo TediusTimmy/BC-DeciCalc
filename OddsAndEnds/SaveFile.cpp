@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Forwards/Parser/Parser.h"
 
+#include "GetAndSet.h"
+
 static void replaceAll(std::string& in, char ch, const std::string& with)
  {
    size_t c;
@@ -60,7 +62,7 @@ static std::string harden(const std::string& in)
    return result;
  }
 
-void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theSheet)
+void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theSheet, const std::map<std::size_t, int>& map, int def)
  {
    std::ofstream file (fileName.c_str(), std::ios::out);
    for (auto& column : theSheet->sheet)
@@ -90,7 +92,19 @@ void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theShe
    size_t col = 0U;
    for (auto& column : theSheet->sheet)
     {
-      file << "   <tr>";
+      int width = getWidth(map, col, def);
+      if (width == def)
+       {
+         file << "   <tr>";
+       }
+      else
+       {
+         file << "   <tr width=\"" << width << "\">";
+       }
+      if (0U == column.size())
+       {
+         file << "<td />"; // Insert one cell so that web browsers render the column.
+       }
       size_t row = 0U;
       for (auto& cell : column)
        {
@@ -146,7 +160,7 @@ static std::string soften(const std::string& in)
    return result;
  }
 
-void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet)
+void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet, std::map<std::size_t, int>& map)
  {
    std::ifstream file (fileName.c_str(), std::ios::in);
    if (!file.good())
@@ -185,6 +199,35 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet)
     {
       size_t row = 0U;
       size_t n = curCol.find("<tr>");
+      if (std::string::npos == n) // Does this column have attributes?
+       {
+         n = curCol.find("<tr ");
+         if (std::string::npos != n) // Yes
+          {
+            size_t a = curCol.find("width=\"", n);
+            if (std::string::npos != a)
+             {
+               try
+                {
+                  int width = std::stoi(curCol.substr(a + 7, curCol.find('"', a + 7)));
+                  setWidth(map, col, width);
+                }
+               catch (const std::invalid_argument&)
+                {
+                }
+               catch (const std::out_of_range&)
+                {
+                }
+             }
+
+               // Set the next read position after the end of the current tag.
+            n = curCol.find('>', n);
+            if (std::string::npos != n)
+             {
+               n -= 4U;
+             }
+          }
+       }
 
       if (std::string::npos != n)
        {
@@ -234,8 +277,16 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet)
              }
             else
              {
-                  // Skip junk.
-               n = curCol.find('<', n);
+                  // Skip junk. And don't get stuck in an infinite loop on a tag we don't understand.
+               size_t newn = curCol.find('<', n);
+               if (n != newn)
+                {
+                  n = newn;
+                }
+               else
+                {
+                  ++n;
+                }
              }
           }
        }

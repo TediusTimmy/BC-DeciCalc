@@ -11,6 +11,8 @@ Differences from POSIX bc: The default rounding mode is ties to even, and all op
 
 New changes July 2023: I simplified the code to recalculate a cell. It no longer recurses nearly so much. Hopefully, the program will be more performant without too much of a loss in usability. Look at `AppKiller.html` for an example spreadsheet that really killed the program: it's a simple sheet to compute multiple iterations of Newton's Method.
 
+New changes August 2023: The save file format has been modified in a backwards-compatible manner. However, new save files will load with missing columns with the older software.
+
 
 Limitations
 -----------

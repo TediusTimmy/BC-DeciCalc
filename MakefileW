@@ -14,6 +14,7 @@ endif
 
 ifeq "$(MAKECMDGOALS)" "debug"
    CFLAGS += -O0 -g
+   BFLAGS += -static
 endif
 
 .PHONY: all clean release debug

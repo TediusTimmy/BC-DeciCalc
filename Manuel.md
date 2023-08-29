@@ -40,8 +40,9 @@ Cons:
 
 ## Starting the Program
 
-* The only accepted argument is `-l`, which specifies a Backwards library file to load.
-* The first argument after all specified libraries is a file to load. If no file is loaded, then an empty spreadsheet is given.
+* The first accepted argument is `-l`, which specifies a Backwards library file to load. There can be a chain of multiple libraries, however: `-l MyBetterLib.txt -l TheBaseLibrarySucks.txt`. These must be at the begining.
+* The next accepted argument is `-b`, which initiates batch mode. For each `-b` argument, the next argument is expected to be a formula to evaluate. The program will evaluate each batch command and then stop before entering interactive mode. This can be used to: use DeciCalc as a command-line calculator; query the contents of a spreadsheet from a shell script; or output the value of a cell whose contents are too large to see in interactive mode.
+* The first argument after all explicit arguments is a file to load. If no file is loaded, then an empty spreadsheet is given.
 * The second argument is the file name to use to save files. If no second argument is specified, then the file is saved with the name of the file read in. If NO file name is specified, then the name "untitled.html" is used.
 * Any other arguments are ignored.
 

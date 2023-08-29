@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Forwards/Types/ValueType.h"
 
+#include "BatchMode.h"
 #include "GetAndSet.h"
 #include "LibraryLoader.h"
 #include "SaveFile.h"
@@ -61,7 +62,10 @@ int main (int argc, char ** argv)
    Forwards::Engine::GetterMap map;
    context.map = &map;
 
+   std::list<std::string> batches;
+
    int file = LoadLibraries(argc, argv, context);
+   file = ReadBatches(argc, argv, file, batches);
 
 
    SharedData state;
@@ -103,6 +107,13 @@ int main (int argc, char ** argv)
    if (0U != sheet.max_row) // We loaded saved data, so recalculate the sheet.
     {
       sheet.recalc(context);
+    }
+
+
+   if (false == batches.empty())
+    {
+      RunBatches(batches, context);
+      return 0;
     }
 
 

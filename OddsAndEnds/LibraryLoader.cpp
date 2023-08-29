@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "StdLib.h"
 
-static void dumpLog(Backwards::Engine::Logger& logger)
+void dumpLog(Backwards::Engine::Logger& logger)
  {
    try
     {
@@ -87,50 +87,47 @@ int LoadLibraries (int argc, char ** argv, Forwards::Engine::CallingContext& con
     }
 
    int i = 1;
-   if (argc > 1)
+   while (i < argc)
     {
-      while (i < argc)
+      if (std::string("-l") == argv[i])
        {
-         if (std::string("-l") == argv[i])
+         ++i;
+         if (i < argc)
           {
-            ++i;
-            if (i < argc)
-             {
-               Backwards::Input::FileInput console (argv[i]);
-               Backwards::Input::Lexer lexer (console, argv[i]);
+            Backwards::Input::FileInput console (argv[i]);
+            Backwards::Input::Lexer lexer (console, argv[i]);
 
-               std::shared_ptr<Backwards::Engine::Statement> res = Backwards::Parser::Parser::ParseFunctions(lexer, table, *context.logger);
-               if (nullptr == res.get())
+            std::shared_ptr<Backwards::Engine::Statement> res = Backwards::Parser::Parser::ParseFunctions(lexer, table, *context.logger);
+            if (nullptr == res.get())
+             {
+               std::cerr << "Error processing file: " << argv[i] << std::endl;
+               dumpLog(*context.logger);
+             }
+            else
+             {
+               try
                 {
+                  res->execute(context);
+                }
+               catch (const Backwards::Types::TypedOperationException& e)
+                {
+                  std::cerr << "Caught runtime exception: " << e.what() << std::endl;
                   std::cerr << "Error processing file: " << argv[i] << std::endl;
                   dumpLog(*context.logger);
                 }
-               else
+               catch (const Backwards::Engine::FatalException& e)
                 {
-                  try
-                   {
-                     res->execute(context);
-                   }
-                  catch (const Backwards::Types::TypedOperationException& e)
-                   {
-                     std::cerr << "Caught runtime exception: " << e.what() << std::endl;
-                     std::cerr << "Error processing file: " << argv[i] << std::endl;
-                     dumpLog(*context.logger);
-                   }
-                  catch (const Backwards::Engine::FatalException& e)
-                   {
-                     std::cerr << "Caught Fatal Error: " << e.what() << std::endl;
-                     std::cerr << "Error processing file: " << argv[i] << std::endl;
-                     dumpLog(*context.logger);
-                   }
+                  std::cerr << "Caught Fatal Error: " << e.what() << std::endl;
+                  std::cerr << "Error processing file: " << argv[i] << std::endl;
+                  dumpLog(*context.logger);
                 }
              }
-            ++i;
           }
-         else
-          {
-            break;
-          }
+         ++i;
+       }
+      else
+       {
+         break;
        }
     }
 

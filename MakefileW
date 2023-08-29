@@ -31,7 +31,7 @@ release: all
 debug: all
 
 
-bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/Screen.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
+bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/Screen.o obj/BatchMode.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
 	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/*.a -lncurses -lgmp
 
 obj/main.o: Curses/main.cpp
@@ -39,6 +39,9 @@ obj/main.o: Curses/main.cpp
 
 obj/Screen.o: Curses/Screen.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -IOddsAndEnds -c -o obj/Screen.o Curses/Screen.cpp
+
+obj/BatchMode.o: OddsAndEnds/BatchMode.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/BatchMode.o OddsAndEnds/BatchMode.cpp
 
 obj/GetAndSet.o: OddsAndEnds/GetAndSet.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/GetAndSet.o OddsAndEnds/GetAndSet.cpp

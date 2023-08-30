@@ -63,8 +63,10 @@ int main (int argc, char ** argv)
    context.map = &map;
 
    std::list<std::string> batches;
+   std::vector<std::pair<std::string, std::string> > argLibs;
+   std::vector<std::pair<std::string, std::string> > fileLibs;
 
-   int file = LoadLibraries(argc, argv, context);
+   int file = PreLoadLibraries(argc, argv, argLibs);
    file = ReadBatches(argc, argv, file, batches);
 
 
@@ -100,8 +102,12 @@ int main (int argc, char ** argv)
          saveFileName = argv[file];
        }
 
-      LoadFile(argv[file], &sheet, state.col_widths);
+      LoadFile(argv[file], &sheet, state.col_widths, fileLibs);
     }
+
+
+   fileLibs.insert(fileLibs.end(), argLibs.begin(), argLibs.end());
+   LoadLibraries(fileLibs, context);
 
 
    if (0U != sheet.max_row) // We loaded saved data, so recalculate the sheet.
@@ -124,7 +130,7 @@ int main (int argc, char ** argv)
       UpdateScreen(state);
       if (true == state.saveRequested)
        {
-         SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width);
+         SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width, fileLibs);
          state.saveRequested = false;
        }
     }
@@ -132,7 +138,7 @@ int main (int argc, char ** argv)
 
    if (true == state.saveRequested)
     {
-      SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width);
+      SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width, fileLibs);
       state.saveRequested = false;
     }
 

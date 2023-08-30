@@ -41,6 +41,7 @@ namespace Engine
  }
 
    // Returns the argument that is at the end of the "-l" chain.
-int LoadLibraries (int argc, char ** argv, Forwards::Engine::CallingContext& context);
+int PreLoadLibraries (int argc, char ** argv, std::vector<std::pair<std::string, std::string> >& libraries);
+void LoadLibraries (const std::vector<std::pair<std::string, std::string> >& allLibs, Forwards::Engine::CallingContext& context);
 
 #endif /* LIBRARYLOADER_H */

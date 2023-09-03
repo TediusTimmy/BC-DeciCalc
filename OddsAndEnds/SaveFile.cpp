@@ -238,7 +238,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
 
          if ((std::string::npos != bn) && (std::string::npos != en) && (std::string::npos != bt) && (std::string::npos != et))
           {
-            fileLibs.push_back(std::make_pair(curCol.substr(bn + 3U, en - bn - 3U), soften(curCol.substr(bt + 3U, et - bt - 3U))));
+            fileLibs.push_back(std::make_pair(soften(curCol.substr(bn + 3U, en - bn - 3U)), soften(curCol.substr(bt + 3U, et - bt - 3U))));
           }
 
          curCol = "";

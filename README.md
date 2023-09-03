@@ -48,6 +48,8 @@ The following functions have been modified/removed/added:
 * NAN - removed
 * GETSCALE - gets the scale setting
 * SETSCALE - sets the scale setting
+* GETROUND - gets the rounding setting
+* SETROUND - sets the rounding setting
 
 New Standard Library
 --------------------

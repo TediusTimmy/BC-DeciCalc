@@ -44,7 +44,8 @@ namespace BigInt
       ROUND_ZERO,
       ROUND_TIES_ODD,
       ROUND_TIES_ZERO,
-      ROUND_AWAY
+      ROUND_AWAY,
+      ROUND_DOUBLE
     };
 
    class Fixed
@@ -63,8 +64,8 @@ namespace BigInt
          static Fixed_Round_Mode setRoundMode (Fixed_Round_Mode newMode)
           { return (mode = newMode); }
 
-         static bool decideRound (bool, bool, int, bool); // Public so it can be tested.
-         static bool decideRound (bool, bool, int, bool, Fixed_Round_Mode);
+         static bool decideRound (bool, bool, int, bool, bool); // Public so it can be tested.
+         static bool decideRound (bool, bool, int, bool, bool, Fixed_Round_Mode);
 
       private:
          Integer Data;

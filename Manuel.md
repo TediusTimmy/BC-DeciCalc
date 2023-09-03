@@ -118,6 +118,8 @@ The following functions are all that is implemented. It is a curated list from t
 * ROUND - round to integer (ties away from zero) (return value has scale 0)
 * GETSCALE - gets the scale setting
 * SETSCALE - sets the scale setting
+* GETROUND - gets the rounding setting
+* SETROUND - sets the rounding setting
 
 
 ## New Standard Library
@@ -306,3 +308,6 @@ Directed rounding modes are a part of IEEE-754 for doing algorithm analysis. Bas
 * 5 - Round to nearest, ties to odd
 * 6 - Round to nearest, ties to zero
 * 7 - Round away from zero
+* 8 - Round 05 away from zero : double rounding mode
+
+The final rounding mode probably needs some explanation: it is round to zero, unless the last digit of the result is a zero or five, then it is round away from zero. This mode allows computations made at a higher precision to be double rounded later to a lower precision (correctly). The least significant digit is treated as a sticky digit ought to be for eventual rounding.

@@ -645,7 +645,7 @@ namespace Engine
        {
          long val = static_cast<const Types::FloatValue&>(*arg).value.roundToInteger().toInt();
          if ((val >= static_cast<long>(BigInt::ROUND_TIES_EVEN)) &&
-            (val <= static_cast<long>(BigInt::ROUND_AWAY)))
+            (val <= static_cast<long>(BigInt::ROUND_DOUBLE)))
           {
             (void) BigInt::Fixed::setRoundMode(static_cast<BigInt::Fixed_Round_Mode>(val));
             return arg;

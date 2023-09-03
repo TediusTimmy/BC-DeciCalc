@@ -87,6 +87,11 @@ namespace BigInt
       return isZero() ? true : mpz_even_p(Data->Data);
     }
 
+   bool Integer::is0mod5 (void) const
+    {
+      return isZero() ? true : (0 != mpz_divisible_ui_p (Data->Data, 5U));
+    }
+
    Integer& Integer::negate (void)
     {
       if (isZero()) Sign = false;

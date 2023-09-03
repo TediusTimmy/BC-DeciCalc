@@ -58,6 +58,7 @@ namespace BigInt
          bool isSigned (void) const { return Sign; }
          bool isZero (void) const { return nullptr == Data.get(); }
          bool isEven (void) const;
+         bool is0mod5 (void) const;
 
          std::string toString (int base = 10) const;
 

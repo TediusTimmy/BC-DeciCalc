@@ -163,4 +163,12 @@ extern const char* const STDLIB =
 "set GETSCALE to function (x) is "
    "return GetDefaultPrecision() "
 "end "
+
+"set SETROUND to function (x) is "
+   "return SetRoundMode(EvalCell(x[0])) "
+"end "
+
+"set GETROUND to function (x) is "
+   "return GetRoundMode() "
+"end "
 ;

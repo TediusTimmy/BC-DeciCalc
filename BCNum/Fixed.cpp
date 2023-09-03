@@ -209,8 +209,8 @@ namespace BigInt
 
       r.Data = r.Data * Integer(2U);
 
-      if (Fixed::decideRound(s, q.Data.isEven(),
-                             d.compare(r.Data.abs()), r.Data.isZero()))
+      if (Fixed::decideRound(s, q.Data.isEven(), d.compare(r.Data.abs()),
+                             r.Data.isZero(), q.Data.is0mod5()))
        {
          if (s) q.Data = q.Data - Integer(1U);
          else q.Data = q.Data + Integer(1U);
@@ -238,8 +238,8 @@ namespace BigInt
 
          rem = rem * Integer(2U);
 
-         if (decideRound(s, Data.isEven(),
-                         scale.compare(rem.abs()), rem.isZero()))
+         if (decideRound(s, Data.isEven(), scale.compare(rem.abs()),
+                         rem.isZero(), Data.is0mod5()))
           {
             if (s) Data = Data - Integer(1U);
             else Data = Data + Integer(1U);
@@ -338,8 +338,8 @@ namespace BigInt
 
          rem = rem * Integer(2U);
 
-         if (decideRound(s, temp.Data.isEven(),
-                         scale.compare(rem.abs()), rem.isZero(), withMode))
+         if (decideRound(s, temp.Data.isEven(), scale.compare(rem.abs()),
+                         rem.isZero(), temp.Data.is0mod5(), withMode))
           {
             if (s) temp.Data = temp.Data - Integer(1U);
             else temp.Data = temp.Data + Integer(1U);
@@ -351,12 +351,12 @@ namespace BigInt
     }
 
 
-   bool Fixed::decideRound (bool sign, bool even, int comp, bool zero)
+   bool Fixed::decideRound (bool sign, bool even, int comp, bool zero, bool zmf)
     {
-      return decideRound(sign, even, comp, zero, mode);
+      return decideRound(sign, even, comp, zero, zmf, mode);
     }
 
-   bool Fixed::decideRound (bool sign, bool even, int comp, bool zero, Fixed_Round_Mode thisMode)
+   bool Fixed::decideRound (bool sign, bool even, int comp, bool zero, bool zmf, Fixed_Round_Mode thisMode)
     {
       switch (thisMode)
        {
@@ -382,6 +382,9 @@ namespace BigInt
             break;
          case ROUND_AWAY:
             if (!zero) return true;
+            break;
+         case ROUND_DOUBLE:
+            if (!zero && zmf) return true;
             break;
        }
       return false;

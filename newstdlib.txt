@@ -1,64 +1,3 @@
-set Exp to function (x) is
-
-   set sign to 0
-      (* exp(-x) == 1/exp(x) *)
-   if x < 0 then
-      set sign to 1
-      set x to -x
-   end
-
-   set scale to GetDefaultPrecision()
-      (* 0.44 is approx 1 / ln(10),
-         which appears to be a good estimate of the number of extra digits needed
-         as we square the summand about x times *)
-   set workingScale to scale + SetPrecision(Floor(0.44 * x); 0) + 1
-   set loops to 0
-
-      (* the scale manipulations I stole from GNU bc *)
-   call SetDefaultPrecision(GetPrecision(x) + 1)
-      (* Very common argument reduction: e^x == (e^(x/2))^2 *)
-   while x > 1 do
-      set loops to loops + 1
-      set x to x / 2
-      call SetDefaultPrecision(GetDefaultPrecision() + 1)
-   end
-
-      (* initialize variables *)
-   call SetDefaultPrecision(workingScale)
-   set sum to 0
-   set sumPrev to 1
-   set xn to 1
-   set nfact to 1
-   set n to 1
-
-      (* the Maclaurin series approximation for e^x *)
-   while sum <> sumPrev do
-      set sumPrev to sum
-      set sum to sum + xn / nfact
-      set xn to xn * x
-      set nfact to nfact * n
-      set n to n + 1
-   end
-
-      (* un-reduce the argument *)
-   while loops > 0 do
-      set loops to loops - 1
-      set sum to sum * sum
-   end
-
-      (* reset working scale and return *)
-   call SetDefaultPrecision(scale)
-   if sign then
-      return 1 / sum
-   end
-   return SetPrecision(sum; scale)
-end
-
-set EXP to function (x) is
-   return Exp(EvalCell(x[0]))
-end
-
-
    (* raise an integer to a positive integer power
       this function doesn't check its inputs and is, thus, not API *)
 set IntPow to function (x; y) is
@@ -80,6 +19,70 @@ set IntPow to function (x; y) is
    call SetDefaultPrecision(scale)
    return result
 end
+
+
+set Exp to function (x) is
+
+   set sign to 0
+      (* exp(-x) == 1/exp(x) *)
+   if x < 0 then
+      set sign to 1
+      set x to -x
+   end
+
+   set scale to GetDefaultPrecision()
+      (* 0.44 is approx 1 / ln(10),
+         which appears to be a good estimate of the number of extra digits needed
+         as we square the summand about x times *)
+   set workingScale to scale + SetPrecision(Floor(0.44 * x); 0) + 1
+   set loops to 0
+
+   set round to GetRoundMode()
+   call SetRoundMode(8)
+      (* the scale manipulations I stole from GNU bc *)
+   call SetDefaultPrecision(GetPrecision(x) + 1)
+      (* Very common argument reduction: e^x == (e^(x/2))^2 *)
+   while x > 1 do
+      set loops to loops + 1
+      set x to x / 2
+      call SetDefaultPrecision(GetDefaultPrecision() + 1)
+   end
+
+      (* initialize variables *)
+   call SetDefaultPrecision(workingScale)
+   set sum to 0
+   set xn to 1
+   set nfact to 1
+   set n to 1
+   set scaler to IntPow(10; GetDefaultPrecision())
+
+      (* the Maclaurin series approximation for e^x *)
+   while nfact < (scaler * xn) do
+      set sum to sum + xn / nfact
+      set xn to xn * x
+      set nfact to nfact * n
+      set n to n + 1
+   end
+
+      (* un-reduce the argument *)
+   while loops > 0 do
+      set loops to loops - 1
+      set sum to sum * sum
+   end
+
+   call SetRoundMode(round)
+      (* reset working scale and return *)
+   call SetDefaultPrecision(scale)
+   if sign then
+      return 1 / sum
+   end
+   return SetPrecision(sum; scale)
+end
+
+set EXP to function (x) is
+   return Exp(EvalCell(x[0]))
+end
+
 
    (* raise a number to an integer power *)
 set Raise to function (x; y) is
@@ -122,6 +125,8 @@ set Sqrt to function (x) is
       call Fatal("imaginary result")
    end
 
+   set round to GetRoundMode()
+   call SetRoundMode(8)
    set scale to GetDefaultPrecision()
    call SetDefaultPrecision(scale + 1)
 
@@ -134,12 +139,18 @@ set Sqrt to function (x) is
       (* If you use (fx^2 + x) / (2fx) then you may get stuck in a loop
          (and that loop isn't very accurate) *)
    set last to x
+   set ulp to 1 / IntPow(10; scale + 1)
    while 0 <> last - fx do
       set last to fx
          (* This is much more numerically stable than dividing by 2fx *)
       set fx to (fx + x / fx) * .5
+      if ulp = last - fx then
+         call SetDefaultPrecision(GetDefaultPrecision() + 1)
+         set ulp to ulp * .1
+      end
    end
 
+   call SetRoundMode(round)
    call SetDefaultPrecision(scale)
    return SetPrecision(fx; scale)
 end
@@ -154,6 +165,8 @@ set Log to function (x) is
       call Fatal("domain error")
    end
 
+   set round to GetRoundMode()
+   call SetRoundMode(8)
    set scale to GetDefaultPrecision()
    call SetDefaultPrecision(scale + 2)
 
@@ -170,16 +183,16 @@ set Log to function (x) is
    set sum to n
    set n2 to n * n
    set i to 3
-   set change to 1
-   while change do
+   set scaler to IntPow(10; GetDefaultPrecision())
+   while i < Abs(n * scaler) do
       set n to n * n2
-      set change to n / i
-      set sum to sum + change
+      set sum to sum + n / i
       set i to i + 2
    end
 
    set sum to sum * factor
 
+   call SetRoundMode(round)
    call SetDefaultPrecision(scale)
    return SetPrecision(sum; scale)
 end
@@ -206,6 +219,8 @@ set Pow to function (x; y) is
       call Fatal("power is not integer")
    end
 
+   set round to GetRoundMode()
+   call SetRoundMode(8)
    set scale to GetDefaultPrecision()
    call SetDefaultPrecision(scale + 2)
 
@@ -219,6 +234,7 @@ set Pow to function (x; y) is
 
    if y < 0 then
       set result to Exp(y * Log(x))
+      call SetRoundMode(round)
       call SetDefaultPrecision(scale)
       return SetPrecision(result; scale)
    end
@@ -235,6 +251,7 @@ set Pow to function (x; y) is
    end
    set result to Exp(Log(x) * (y - yi)) * ipart
 
+   call SetRoundMode(round)
    call SetDefaultPrecision(scale)
    return SetPrecision(result; scale)
 end

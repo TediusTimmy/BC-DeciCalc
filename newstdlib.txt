@@ -153,6 +153,10 @@ set Sqrt to function (x) is
       set fx to IntPow(10; Floor(length / 2))
    end
 
+   if fx = x then
+      set fx to (fx + x / fx) * .5
+   end
+
       (* If you use (fx^2 + x) / (2fx) then you may get stuck in a loop
          (and that loop isn't very accurate) *)
    set last to x

@@ -132,6 +132,8 @@ This adds some transcendental functions that I didn't want to include at first. 
 * RAISE - The first argument raised to an integer power second argument
 * POW - The first argument raised to an arbitrary power second argument
 * PMT - (interest rate per repayment period; repayment periods; present value)
+* GETLIBROUND - Get the internal rounding mode of EXP, LOG, SQRT, and POW.
+* SETLIBROUND - Set the internal rounding mode of those functions.
 
 
 # Backwards

@@ -62,4 +62,6 @@ The following functions are provided. EXP, SQRT, and LOG draw heavy inspiration 
 * RAISE - The first argument raised to an integer power second argument
 * POW - The first argument raised to an arbitrary power second argument
 * PMT - (interest rate per repayment period; repayment periods; present value)
+* GETLIBROUND - Get the internal rounding mode of EXP, LOG, SQRT, and POW.
+* SETLIBROUND - Set the internal rounding mode of those functions.
 

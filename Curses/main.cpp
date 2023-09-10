@@ -110,16 +110,16 @@ int main (int argc, char ** argv)
    LoadLibraries(fileLibs, context);
 
 
-   if (0U != sheet.max_row) // We loaded saved data, so recalculate the sheet.
-    {
-      sheet.recalc(context);
-    }
-
-
    if (false == batches.empty())
     {
       RunBatches(batches, context);
       return 0;
+    }
+
+
+   if (0U != sheet.max_row) // We loaded saved data, so recalculate the sheet.
+    {
+      sheet.recalc(context);
     }
 
 

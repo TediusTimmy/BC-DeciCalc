@@ -65,6 +65,7 @@ void dumpLog(Backwards::Engine::Logger& logger); // From LibraryLoader
 
 void RunBatches (const std::list<std::string>& batches, Forwards::Engine::CallingContext& context)
  {
+   ++context.generation;
    for (const std::string& batch : batches)
     {
       Forwards::Engine::CellFrame newFrame (nullptr, 0U, 0U);

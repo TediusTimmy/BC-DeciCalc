@@ -62,9 +62,9 @@ Most of the navigation and commands are taken from the Unix tool `sc`. The tool 
 * `q` or F7 : exit. You must next press either 'y' to save and exit, or 'n' to not save and exit, in order to actually exit.
 * `!` : recalculate the sheet
 * `W` : save the sheet
-* `dd` : delete the current cell
-* `dr` : delete all cells in the current row
-* `dc` : delete all cells in the current column
+* `dd` : clear (delete) the current cell
+* `dr` : clear all cells in the current row
+* `dc` : clear all cells in the current column
 * `yy` : copy the current cell
 * `pp` : paste the current cell
 * `e` : edit the current cell's contents

@@ -83,12 +83,12 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    ASSERT_EQ(nullptr, shet.getCellAt(5U, 1U));
    ASSERT_EQ(nullptr, shet.getCellAt(1U, 5U));
 
-   shet.removeCellAt(3U, 2U);
+   shet.clearCellAt(3U, 2U);
    EXPECT_EQ(nullptr, shet.getCellAt(3U, 2U));
 
       // Calling these should do no harm.
-   shet.removeCellAt(1U, 5U);
-   shet.removeCellAt(5U, 1U);
+   shet.clearCellAt(1U, 5U);
+   shet.clearCellAt(5U, 1U);
 
    EXPECT_EQ("", shet.computeCell(context, res, 5U, 1U, false));
 
@@ -514,4 +514,73 @@ TEST(EngineTests, testSpreadSheet_Recalc_NoHang)
           }
        }
     }
+ }
+
+TEST(EngineTests, testSpreadSheet_ClearRowColumn)
+ {
+   Forwards::Engine::CallingContext context;
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.initCellAt(0U, 0U);
+   shet.initCellAt(1U, 0U);
+   shet.initCellAt(2U, 0U);
+   shet.initCellAt(0U, 1U);
+   shet.initCellAt(1U, 1U);
+   shet.initCellAt(2U, 1U);
+   shet.initCellAt(0U, 2U);
+   shet.initCellAt(1U, 2U);
+   shet.initCellAt(2U, 2U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+
+   shet.clearColumn(1U);
+
+   EXPECT_NE(nullptr, shet.getCellAt(0U, 0U));
+   EXPECT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   EXPECT_NE(nullptr, shet.getCellAt(2U, 0U));
+   EXPECT_NE(nullptr, shet.getCellAt(0U, 1U));
+   EXPECT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   EXPECT_NE(nullptr, shet.getCellAt(2U, 1U));
+   EXPECT_NE(nullptr, shet.getCellAt(0U, 2U));
+   EXPECT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   EXPECT_NE(nullptr, shet.getCellAt(2U, 2U));
+
+   shet.clearColumn(7U); // Shouldn't crash.
+
+   shet.initCellAt(1U, 0U);
+   shet.initCellAt(1U, 1U);
+   shet.initCellAt(1U, 2U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+
+   shet.clearRow(1U);
+
+   EXPECT_NE(nullptr, shet.getCellAt(0U, 0U));
+   EXPECT_NE(nullptr, shet.getCellAt(1U, 0U));
+   EXPECT_NE(nullptr, shet.getCellAt(2U, 0U));
+   EXPECT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   EXPECT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   EXPECT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   EXPECT_NE(nullptr, shet.getCellAt(0U, 2U));
+   EXPECT_NE(nullptr, shet.getCellAt(1U, 2U));
+   EXPECT_NE(nullptr, shet.getCellAt(2U, 2U));
+
+   shet.clearRow(5U); // Shouldn't crash.
  }

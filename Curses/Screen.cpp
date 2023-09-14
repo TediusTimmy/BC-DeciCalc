@@ -727,19 +727,19 @@ int ProcessInput(SharedData& data)
        }
       break;
    case 'H':
+    {
+      size_t cl = CountColumnsLeft(data, data.tr_col, x);
+      if (data.tr_col > cl)
        {
-         size_t cl = CountColumnsLeft(data, data.tr_col, x);
-         if (data.tr_col > cl)
-          {
-            data.tr_col -= cl;
-            data.c_col = data.tr_col;
-          }
-         else
-          {
-            data.c_col = 0;
-            data.tr_col = 0;
-          }
+         data.tr_col -= cl;
+         data.c_col = data.tr_col;
        }
+      else
+       {
+         data.c_col = 0;
+         data.tr_col = 0;
+       }
+    }
       break;
    case 'L':
       data.tr_col += tc;
@@ -808,19 +808,16 @@ int ProcessInput(SharedData& data)
       switch (c)
        {
       case 'd':
-         data.context->theSheet->removeCellAt(data.c_col, data.c_row);
-         data.context->theSheet->recalc(*data.context);
+         data.context->theSheet->clearCellAt(data.c_col, data.c_row);
          break;
       case 'c':
-         data.context->theSheet->sheet[data.c_col].clear();
+         data.context->theSheet->clearColumn(data.c_col);
          break;
       case 'r':
-         for (size_t i = 0U; i < data.context->theSheet->sheet.size(); ++i)
-          {
-            data.context->theSheet->removeCellAt(i, data.c_row);
-          }
+         data.context->theSheet->clearRow(data.c_row);
          break;
        }
+      data.context->theSheet->recalc(*data.context);
       break;
    case 'y':
       if ('y' == getch())

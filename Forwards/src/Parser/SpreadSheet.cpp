@@ -88,13 +88,32 @@ namespace Engine
       sheet[col][row] = std::make_unique<Forwards::Engine::Cell>();
     }
 
-   void SpreadSheet::removeCellAt(size_t col, size_t row)
+   void SpreadSheet::clearCellAt(size_t col, size_t row)
     {
       if (col < sheet.size())
        {
          if (row < sheet[col].size())
           {
             sheet[col][row].reset();
+          }
+       }
+    }
+
+   void SpreadSheet::clearColumn(size_t col)
+    {
+      if (col < sheet.size())
+       {
+         sheet[col].clear();
+       }
+    }
+
+   void SpreadSheet::clearRow(size_t row)
+    {
+      for (size_t i = 0U; i < sheet.size(); ++i)
+       {
+         if (row < sheet[i].size())
+          {
+            sheet[i][row].reset();
           }
        }
     }

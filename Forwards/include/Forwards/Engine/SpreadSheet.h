@@ -66,7 +66,10 @@ namespace Engine
 
       Cell* getCellAt(size_t col, size_t row);
       void initCellAt(size_t col, size_t row);
-      void removeCellAt(size_t col, size_t row);
+
+      void clearCellAt(size_t col, size_t row);
+      void clearColumn(size_t col);
+      void clearRow(size_t row);
 
       std::string computeCell(CallingContext&, std::shared_ptr<Types::ValueType>& OUT, size_t col, size_t row, bool rethrow);
       void recalc(CallingContext&);

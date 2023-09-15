@@ -1459,3 +1459,53 @@ TEST(EngineTests, testCellRefEval)
    //EXPECT_THROW(low.equal(defaulted), Backwards::Engine::ProgrammingException);
    //EXPECT_THROW(low.sort(defaulted), Backwards::Engine::ProgrammingException);
  }
+
+TEST(EngineTests, testCellRefEval_EqualCases)
+ {
+   Backwards::Types::CellRefValue un (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 0, false, 0))));
+   Backwards::Types::CellRefValue deux (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(true, 0, false, 0))));
+   Backwards::Types::CellRefValue trois (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 0, true, 0))));
+   Backwards::Types::CellRefValue quatre (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 1, false, 0))));
+   Backwards::Types::CellRefValue cinq (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 0, false, 1))));
+   Backwards::Types::CellRefValue six (std::make_shared<Forwards::Engine::CellRefEval>(
+      std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 0, false, 0))));
+
+   EXPECT_FALSE(un.equal(deux));
+   EXPECT_FALSE(un.equal(trois));
+   EXPECT_FALSE(un.equal(quatre));
+   EXPECT_FALSE(un.equal(cinq));
+   EXPECT_TRUE(un.equal(six));
+
+   EXPECT_TRUE(un.sort(deux) | deux.sort(un));
+   EXPECT_TRUE(un.sort(trois) | trois.sort(un));
+   EXPECT_TRUE(un.sort(quatre) | quatre.sort(un));
+   EXPECT_TRUE(un.sort(cinq) | cinq.sort(un));
+   EXPECT_FALSE(un.sort(six) | six.sort(un));
+ }
+
+TEST(EngineTests, testCellRangeExpand_EqualCases)
+ {
+   Backwards::Types::CellRangeValue un (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 0U, 1U, 1U)));
+   Backwards::Types::CellRangeValue deux (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(1U, 0U, 1U, 1U)));
+   Backwards::Types::CellRangeValue trois (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 1U, 1U, 1U)));
+   Backwards::Types::CellRangeValue quatre (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 0U, 2U, 1U)));
+   Backwards::Types::CellRangeValue cinq (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 0U, 1U, 2U)));
+   Backwards::Types::CellRangeValue six (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 0U, 1U, 1U)));
+
+   EXPECT_FALSE(un.equal(deux));
+   EXPECT_FALSE(un.equal(trois));
+   EXPECT_FALSE(un.equal(quatre));
+   EXPECT_FALSE(un.equal(cinq));
+   EXPECT_TRUE(un.equal(six));
+
+   EXPECT_TRUE(un.sort(deux) | deux.sort(un));
+   EXPECT_TRUE(un.sort(trois) | trois.sort(un));
+   EXPECT_TRUE(un.sort(quatre) | quatre.sort(un));
+   EXPECT_TRUE(un.sort(cinq) | cinq.sort(un));
+   EXPECT_FALSE(un.sort(six) | six.sort(un));
+ }

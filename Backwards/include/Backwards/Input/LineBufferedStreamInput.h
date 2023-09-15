@@ -51,9 +51,9 @@ namespace Input
       size_t index;
 
    public:
-      LineBufferedStreamInput(std::istream& input);
+      explicit LineBufferedStreamInput(std::istream& input);
 
-      int getNextCharacter();
+      int getNextCharacter() override;
 
     };
 
@@ -72,9 +72,9 @@ namespace Input
       std::ifstream source;
 
    public:
-      FileInput(const std::string& fileName);
+      explicit FileInput(const std::string& fileName);
 
-      int getNextCharacter();
+      int getNextCharacter() override;
 
     };
 

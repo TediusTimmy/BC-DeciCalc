@@ -57,7 +57,7 @@ namespace Parser
       std::string message;
 
    public:
-      ParserException(const std::string& message) : message(message) { }
+      explicit ParserException(const std::string& message) : message(message) { }
 
       ~ParserException() throw() { }
 
@@ -452,7 +452,6 @@ namespace Parser
       case Input::FUNCTION:
        {
          Input::Token buildToken = src.getNextToken();
-         bool badWrong = false;
 
          std::vector<std::shared_ptr<Engine::Expression> > captures;
          if (Input::OPEN_BRACKET == src.peekNextToken().lexeme)
@@ -470,6 +469,7 @@ namespace Parser
          table.pushContext();
          try
           {
+            bool badWrong = false;
             if (Input::IDENTIFIER == src.peekNextToken().lexeme)
              {
                Input::Token identToken = src.getNextToken();
@@ -614,7 +614,7 @@ namespace Parser
 
 
 
-   bool Parser::enforceUnique(const Input::Token& token, SymbolTable& table, const std::string& use, Engine::Logger& logger)
+   bool Parser::enforceUnique(const Input::Token& token, const SymbolTable& table, const std::string& use, Engine::Logger& logger)
     {
       bool errorOccurred = false;
       if (SymbolTable::UNDEFINED != table.lookup(token.text))
@@ -768,12 +768,12 @@ namespace Parser
     {
       std::shared_ptr<Engine::Statement> ret;
       bool badWrong = false;
-      bool defined = false;
 
       switch (src.peekNextToken().lexeme)
        {
       case Input::SET:
        {
+         bool defined = false;
          Input::Token buildToken = src.getNextToken();
          Input::Token identToken = src.peekNextToken();
          expect(src, Input::IDENTIFIER, "Identifier");

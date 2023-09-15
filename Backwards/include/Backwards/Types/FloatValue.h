@@ -48,24 +48,24 @@ namespace Types
       BigInt::Fixed value;
 
       FloatValue();
-      FloatValue(const BigInt::Fixed& value);
+      explicit FloatValue(const BigInt::Fixed& value);
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      std::shared_ptr<ValueType> neg() const;
-      bool logical() const;
+      std::shared_ptr<ValueType> neg() const override;
+      bool logical() const override;
 
-      std::shared_ptr<ValueType> add (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> sub (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> mul (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> div (const FloatValue& lhs) const;
+      std::shared_ptr<ValueType> add (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> sub (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> mul (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> div (const FloatValue& lhs) const override;
 
-      bool greater (const FloatValue& lhs) const;
-      bool less (const FloatValue& lhs) const;
-      bool geq (const FloatValue& lhs) const;
-      bool leq (const FloatValue& lhs) const;
-      bool equal (const FloatValue& lhs) const;
-      bool notEqual (const FloatValue& lhs) const;
+      bool greater (const FloatValue& lhs) const override;
+      bool less (const FloatValue& lhs) const override;
+      bool geq (const FloatValue& lhs) const override;
+      bool leq (const FloatValue& lhs) const override;
+      bool equal (const FloatValue& lhs) const override;
+      bool notEqual (const FloatValue& lhs) const override;
 
       DECLAREVISITOR
 

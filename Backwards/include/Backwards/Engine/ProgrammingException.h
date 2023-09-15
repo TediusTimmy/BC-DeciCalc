@@ -44,7 +44,7 @@ namespace Engine
       std::string message;
 
    public:
-      ProgrammingException(const std::string& message) : message("If you see this, then the programmer is wrong: " + message) { }
+      explicit ProgrammingException(const std::string& message) : message("If you see this, then the programmer is wrong: " + message) { }
 
       ~ProgrammingException() throw() { }
 

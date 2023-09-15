@@ -70,7 +70,7 @@ namespace Input
 
    public:
 
-      Token peekNextToken (void) { return nextToken; }
+      const Token& peekNextToken (void) const { return nextToken; }
       Token getNextToken (void); // Returns nextToken and then updates nextToken.
 
       Lexer (GenericInput& input, const std::string& sourceName, size_t lineNumber = 1U, size_t lineLocation = 1U);

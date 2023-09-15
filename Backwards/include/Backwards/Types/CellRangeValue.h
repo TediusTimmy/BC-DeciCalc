@@ -59,15 +59,15 @@ namespace Types
       std::shared_ptr<CellRangeHolder> value;
 
       CellRangeValue();
-      CellRangeValue(const std::shared_ptr<CellRangeHolder>& value);
+      explicit CellRangeValue(const std::shared_ptr<CellRangeHolder>& value);
 
       CellRangeValue(const CellRangeValue&) = delete;
       CellRangeValue& operator=(const CellRangeValue&) = delete;
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      bool equal (const CellRangeValue& lhs) const;
-      bool notEqual (const CellRangeValue& lhs) const;
+      bool equal (const CellRangeValue& lhs) const override;
+      bool notEqual (const CellRangeValue& lhs) const override;
 
       DECLAREVISITOR
 

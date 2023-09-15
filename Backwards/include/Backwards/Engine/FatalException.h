@@ -44,7 +44,7 @@ namespace Engine
       std::string message;
 
    public:
-      FatalException(const std::string& message) : message(message) { }
+      explicit FatalException(const std::string& message) : message(message) { }
 
       ~FatalException() throw() { }
 

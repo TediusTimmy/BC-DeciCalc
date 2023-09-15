@@ -68,7 +68,7 @@ namespace Parser
    private:
 
       static void expect (Input::Lexer& src, Input::Lexeme expected, const std::string& name);
-      static bool enforceUnique(const Input::Token&, SymbolTable&, const std::string&, Engine::Logger&);
+      static bool enforceUnique(const Input::Token&, const SymbolTable&, const std::string&, Engine::Logger&);
 
       static std::shared_ptr<Engine::Expression> expression (Input::Lexer& src, SymbolTable&, Engine::Logger&);
       static std::shared_ptr<Engine::Expression> predicate (Input::Lexer& src, SymbolTable&, Engine::Logger&);

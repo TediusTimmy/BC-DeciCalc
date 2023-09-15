@@ -259,7 +259,6 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
    size_t col = 0U;
    while (("</table></body></html>" != curCol) && (true == file.good()))
     {
-      size_t row = 0U;
       size_t n = curCol.find("<tr>");
       if (std::string::npos == n) // Does this column have attributes?
        {
@@ -293,6 +292,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
 
       if (std::string::npos != n)
        {
+         size_t row = 0U;
          n = n + 4U;
          while (std::string::npos != n)
           {

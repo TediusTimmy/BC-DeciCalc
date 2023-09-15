@@ -69,8 +69,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      LocalGetter(size_t location);
-      std::shared_ptr<Types::ValueType> get(CallingContext&) const;
+      explicit LocalGetter(size_t location);
+      std::shared_ptr<Types::ValueType> get(CallingContext&) const override;
     };
 
    class LocalSetter final : public Setter
@@ -78,8 +78,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      LocalSetter(size_t location);
-      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const;
+      explicit LocalSetter(size_t location);
+      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const override;
     };
 
    class ArgGetter final : public Getter
@@ -87,8 +87,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      ArgGetter(size_t location);
-      std::shared_ptr<Types::ValueType> get(CallingContext&) const;
+      explicit ArgGetter(size_t location);
+      std::shared_ptr<Types::ValueType> get(CallingContext&) const override;
     };
 
    class ArgSetter final : public Setter
@@ -96,8 +96,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      ArgSetter(size_t location);
-      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const;
+      explicit ArgSetter(size_t location);
+      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const override;
     };
 
    class CaptureGetter final : public Getter
@@ -105,8 +105,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      CaptureGetter(size_t location);
-      std::shared_ptr<Types::ValueType> get(CallingContext&) const;
+      explicit CaptureGetter(size_t location);
+      std::shared_ptr<Types::ValueType> get(CallingContext&) const override;
     };
 
    class CaptureSetter final : public Setter
@@ -114,8 +114,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      CaptureSetter(size_t location);
-      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const;
+      explicit CaptureSetter(size_t location);
+      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const override;
     };
 
  } // namespace Engine

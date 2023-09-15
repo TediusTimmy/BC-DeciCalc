@@ -53,7 +53,7 @@ namespace Input
       void fill (int count);
 
    public:
-      BufferedGenericInput(GenericInput& input);
+      explicit BufferedGenericInput(GenericInput& input);
 
       int peek () { return peek(0U); }
       int peek (size_t lookahead);

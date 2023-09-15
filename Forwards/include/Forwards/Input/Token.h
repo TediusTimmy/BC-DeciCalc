@@ -51,7 +51,7 @@ namespace Input
 
       size_t location;
 
-      Token(Lexeme lexeme, std::string text, size_t loc) :
+      Token(Lexeme lexeme, const std::string& text, size_t loc) :
          lexeme(lexeme), text(text), location(loc) { }
 
       Token() : lexeme(INVALID), text(), location(0U) { }

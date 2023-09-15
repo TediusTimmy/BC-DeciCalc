@@ -49,9 +49,9 @@ namespace Input
       size_t index;
 
    public:
-      StringInput(const std::string& input);
+      explicit StringInput(const std::string& input);
 
-      int getNextCharacter();
+      int getNextCharacter() override;
 
     };
 

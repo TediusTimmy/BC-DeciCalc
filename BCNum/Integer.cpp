@@ -49,7 +49,7 @@ namespace BigInt
          mpz_clear(Data);
        }
 
-      DataHolder (unsigned long src)
+      explicit DataHolder (unsigned long src)
        {
          mpz_init_set_ui(Data, src);
        }

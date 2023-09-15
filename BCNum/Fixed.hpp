@@ -77,10 +77,10 @@ namespace BigInt
             Data (from.Data), Digits (from.Digits) { }
          Fixed (unsigned long precision = defPrec) :
             Data (), Digits (precision) { }
-         Fixed (long long i, unsigned long p = defPrec) :
+         explicit Fixed (long long i, unsigned long p = defPrec) :
             Data (static_cast<long>(i)), Digits (p) { } // Long long is used to assist the compiler.
-         Fixed (const std::string &);
-         Fixed (const char *);
+         explicit Fixed (const std::string &);
+         explicit Fixed (const char *);
          ~Fixed () { /* This has nothing to do. */ }
 
          unsigned long getPrecision (void) const { return Digits; }

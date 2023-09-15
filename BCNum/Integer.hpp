@@ -51,7 +51,7 @@ namespace BigInt
 
       public:
          Integer ();
-         Integer (unsigned long);
+         explicit Integer (unsigned long);
          Integer (const Integer&) = default;
          ~Integer (); // Not default due to pimpl
 

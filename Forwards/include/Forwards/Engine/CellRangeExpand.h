@@ -47,14 +47,14 @@ namespace Engine
       std::shared_ptr<Types::CellRangeValue> value;
 
       CellRangeExpand();
-      CellRangeExpand(const std::shared_ptr<Types::CellRangeValue>&);
+      explicit CellRangeExpand(const std::shared_ptr<Types::CellRangeValue>&);
 
-      virtual std::shared_ptr<Backwards::Types::ValueType> expand (Backwards::Engine::CallingContext&) const;
+      virtual std::shared_ptr<Backwards::Types::ValueType> expand (Backwards::Engine::CallingContext&) const override;
 
-      virtual bool equal (const Backwards::Types::CellRangeValue& lhs) const;
-      virtual bool notEqual (const Backwards::Types::CellRangeValue& lhs) const;
-      virtual bool sort (const Backwards::Types::CellRangeValue& lhs) const;
-      virtual size_t hash() const;
+      virtual bool equal (const Backwards::Types::CellRangeValue& lhs) const override;
+      virtual bool notEqual (const Backwards::Types::CellRangeValue& lhs) const override;
+      virtual bool sort (const Backwards::Types::CellRangeValue& lhs) const override;
+      virtual size_t hash() const override;
     };
 
  } // namespace Engine

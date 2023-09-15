@@ -49,18 +49,18 @@ namespace Types
       std::string value;
 
       StringValue();
-      StringValue(const std::string& value);
+      explicit StringValue(const std::string& value);
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      std::shared_ptr<ValueType> add (const StringValue& lhs) const;
+      std::shared_ptr<ValueType> add (const StringValue& lhs) const override;
 
-      bool greater (const StringValue& lhs) const;
-      bool less (const StringValue& lhs) const;
-      bool geq (const StringValue& lhs) const;
-      bool leq (const StringValue& lhs) const;
-      bool equal (const StringValue& lhs) const;
-      bool notEqual (const StringValue& lhs) const;
+      bool greater (const StringValue& lhs) const override;
+      bool less (const StringValue& lhs) const override;
+      bool geq (const StringValue& lhs) const override;
+      bool leq (const StringValue& lhs) const override;
+      bool equal (const StringValue& lhs) const override;
+      bool notEqual (const StringValue& lhs) const override;
 
       DECLAREVISITOR
 

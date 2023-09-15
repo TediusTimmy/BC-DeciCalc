@@ -87,9 +87,9 @@ namespace Engine
    class NOP final : public Statement
     {
    public:
-      NOP(const Input::Token&);
+      explicit NOP(const Input::Token&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class Expr final : public Statement
@@ -99,7 +99,7 @@ namespace Engine
 
       Expr(const Input::Token&, const std::shared_ptr<Expression>&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StatementSeq final : public Statement
@@ -109,7 +109,7 @@ namespace Engine
 
       StatementSeq(const Input::Token&, const std::vector<std::shared_ptr<Statement> >&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class RecAssignState final
@@ -140,7 +140,7 @@ namespace Engine
       Assignment(const Input::Token&, const std::shared_ptr<Getter>&, const std::shared_ptr<Setter>&,
          const std::shared_ptr<RecAssignState>&, const std::shared_ptr<Expression>&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class IfStatement final : public Statement
@@ -152,7 +152,7 @@ namespace Engine
 
       IfStatement(const Input::Token&, const std::shared_ptr<Expression>&, const std::shared_ptr<Statement>&, const std::shared_ptr<Statement>&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class WhileStatement final : public Statement
@@ -164,7 +164,7 @@ namespace Engine
 
       WhileStatement(const Input::Token&, const std::shared_ptr<Expression>&, const std::shared_ptr<Statement>&, size_t);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class CaseContainer final
@@ -199,7 +199,7 @@ namespace Engine
 
       SelectStatement(const Input::Token&, const std::shared_ptr<Expression>&, const std::vector<std::shared_ptr<CaseContainer> >&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class ForStatement final : public Statement
@@ -222,7 +222,7 @@ namespace Engine
          const std::shared_ptr<Expression>&, bool, const std::shared_ptr<Expression>&,
          const std::shared_ptr<Expression>&, const std::shared_ptr<Statement>&, size_t);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class FlowControlStatement final : public Statement
@@ -234,55 +234,55 @@ namespace Engine
 
       FlowControlStatement(const Input::Token&, FlowControl::Type, size_t, const std::shared_ptr<Expression>&);
 
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardConstantFunction final : public Statement
     {
    public:
       ConstantFunctionPointer function;
-      StandardConstantFunction(ConstantFunctionPointer);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardConstantFunction(ConstantFunctionPointer);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardConstantFunctionWithContext final : public Statement
     {
    public:
       ConstantFunctionPointerWithContext function;
-      StandardConstantFunctionWithContext(ConstantFunctionPointerWithContext);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardConstantFunctionWithContext(ConstantFunctionPointerWithContext);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardUnaryFunction final : public Statement
     {
    public:
       UnaryFunctionPointer function;
-      StandardUnaryFunction(UnaryFunctionPointer);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardUnaryFunction(UnaryFunctionPointer);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardUnaryFunctionWithContext final : public Statement
     {
    public:
       UnaryFunctionPointerWithContext function;
-      StandardUnaryFunctionWithContext(UnaryFunctionPointerWithContext);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardUnaryFunctionWithContext(UnaryFunctionPointerWithContext);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardBinaryFunction final : public Statement
     {
    public:
       BinaryFunctionPointer function;
-      StandardBinaryFunction(BinaryFunctionPointer);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardBinaryFunction(BinaryFunctionPointer);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
    class StandardTernaryFunction final : public Statement
     {
    public:
       TernaryFunctionPointer function;
-      StandardTernaryFunction(TernaryFunctionPointer);
-      std::shared_ptr<FlowControl> execute (CallingContext&) const;
+      explicit StandardTernaryFunction(TernaryFunctionPointer);
+      std::shared_ptr<FlowControl> execute (CallingContext&) const override;
     };
 
  } // namespace Engine

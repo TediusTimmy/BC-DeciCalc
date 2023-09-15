@@ -420,7 +420,7 @@ void UpdateScreen(SharedData& data)
    refresh();
  }
 
-size_t CountColumns(SharedData& data, size_t fromHere, int x)
+size_t CountColumns(const SharedData& data, size_t fromHere, int x)
  {
    size_t tc = 0U;
    size_t cc = fromHere;
@@ -442,7 +442,7 @@ size_t CountColumns(SharedData& data, size_t fromHere, int x)
    return tc;
  }
 
-size_t CountColumnsLeft(SharedData& data, size_t fromHere, int x)
+size_t CountColumnsLeft(const SharedData& data, size_t fromHere, int x)
  {
    size_t tc = 0U;
    size_t cc = fromHere;

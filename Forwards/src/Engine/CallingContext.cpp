@@ -37,7 +37,7 @@ namespace Forwards
 namespace Engine
  {
 
-   CallingContext::CallingContext() : inUserInput(false), generation(1U), theSheet(nullptr)
+   CallingContext::CallingContext() : inUserInput(false), generation(1U), theSheet(nullptr), map(nullptr)
     {
     }
 

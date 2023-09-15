@@ -87,8 +87,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      GlobalGetter(size_t location);
-      std::shared_ptr<Types::ValueType> get(CallingContext&) const;
+      explicit GlobalGetter(size_t location);
+      std::shared_ptr<Types::ValueType> get(CallingContext&) const override;
     };
 
    class GlobalSetter final : public Setter
@@ -96,8 +96,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      GlobalSetter(size_t location);
-      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const;
+      explicit GlobalSetter(size_t location);
+      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const override;
     };
 
    class ScopeGetter final : public Getter
@@ -105,8 +105,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      ScopeGetter(size_t location);
-      std::shared_ptr<Types::ValueType> get(CallingContext&) const;
+      explicit ScopeGetter(size_t location);
+      std::shared_ptr<Types::ValueType> get(CallingContext&) const override;
     };
 
    class ScopeSetter final : public Setter
@@ -114,8 +114,8 @@ namespace Engine
    private:
       size_t location;
    public:
-      ScopeSetter(size_t location);
-      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const;
+      explicit ScopeSetter(size_t location);
+      void set(CallingContext&, const std::shared_ptr<Types::ValueType>&) const override;
     };
 
    typedef std::shared_ptr<Types::ValueType> (*ConstantFunctionPointer)(void);

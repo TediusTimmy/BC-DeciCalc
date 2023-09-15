@@ -66,7 +66,7 @@ namespace Engine
 
       Constant(const Input::Token&, const std::shared_ptr<Types::ValueType>&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
     };
 
    class Variable final : public Expression
@@ -76,7 +76,7 @@ namespace Engine
 
       Variable(const Input::Token&, const std::shared_ptr<Getter>&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext& context) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext& context) const override;
     };
 
 #define BinaryOperation(x) \
@@ -85,7 +85,7 @@ namespace Engine
    public: \
       std::shared_ptr<Expression> lhs, rhs; \
       x(const Input::Token&, const std::shared_ptr<Expression>&, const std::shared_ptr<Expression>&); \
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const; \
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override; \
     };
 
    BinaryOperation(Plus)
@@ -109,7 +109,7 @@ namespace Engine
    public: \
       std::shared_ptr<Expression> arg; \
       x(const Input::Token&, const std::shared_ptr<Expression>&); \
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const; \
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override; \
     };
 
    UnaryOperation(Not)
@@ -125,7 +125,7 @@ namespace Engine
 
       FunctionCall(const Input::Token&, const std::shared_ptr<Expression>&, const std::vector<std::shared_ptr<Expression> >&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
     };
 
 
@@ -140,7 +140,7 @@ namespace Engine
       BuildFunction(const Input::Token&, const std::shared_ptr<FunctionContext>&, const std::vector<std::shared_ptr<Expression> >&);
       BuildFunction(const Input::Token&, const std::vector<std::shared_ptr<Expression> >&, const std::weak_ptr<FunctionContext>&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
     };
 
 
@@ -153,7 +153,7 @@ namespace Engine
       TernaryOperation(const Input::Token&,
          const std::shared_ptr<Expression>&, const std::shared_ptr<Expression>&, const std::shared_ptr<Expression>&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
     };
 
  } // namespace Engine

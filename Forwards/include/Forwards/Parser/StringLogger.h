@@ -47,8 +47,8 @@ class StringLogger final : public Backwards::Engine::Logger
  {
 public:
    std::vector<std::string> logs;
-   void log (const std::string& message) { logs.emplace_back(message); }
-   std::string get () { return ""; }
+   void log (const std::string& message) override { logs.emplace_back(message); }
+   std::string get () override { return ""; }
  };
 
  } // namespace Parser

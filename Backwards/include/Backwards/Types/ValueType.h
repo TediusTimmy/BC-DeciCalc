@@ -98,7 +98,7 @@ namespace Types
    virtual bool sort (const NilValue& lhs) const override; \
    virtual bool sort (const CellRefValue& lhs) const override; \
    virtual bool sort (const CellRangeValue& lhs) const override; \
-   virtual size_t hash() const;
+   virtual size_t hash() const override;
 
 #define IMPLEMENT(x,y) \
    std::shared_ptr<ValueType> x::y (const ValueType& rhs) const \
@@ -167,7 +167,7 @@ namespace Types
       std::string message;
 
    public:
-      TypedOperationException(const std::string& message) : message(message) { }
+      explicit TypedOperationException(const std::string& message) : message(message) { }
 
       ~TypedOperationException() throw() { }
 

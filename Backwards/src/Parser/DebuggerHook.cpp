@@ -148,10 +148,10 @@ namespace Engine
 
       std::string line, prevLine;
       StackFrame* frame = context.currentFrame;
-      std::stringstream str;
-      str << "In function ";
-      outputFrame(str, frame);
-      context.logger->log(str.str());
+      std::stringstream bstr;
+      bstr << "In function ";
+      outputFrame(bstr, frame);
+      context.logger->log(bstr.str());
       line = context.logger->get();
       while ("quit" != line)
       {

@@ -51,7 +51,7 @@ namespace Parser
       std::string message;
 
    public:
-      ParserException(const std::string& message) : message(message) { }
+      explicit ParserException(const std::string& message) : message(message) { }
 
       ~ParserException() throw() { }
 

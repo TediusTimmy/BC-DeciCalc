@@ -79,8 +79,8 @@ namespace Engine
 
       Constant(const Input::Token&, const std::shared_ptr<Types::ValueType>&);
 
-      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const;
-      std::string toString(size_t, size_t, int) const;
+      std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
+      std::string toString(size_t, size_t, int) const override;
 
       static std::shared_ptr<Types::ValueType> finalConst(std::shared_ptr<Types::CellRefValue>, CallingContext&, const Input::Token&);
     };

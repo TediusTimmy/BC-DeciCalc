@@ -70,7 +70,7 @@ namespace Engine
       void pushCell(CellFrame* cell);
       void popCell();
 
-      virtual std::shared_ptr<Backwards::Engine::CallingContext> duplicate(); // This function exists for the debugger.
+      virtual std::shared_ptr<Backwards::Engine::CallingContext> duplicate() override; // This function exists for the debugger.
 
    private:
       std::vector<CellFrame*> cells;

@@ -59,15 +59,15 @@ namespace Types
       std::shared_ptr<CellRefHolder> value;
 
       CellRefValue();
-      CellRefValue(const std::shared_ptr<CellRefHolder>& value);
+      explicit CellRefValue(const std::shared_ptr<CellRefHolder>& value);
 
       CellRefValue(const CellRefValue&) = delete;
       CellRefValue& operator=(const CellRefValue&) = delete;
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      bool equal (const CellRefValue& lhs) const;
-      bool notEqual (const CellRefValue& lhs) const;
+      bool equal (const CellRefValue& lhs) const override;
+      bool notEqual (const CellRefValue& lhs) const override;
 
       DECLAREVISITOR
 

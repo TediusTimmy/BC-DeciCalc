@@ -47,10 +47,10 @@ namespace Types
 
       NilValue();
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      bool equal (const NilValue& lhs) const;
-      bool notEqual (const NilValue& lhs) const;
+      bool equal (const NilValue& lhs) const override;
+      bool notEqual (const NilValue& lhs) const override;
 
       DECLAREVISITOR
 

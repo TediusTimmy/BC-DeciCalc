@@ -48,26 +48,26 @@ namespace Types
    public:
       std::vector<std::shared_ptr<ValueType> > value;
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      std::shared_ptr<ValueType> neg() const;
+      std::shared_ptr<ValueType> neg() const override;
 
-      std::shared_ptr<ValueType> add (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> add (const StringValue& lhs) const;
-      std::shared_ptr<ValueType> add (const ArrayValue& lhs) const;
-      std::shared_ptr<ValueType> add (const DictionaryValue& lhs) const;
-      std::shared_ptr<ValueType> sub (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> sub (const ArrayValue& lhs) const;
-      std::shared_ptr<ValueType> sub (const DictionaryValue& lhs) const;
-      std::shared_ptr<ValueType> mul (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> mul (const ArrayValue& lhs) const;
-      std::shared_ptr<ValueType> mul (const DictionaryValue& lhs) const;
-      std::shared_ptr<ValueType> div (const FloatValue& lhs) const;
-      std::shared_ptr<ValueType> div (const ArrayValue& lhs) const;
-      std::shared_ptr<ValueType> div (const DictionaryValue& lhs) const;
+      std::shared_ptr<ValueType> add (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> add (const StringValue& lhs) const override;
+      std::shared_ptr<ValueType> add (const ArrayValue& lhs) const override;
+      std::shared_ptr<ValueType> add (const DictionaryValue& lhs) const override;
+      std::shared_ptr<ValueType> sub (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> sub (const ArrayValue& lhs) const override;
+      std::shared_ptr<ValueType> sub (const DictionaryValue& lhs) const override;
+      std::shared_ptr<ValueType> mul (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> mul (const ArrayValue& lhs) const override;
+      std::shared_ptr<ValueType> mul (const DictionaryValue& lhs) const override;
+      std::shared_ptr<ValueType> div (const FloatValue& lhs) const override;
+      std::shared_ptr<ValueType> div (const ArrayValue& lhs) const override;
+      std::shared_ptr<ValueType> div (const DictionaryValue& lhs) const override;
 
-      bool equal (const ArrayValue& lhs) const;
-      bool notEqual (const ArrayValue& lhs) const;
+      bool equal (const ArrayValue& lhs) const override;
+      bool notEqual (const ArrayValue& lhs) const override;
 
       DECLAREVISITOR
 

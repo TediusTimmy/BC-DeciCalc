@@ -48,14 +48,14 @@ namespace Engine
       std::shared_ptr<Expression> value;
 
       CellRefEval();
-      CellRefEval(const std::shared_ptr<Expression>&);
+      explicit CellRefEval(const std::shared_ptr<Expression>&);
 
-      virtual std::shared_ptr<Backwards::Types::ValueType> evaluate (Backwards::Engine::CallingContext&) const;
+      virtual std::shared_ptr<Backwards::Types::ValueType> evaluate (Backwards::Engine::CallingContext&) const override;
 
-      virtual bool equal (const Backwards::Types::CellRefValue& lhs) const;
-      virtual bool notEqual (const Backwards::Types::CellRefValue& lhs) const;
-      virtual bool sort (const Backwards::Types::CellRefValue& lhs) const;
-      virtual size_t hash() const;
+      virtual bool equal (const Backwards::Types::CellRefValue& lhs) const override;
+      virtual bool notEqual (const Backwards::Types::CellRefValue& lhs) const override;
+      virtual bool sort (const Backwards::Types::CellRefValue& lhs) const override;
+      virtual size_t hash() const override;
     };
 
  } // namespace Engine

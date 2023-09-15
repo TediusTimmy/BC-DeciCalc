@@ -48,7 +48,7 @@ namespace Types
       BigInt::Fixed value;
 
       FloatValue();
-      FloatValue(const BigInt::Fixed& value);
+      explicit FloatValue(const BigInt::Fixed& value);
 
       const std::string& getTypeName() const override;
       std::string toString(size_t, size_t) const override;

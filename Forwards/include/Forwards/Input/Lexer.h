@@ -63,10 +63,10 @@ namespace Input
 
    public:
 
-      Token peekNextToken (void) { return nextToken; }
+      const Token& peekNextToken (void) const { return nextToken; }
       Token getNextToken (void); // Returns nextToken and then updates nextToken.
 
-      Lexer (Backwards::Input::GenericInput& input, size_t location = 1U);
+      explicit Lexer (Backwards::Input::GenericInput& input, size_t location = 1U);
 
     };
 

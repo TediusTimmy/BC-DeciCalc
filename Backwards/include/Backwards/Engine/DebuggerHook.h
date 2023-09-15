@@ -50,7 +50,7 @@ namespace Engine
     {
    public:
       static void printValue(std::ostream&, const std::shared_ptr<Types::ValueType>&);
-      virtual void EnterDebugger(const std::string& exceptionMessage, CallingContext& context);
+      virtual void EnterDebugger(const std::string& exceptionMessage, CallingContext& context) override;
     };
 
  } // namespace Engine

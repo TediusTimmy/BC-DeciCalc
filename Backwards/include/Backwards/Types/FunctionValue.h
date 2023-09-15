@@ -67,10 +67,10 @@ namespace Types
 
       FunctionValue& operator=(const FunctionValue&) = delete;
 
-      const std::string& getTypeName() const;
+      const std::string& getTypeName() const override;
 
-      bool equal (const FunctionValue& lhs) const;
-      bool notEqual (const FunctionValue& lhs) const;
+      bool equal (const FunctionValue& lhs) const override;
+      bool notEqual (const FunctionValue& lhs) const override;
 
       DECLAREVISITOR
 

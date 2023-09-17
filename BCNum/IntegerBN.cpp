@@ -28,40 +28,63 @@ SUCH DAMAGE.
 */
 
 #include "Integer.hpp"
-#include <gmp.h>
-#include <cstdlib>
+#include <openssl/bn.h>
+#include <cstring>
 
 namespace BigInt
  {
 
+      // I'm going to handle this the same way OpenBSD does.
+   static void bn_check (int x)
+    {
+      if (0 == x)
+       {
+         throw std::bad_alloc();
+       }
+    }
+
+   static void bn_check (const void* p)
+   { 
+      if (nullptr == p)
+       {
+         throw std::bad_alloc();
+       }
+    }
+
    class DataHolder
     {
    public:
-      mpz_t Data;
+      BIGNUM* Data;
 
       DataHolder ()
        {
-         mpz_init(Data);
+         bn_check(Data = BN_new());
        }
 
       ~DataHolder ()
        {
-         mpz_clear(Data);
+         BN_free(Data);
        }
 
       explicit DataHolder (unsigned long src)
        {
-         mpz_init_set_ui(Data, src);
+         bn_check(Data = BN_new());
+         bn_check(BN_set_word(Data, src));
        }
 
       DataHolder (const DataHolder & src)
        {
-         mpz_init_set(Data, src.Data);
+         bn_check(Data = BN_dup(src.Data));
        }
 
       DataHolder (const char* src)
        {
-         mpz_init_set_str(Data, src, 10);
+         bn_check(Data = BN_new());
+         int len = BN_dec2bn(&Data, src);
+         if (static_cast<size_t>(len) != std::strlen(src))
+          {
+            BN_clear(Data);
+          }
        }
     };
 
@@ -84,12 +107,15 @@ namespace BigInt
 
    bool Integer::isEven (void) const
     {
-      return isZero() ? true : mpz_even_p(Data->Data);
+      return isZero() ? true : !BN_is_odd(Data->Data);
     }
 
    bool Integer::is0mod5 (void) const
     {
-      return isZero() ? true : (0 != mpz_divisible_ui_p (Data->Data, 5U));
+      if (isZero()) return true;
+      Integer five (5U), quot, rem;
+      quotrem(*this, five, quot, rem);
+      return rem.isZero();
     }
 
    Integer& Integer::negate (void)
@@ -107,8 +133,9 @@ namespace BigInt
 
    long Integer::toInt (void) const //It works for its purpose.
     {
-      if (isZero() || (0 == mpz_fits_sint_p(Data->Data))) return 0;
-      return Sign ? -mpz_get_si(Data->Data) : mpz_get_si(Data->Data);
+      if (isZero()) return 0;
+      if (~0UL == BN_get_word(Data->Data)) return 0;
+      return Sign ? -BN_get_word(Data->Data) : BN_get_word(Data->Data);
     }
 
 
@@ -156,8 +183,8 @@ namespace BigInt
          Return the unsigned comparison, remembering that if we are
          negative, then the result is negated.
        */
-      if (Sign) return -mpz_cmp(Data->Data, to.Data->Data);
-      return mpz_cmp(Data->Data, to.Data->Data);
+      if (Sign) return -BN_cmp(Data->Data, to.Data->Data);
+      return BN_cmp(Data->Data, to.Data->Data);
     }
 
 
@@ -178,18 +205,19 @@ namespace BigInt
       result.Sign = lhs.Sign;
       result.Data = std::make_shared<DataHolder>();
 
-      if (lhs.Sign == rhs.Sign) mpz_add(result.Data->Data, lhs.Data->Data, rhs.Data->Data);
-      else mpz_sub(result.Data->Data, lhs.Data->Data, rhs.Data->Data);
+      if (lhs.Sign == rhs.Sign) bn_check(BN_add(result.Data->Data, lhs.Data->Data, rhs.Data->Data));
+      else bn_check(BN_sub(result.Data->Data, lhs.Data->Data, rhs.Data->Data));
 
-      int sign = mpz_sgn(result.Data->Data);
+      int sign = -BN_is_negative(result.Data->Data);
+      sign |= BN_is_zero(result.Data->Data);
       switch (sign)
        {
          case -1:
             result.Sign = !result.Sign;
-            mpz_abs(result.Data->Data, result.Data->Data);
+            BN_set_negative(result.Data->Data, 0);
             break;
 
-         case 0:
+         case 1:
             result.Sign = false;
             result.Data.reset();
             break;
@@ -217,18 +245,19 @@ namespace BigInt
       result.Sign = lhs.Sign;
       result.Data = std::make_shared<DataHolder>();
 
-      if (lhs.Sign == rhs.Sign) mpz_sub(result.Data->Data, lhs.Data->Data, rhs.Data->Data);
-      else mpz_add(result.Data->Data, lhs.Data->Data, rhs.Data->Data);
+      if (lhs.Sign == rhs.Sign) bn_check(BN_sub(result.Data->Data, lhs.Data->Data, rhs.Data->Data));
+      else bn_check(BN_add(result.Data->Data, lhs.Data->Data, rhs.Data->Data));
 
-      int sign = mpz_sgn(result.Data->Data);
+      int sign = -BN_is_negative(result.Data->Data);
+      sign |= BN_is_zero(result.Data->Data);
       switch (sign)
        {
          case -1:
             result.Sign = !result.Sign;
-            mpz_abs(result.Data->Data, result.Data->Data);
+            BN_set_negative(result.Data->Data, 0);
             break;
 
-         case 0:
+         case 1:
             result.Sign = false;
             result.Data.reset();
             break;
@@ -250,7 +279,10 @@ namespace BigInt
        }
 
       result.Data = std::make_shared<DataHolder>();
-      mpz_mul(result.Data->Data, lhs.Data->Data, rhs.Data->Data);
+      BN_CTX* tctx = BN_CTX_new();
+      bn_check(tctx);
+      bn_check(BN_mul(result.Data->Data, lhs.Data->Data, rhs.Data->Data, tctx));
+      BN_CTX_free(tctx);
       result.Sign = lhs.Sign ^ rhs.Sign;
 
       return result;
@@ -268,15 +300,16 @@ namespace BigInt
       Sign = false;
       Data = std::make_shared<DataHolder>(src);
 
-      int sign = mpz_sgn(Data->Data);
+      int sign = -BN_is_negative(Data->Data);
+      sign |= BN_is_zero(Data->Data);
       switch (sign)
        {
          case -1:
             Sign = true;
-            mpz_abs(Data->Data, Data->Data);
+            BN_set_negative(Data->Data, 0);
             break;
 
-         case 0:
+         case 1:
             Data.reset();
             break;
 
@@ -294,9 +327,10 @@ namespace BigInt
       if (isZero()) return std::string("0");
       if (isSigned()) result = "-";
 
-      char * rstring = mpz_get_str(nullptr, 10, Data->Data);
+      char * rstring = BN_bn2dec(Data->Data);
+      bn_check(rstring);
       result += rstring;
-      std::free(rstring);
+      OPENSSL_free(rstring);
 
       return result;
     }
@@ -327,20 +361,23 @@ namespace BigInt
       quot = std::make_shared<DataHolder>();
       rem = std::make_shared<DataHolder>();
 
-      mpz_tdiv_qr(quot->Data, rem->Data, lhs.Data->Data, rhs.Data->Data);
+      BN_CTX* tctx = BN_CTX_new();
+      bn_check(tctx);
+      bn_check(BN_div(quot->Data, rem->Data, lhs.Data->Data, rhs.Data->Data, tctx));
+      BN_CTX_free(tctx);
 
       q = Integer();
       r = Integer();
 
-      int sign = mpz_sgn(quot->Data);
-      if (0 != sign)
+      int sign = BN_is_zero(quot->Data);
+      if (1 != sign)
        {
          q.Data = quot;
          q.Sign = qSign;
        }
 
-      sign = mpz_sgn(rem->Data);
-      if (0 != sign)
+      sign = BN_is_zero(rem->Data);
+      if (1 != sign)
        {
          r.Data = rem;
          r.Sign = rSign;
@@ -351,14 +388,18 @@ namespace BigInt
 
    Integer pow10 (unsigned long power)
     {
-      Integer result, ten;
+      Integer result, ten, Power;
 
       if (0U == power) return Integer(1U);
 
       ten = Integer(10U);
+      Power = Integer(power);
       result.Data = std::make_shared<DataHolder>();
 
-      mpz_pow_ui(result.Data->Data, ten.Data->Data, power);
+      BN_CTX* tctx = BN_CTX_new();
+      bn_check(tctx);
+      bn_check(BN_exp(result.Data->Data, ten.Data->Data, Power.Data->Data, tctx));
+      BN_CTX_free(tctx);
 
       return result;
     }

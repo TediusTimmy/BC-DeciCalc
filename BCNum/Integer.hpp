@@ -60,10 +60,10 @@ namespace BigInt
          bool isEven (void) const;
          bool is0mod5 (void) const;
 
-         std::string toString (int base = 10) const;
+         std::string toString () const;
 
-         void fromString (const std::string&, int base = 10);
-         void fromString (const char *, int base = 10);
+         void fromString (const std::string&);
+         void fromString (const char *);
 
          Integer& negate (void);
          Integer& abs (void);

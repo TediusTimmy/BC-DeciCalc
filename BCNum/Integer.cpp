@@ -59,7 +59,7 @@ namespace BigInt
          mpz_init_set(Data, src.Data);
        }
 
-      DataHolder (const char* src)
+      explicit DataHolder (const char* src)
        {
          mpz_init_set_str(Data, src, 10);
        }

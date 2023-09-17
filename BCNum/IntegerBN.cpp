@@ -77,7 +77,7 @@ namespace BigInt
          bn_check(Data = BN_dup(src.Data));
        }
 
-      DataHolder (const char* src)
+      explicit DataHolder (const char* src)
        {
          bn_check(Data = BN_new());
          int len = BN_dec2bn(&Data, src);

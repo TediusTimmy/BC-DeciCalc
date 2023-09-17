@@ -79,7 +79,7 @@ namespace Engine
       std::vector<Scope*> scopes;
 
    protected:
-      virtual void duplicate(std::shared_ptr<CallingContext>);
+      void duplicate(std::shared_ptr<CallingContext>);
     };
 
    class GlobalGetter final : public Getter

@@ -76,7 +76,7 @@ namespace Engine
       std::vector<CellFrame*> cells;
 
    protected:
-      virtual void duplicate(std::shared_ptr<CallingContext>);
+      void duplicate(std::shared_ptr<CallingContext>);
     };
 
  } // namespace Engine

@@ -209,7 +209,7 @@ namespace Engine
       size_t c = result.find('\n');
       if (std::string::npos != c)
        {
-         result = result.substr(0U, c);
+         result.resize(c);
        }
       return result;
     }

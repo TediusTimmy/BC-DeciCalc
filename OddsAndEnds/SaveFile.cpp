@@ -48,7 +48,7 @@ static void replaceAll(std::string& in, char ch, const std::string& with)
    c = in.rfind(ch, std::string::npos);
    while (std::string::npos != c)
     {
-      in = in.substr(0U, c) + with + in.substr(c + 1U, std::string::npos);
+      in.replace(c, 1U, with);
       if (0U != c)
          c = in.rfind(ch, c - 1U);
       else
@@ -174,7 +174,7 @@ static void replaceAllEntities(std::string& in, const std::string& ent, const st
    c = in.rfind(ent, std::string::npos);
    while (std::string::npos != c)
     {
-      in = in.substr(0U, c) + with + in.substr(c + ent.length(), std::string::npos);
+      in.replace(c, ent.length(), with);
       if (0U != c)
          c = in.rfind(ent, c - 1U);
       else
@@ -227,7 +227,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
       std::getline(file, curCol);
       if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
        {
-         curCol = curCol.substr(0U, curCol.size() - 1U);
+         curCol.resize(curCol.size() - 1U);
        }
       while (("<table>" != curCol) && (true == file.good()))
        {
@@ -245,7 +245,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
          std::getline(file, curCol);
          if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
           {
-            curCol = curCol.substr(0U, curCol.size() - 1U);
+            curCol.resize(curCol.size() - 1U);
           }
        }
     }
@@ -254,7 +254,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
    std::getline(file, curCol);
    if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
     {
-      curCol = curCol.substr(0U, curCol.size() - 1U);
+      curCol.resize(curCol.size() - 1U);
     }
    size_t col = 0U;
    while (("</table></body></html>" != curCol) && (true == file.good()))
@@ -358,7 +358,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
       std::getline(file, curCol);
       if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
        {
-         curCol = curCol.substr(0U, curCol.size() - 1U);
+         curCol.resize(curCol.size() - 1U);
        }
     }
  }

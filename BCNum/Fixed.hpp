@@ -75,7 +75,7 @@ namespace BigInt
 
          Fixed (const Fixed & from) :
             Data (from.Data), Digits (from.Digits) { }
-         Fixed (unsigned long precision = defPrec) :
+         explicit Fixed (unsigned long precision = defPrec) :
             Data (), Digits (precision) { }
          explicit Fixed (long long i, unsigned long p = defPrec) :
             Data (static_cast<long>(i)), Digits (p) { } // Long long is used to assist the compiler.

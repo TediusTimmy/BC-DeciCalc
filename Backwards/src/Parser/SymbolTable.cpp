@@ -287,7 +287,6 @@ namespace Parser
    std::shared_ptr<Engine::Expression> SymbolTable::buildPushBack(const Input::Token& buildToken,
       const std::shared_ptr<Engine::Expression>& lhs, const std::shared_ptr<Engine::Expression>& rhs) const
     {
-      std::shared_ptr<Engine::Expression> result;
       std::vector<std::shared_ptr<Engine::Expression> > args;
       args.push_back(lhs);
       args.push_back(rhs);
@@ -302,7 +301,6 @@ namespace Parser
             const std::shared_ptr<Engine::Expression>& first, const std::shared_ptr<Engine::Expression>& second,
             const std::shared_ptr<Engine::Expression>& third) const
     {
-      std::shared_ptr<Engine::Expression> result;
       std::vector<std::shared_ptr<Engine::Expression> > args;
       args.push_back(first);
       args.push_back(second);

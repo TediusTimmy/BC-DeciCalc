@@ -157,7 +157,7 @@ void UpdateScreen(SharedData& data)
           {
             std::string content = curCell->previousValue->toString(data.c_col, data.c_row);
             if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
-            if (content.size() > static_cast<size_t>(x - 22)) content = content.substr(0U, x - 22);
+            if (content.size() > static_cast<size_t>(x - 22)) content.resize(x - 22);
             printw("%s", content.c_str());
             for (int i = (x - 21 - content.size()); i > 0; --i) addch(' ');
           }
@@ -204,7 +204,7 @@ void UpdateScreen(SharedData& data)
                content = result->toString(data.c_col, data.c_row);
              }
             content = setComma(content, data.useComma);
-            if (content.size() > static_cast<size_t>(x - 1)) content = content.substr(0U, x - 1);
+            if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
           }
@@ -213,7 +213,7 @@ void UpdateScreen(SharedData& data)
           {
             std::string content = curCell->value->toString(data.c_col, data.c_row);
             if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
-            if (content.size() > static_cast<size_t>(x - 1)) content = content.substr(0U, x - 1);
+            if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
           }
@@ -221,7 +221,7 @@ void UpdateScreen(SharedData& data)
          else
           {
             std::string content = curCell->currentInput;
-            if (content.size() > static_cast<size_t>(x - 1)) content = content.substr(0U, x - 1);
+            if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
           }
@@ -242,7 +242,7 @@ void UpdateScreen(SharedData& data)
             std::string content = curCell->currentInput.substr(data.baseChar, std::string::npos);
             if (content.size() > static_cast<size_t>(x))
              {
-               content = content.substr(0U, x);
+               content.resize(x);
              }
             mx = data.editChar - data.baseChar;
             printw("%s", content.c_str());
@@ -254,7 +254,7 @@ void UpdateScreen(SharedData& data)
              {
                std::string content = curCell->value->toString(data.c_col, data.c_row);
                if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
-               if (content.size() > static_cast<size_t>(x - 1)) content = content.substr(0U, x - 1);
+               if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
                printw("%s", content.c_str());
                for (int i = (x - content.size()); i > 0; --i) addch(' ');
              }
@@ -366,11 +366,12 @@ void UpdateScreen(SharedData& data)
                    {
                      if (Forwards::Types::FLOAT == curCell->previousValue->getType()) // Make numbers note that they are truncated.
                       {
-                        content = content.substr(0U, nextWidth - 1) + "#";
+                        content.resize(nextWidth - 1);
+                        content += "#";
                       }
                      else // Truncate strings
                       {
-                        content = content.substr(0U, nextWidth);
+                        content.resize(nextWidth);
                       }
                    }
                   if (content.size() < static_cast<size_t>(nextWidth))
@@ -391,7 +392,7 @@ void UpdateScreen(SharedData& data)
                   attron(COLOR_PAIR(5));
                   for (int i = 0; i < static_cast<int>((nextWidth - 3) >> 1); ++i) addch(' ');
                   std::string temp = "***";
-                  if (temp.size() > static_cast<size_t>(nextWidth)) temp = temp.substr(0U, nextWidth);
+                  if (temp.size() > static_cast<size_t>(nextWidth)) temp.resize(nextWidth);
                   printw("%s", temp.c_str());
                   for (int i = 0; i < static_cast<int>((nextWidth - 3) >> 1); ++i) addch(' ');
                   if ((nextWidth > 3) && ((nextWidth - 3) & 1U)) addch(' ');

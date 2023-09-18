@@ -209,7 +209,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
    std::getline(file, curCol);
    if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
     {
-      curCol = curCol.substr(0U, curCol.size() - 1U);
+      curCol.resize(curCol.size() - 1U);
     }
    if (("<html><head><style>td { border: 1px solid black; }</style></head><body><table>" != curCol) &&
       ("<html><head><style>td { border: 1px solid black; }</style></head><body>" != curCol)) // I WILL REGRET THIS!

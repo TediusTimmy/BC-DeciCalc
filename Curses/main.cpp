@@ -139,7 +139,6 @@ int main (int argc, char ** argv)
    if (true == state.saveRequested)
     {
       SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width, fileLibs);
-      state.saveRequested = false;
     }
 
    if (false == logger.logs.empty())

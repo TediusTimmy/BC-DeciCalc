@@ -112,10 +112,7 @@ namespace BigInt
 
    bool Integer::is0mod5 (void) const
     {
-      if (isZero()) return true;
-      Integer five (5U), quot, rem;
-      quotrem(*this, five, quot, rem);
-      return rem.isZero();
+      return isZero() ? true : (0 == BN_mod_word(Data->Data, 5U));
     }
 
    Integer& Integer::negate (void)

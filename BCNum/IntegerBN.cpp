@@ -72,11 +72,6 @@ namespace BigInt
          bn_check(BN_set_word(Data, src));
        }
 
-      DataHolder (const DataHolder & src)
-       {
-         bn_check(Data = BN_dup(src.Data));
-       }
-
       explicit DataHolder (const char* src)
        {
          bn_check(Data = BN_new());
@@ -385,18 +380,23 @@ namespace BigInt
 
    Integer pow10 (unsigned long power)
     {
-      Integer result, ten, Power;
+      Integer result;
+      BIGNUM* ten, *Power;
 
       if (0U == power) return Integer(1U);
 
-      ten = Integer(10U);
-      Power = Integer(power);
+      bn_check(ten = BN_new());
+      bn_check(BN_set_word(ten, 10U));
+      bn_check(Power = BN_new());
+      bn_check(BN_set_word(Power, power));
       result.Data = std::make_shared<DataHolder>();
 
       BN_CTX* tctx = BN_CTX_new();
       bn_check(tctx);
-      bn_check(BN_exp(result.Data->Data, ten.Data->Data, Power.Data->Data, tctx));
+      bn_check(BN_exp(result.Data->Data, ten, Power, tctx));
       BN_CTX_free(tctx);
+      BN_free(ten);
+      BN_free(Power);
 
       return result;
     }

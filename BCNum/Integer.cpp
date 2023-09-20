@@ -54,11 +54,6 @@ namespace BigInt
          mpz_init_set_ui(Data, src);
        }
 
-      DataHolder (const DataHolder & src)
-       {
-         mpz_init_set(Data, src.Data);
-       }
-
       explicit DataHolder (const char* src)
        {
          mpz_init_set_str(Data, src, 10);

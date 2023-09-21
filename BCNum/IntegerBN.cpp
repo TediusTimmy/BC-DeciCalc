@@ -52,7 +52,7 @@ namespace BigInt
        }
     }
 
-   static size_t FREE_LIST_SIZE = 128; // FREE_LIST_SIZE - 1 MUST BE a power of 2.
+   static size_t FREE_LIST_SIZE = 128U; // FREE_LIST_SIZE MUST BE a power of 2.
    class StaticHolder
     {
    private:

@@ -30,6 +30,7 @@ SUCH DAMAGE.
 #include "Integer.hpp"
 #include <openssl/bn.h>
 #include <cstring>
+#include <vector>
 
 namespace BigInt
  {
@@ -51,6 +52,69 @@ namespace BigInt
        }
     }
 
+   static size_t FREE_LIST_SIZE = 128; // FREE_LIST_SIZE - 1 MUST BE a power of 2.
+   class StaticHolder
+    {
+   private:
+      std::vector<BIGNUM*> freeList;
+      size_t front, back;
+      BN_CTX* tctx;
+
+      StaticHolder() : freeList(FREE_LIST_SIZE), front(0U), back(0U), tctx(nullptr) { }
+
+   public:
+      static StaticHolder& getInstance()
+       {
+         static StaticHolder instance;
+         return instance;
+       }
+
+      BIGNUM* getNew()
+       {
+         BIGNUM* result;
+         if (front == back)
+          {
+            bn_check(result = BN_new());
+          }
+         else
+          {
+            result = freeList[front];
+            front = (front + 1U) & (FREE_LIST_SIZE - 1U);
+          }
+         return result;
+       }
+
+      void dispose(BIGNUM* ptr)
+       {
+         freeList[back] = ptr;
+         back = (back + 1U) & (FREE_LIST_SIZE - 1U);
+         if (back == front)
+          {
+            BN_free(freeList[front]);
+            front = (front + 1U) & (FREE_LIST_SIZE - 1U);
+          }
+       }
+
+      BN_CTX* getCTX()
+       {
+         if (nullptr == tctx)
+          {
+            bn_check(tctx = BN_CTX_new());
+          }
+         return tctx;
+       }
+
+      ~StaticHolder()
+       {
+         while (front != back)
+          {
+            BN_free(freeList[front]);
+            front = (front + 1U) & (FREE_LIST_SIZE - 1U);
+          }
+         BN_CTX_free(tctx);
+       }
+    };
+
    class DataHolder
     {
    public:
@@ -58,23 +122,23 @@ namespace BigInt
 
       DataHolder ()
        {
-         bn_check(Data = BN_new());
+         Data = StaticHolder::getInstance().getNew();
        }
 
       ~DataHolder ()
        {
-         BN_free(Data);
+         StaticHolder::getInstance().dispose(Data);
        }
 
       explicit DataHolder (unsigned long src)
        {
-         bn_check(Data = BN_new());
+         Data = StaticHolder::getInstance().getNew();
          bn_check(BN_set_word(Data, src));
        }
 
       explicit DataHolder (const char* src)
        {
-         bn_check(Data = BN_new());
+         Data = StaticHolder::getInstance().getNew();
          int len = BN_dec2bn(&Data, src);
          if (static_cast<size_t>(len) != std::strlen(src))
           {
@@ -271,10 +335,7 @@ namespace BigInt
        }
 
       result.Data = std::make_shared<DataHolder>();
-      BN_CTX* tctx = BN_CTX_new();
-      bn_check(tctx);
-      bn_check(BN_mul(result.Data->Data, lhs.Data->Data, rhs.Data->Data, tctx));
-      BN_CTX_free(tctx);
+      bn_check(BN_mul(result.Data->Data, lhs.Data->Data, rhs.Data->Data, StaticHolder::getInstance().getCTX()));
       result.Sign = lhs.Sign ^ rhs.Sign;
 
       return result;
@@ -353,10 +414,7 @@ namespace BigInt
       quot = std::make_shared<DataHolder>();
       rem = std::make_shared<DataHolder>();
 
-      BN_CTX* tctx = BN_CTX_new();
-      bn_check(tctx);
-      bn_check(BN_div(quot->Data, rem->Data, lhs.Data->Data, rhs.Data->Data, tctx));
-      BN_CTX_free(tctx);
+      bn_check(BN_div(quot->Data, rem->Data, lhs.Data->Data, rhs.Data->Data, StaticHolder::getInstance().getCTX()));
 
       q = Integer();
       r = Integer();
@@ -377,26 +435,24 @@ namespace BigInt
     }
 
 
-
+   static BIGNUM *s_ten = nullptr, *s_power = nullptr;
    Integer pow10 (unsigned long power)
     {
       Integer result;
-      BIGNUM* ten, *Power;
 
       if (0U == power) return Integer(1U);
 
-      bn_check(ten = BN_new());
-      bn_check(BN_set_word(ten, 10U));
-      bn_check(Power = BN_new());
-      bn_check(BN_set_word(Power, power));
+      if (nullptr == s_ten)
+       {
+         bn_check(s_ten = BN_new());
+         bn_check(BN_set_word(s_ten, 10U));
+         bn_check(s_power = BN_new());
+       }
+
+      bn_check(BN_set_word(s_power, power));
       result.Data = std::make_shared<DataHolder>();
 
-      BN_CTX* tctx = BN_CTX_new();
-      bn_check(tctx);
-      bn_check(BN_exp(result.Data->Data, ten, Power, tctx));
-      BN_CTX_free(tctx);
-      BN_free(ten);
-      BN_free(Power);
+      bn_check(BN_exp(result.Data->Data, s_ten, s_power, StaticHolder::getInstance().getCTX()));
 
       return result;
     }

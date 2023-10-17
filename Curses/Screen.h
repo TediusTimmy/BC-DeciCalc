@@ -47,7 +47,7 @@ public:
    bool useComma;
 
    size_t def_col_width;
-   std::map<size_t, int> col_widths;
+   std::vector<int> col_widths;
 
    Forwards::Engine::CellType yankedType;
    std::shared_ptr<Forwards::Engine::Expression> yanked;

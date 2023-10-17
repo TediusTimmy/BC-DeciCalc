@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MIN_COLUMN_WIDTH 1
 #define DEF_COLUMN_WIDTH 9
 
-int getWidth(const std::map<std::size_t, int>& map, std::size_t col, int def);
-void setWidth(std::map<std::size_t, int>& map, std::size_t col, int width);
-void incWidth(std::map<std::size_t, int>& map, std::size_t col, int def);
-void decWidth(std::map<std::size_t, int>& map, std::size_t col, int def);
+int getWidth(const std::vector<int>& map, std::size_t col, int def);
+void setWidth(std::vector<int>& map, std::size_t col, int width, int def);
+void incWidth(std::vector<int>& map, std::size_t col, int def);
+void decWidth(std::vector<int>& map, std::size_t col, int def);
 
 #endif /* GETANDSET_H */

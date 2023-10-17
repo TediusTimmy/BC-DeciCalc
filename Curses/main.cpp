@@ -102,7 +102,7 @@ int main (int argc, char ** argv)
          saveFileName = argv[file];
        }
 
-      LoadFile(argv[file], &sheet, state.col_widths, fileLibs);
+      LoadFile(argv[file], &sheet, state.col_widths, state.def_col_width, fileLibs);
     }
 
 

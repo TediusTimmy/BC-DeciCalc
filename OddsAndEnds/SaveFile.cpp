@@ -66,7 +66,7 @@ static std::string harden(const std::string& in)
    return result;
  }
 
-void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theSheet, const std::map<std::size_t, int>& map, int def, const std::vector<std::pair<std::string, std::string> >& allLibs)
+void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theSheet, const std::vector<int>& map, int def, const std::vector<std::pair<std::string, std::string> >& allLibs)
  {
    std::ofstream file (fileName.c_str(), std::ios::out);
    for (auto& column : theSheet->sheet)
@@ -192,7 +192,7 @@ static std::string soften(const std::string& in)
    return result;
  }
 
-void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet, std::map<std::size_t, int>& map, std::vector<std::pair<std::string, std::string> >& fileLibs)
+void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet, std::vector<int>& map, int def, std::vector<std::pair<std::string, std::string> >& fileLibs)
  {
    std::ifstream file (fileName.c_str(), std::ios::in);
    if (!file.good())
@@ -271,7 +271,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
                try
                 {
                   int width = std::stoi(curCol.substr(a + 7, curCol.find('"', a + 7)));
-                  setWidth(map, col, width);
+                  setWidth(map, col, width, def);
                 }
                catch (const std::invalid_argument&)
                 {

@@ -993,6 +993,74 @@ int ProcessInput(SharedData& data)
          break;
        }
       break;
+   case 'x':
+      c = getch();
+      switch (c)
+       {
+      case 'x':
+         data.context->theSheet->removeCellShiftUp(data.c_col, data.c_row);
+         break;
+      case 'X':
+         data.context->theSheet->removeCellShiftLeft(data.c_col, data.c_row);
+         break;
+      case 'c':
+         data.context->theSheet->removeColumn(data.c_col);
+         removeColumn(data.col_widths, data.c_col);
+         break;
+      case 'r':
+         data.context->theSheet->removeRow(data.c_row);
+         break;
+       }
+      data.context->theSheet->recalc(*data.context);
+      break;
+   case 'i':
+      c = getch();
+      switch (c)
+       {
+      case 'i':
+         data.context->theSheet->insertCellBeforeShiftDown(data.c_col, data.c_row);
+         break;
+      case 'c':
+         data.context->theSheet->insertColumnBefore(data.c_col);
+         insertColumnBefore(data.col_widths, data.c_col, data.def_col_width);
+         break;
+      case 'r':
+         data.context->theSheet->insertRowBefore(data.c_row);
+         break;
+       }
+      data.context->theSheet->recalc(*data.context);
+      break;
+   case 'o':
+      c = getch();
+      switch (c)
+       {
+      case 'o':
+         data.context->theSheet->insertCellBeforeShiftRight(data.c_col, data.c_row);
+         break;
+      case 'c':
+         data.context->theSheet->insertColumnBefore(data.c_col + 1U);
+         insertColumnBefore(data.col_widths, data.c_col + 1U, data.def_col_width);
+         break;
+      case 'r':
+         data.context->theSheet->insertRowBefore(data.c_row + 1U);
+         break;
+       }
+      data.context->theSheet->recalc(*data.context);
+      break;
+   case 'v':
+      if ('v' == getch())
+       {
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (nullptr != curCell->previousValue.get()))
+             {
+               curCell->currentInput = curCell->previousValue->toString(data.c_col, data.c_row);
+               if (Forwards::Engine::VALUE == curCell->type) curCell->currentInput = setComma(curCell->currentInput, data.useComma);
+               curCell->value.reset();
+             }
+          }
+       }
+      break;
     }
 
    return returnValue;

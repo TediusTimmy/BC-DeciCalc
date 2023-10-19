@@ -80,10 +80,16 @@ void decWidth(std::vector<int>& map, std::size_t col, int def)
 
 void insertColumnBefore(std::vector<int>& map, std::size_t col, int def)
  {
-   map.insert(map.begin() + col, def);
+   if (map.size() > col)
+    {
+      map.insert(map.begin() + col, def);
+    }
  }
 
 void removeColumn(std::vector<int>& map, std::size_t col)
  {
-   map.erase(map.begin() + col);
+   if (map.size() > col)
+    {
+      map.erase(map.begin() + col);
+    }
  }

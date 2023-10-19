@@ -145,8 +145,8 @@ namespace Engine
 
    void SpreadSheet::swap(size_t col1, size_t col2, size_t row)
     {
-      Cell* one = getCellAt(col1, row);
-      Cell* two = getCellAt(col2, row);
+      const Cell* one = getCellAt(col1, row);
+      const Cell* two = getCellAt(col2, row);
 
       if ((nullptr != one) || (nullptr != two))
        {

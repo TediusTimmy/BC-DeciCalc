@@ -78,6 +78,17 @@ Most of the navigation and commands are taken from the Unix tool `sc`. The tool 
 * `:$` : Goto the last column of the current row with meaningful data in it.
 * `:^` : Goto row 1 of the current column.
 * `:#` : Goto the last row of the current column with meaningful data in it.
+* `xx` : remove the current cell (shifting cells up)
+* `xX` : remove the current cell (shifting cells right)
+* `xr` : remove the current row
+* `xc` : remove the current column
+* `ii` : insert a cell at the current location (shifting cells down)
+* `ir` : insert a row at the current row
+* `ic` : insert a column at the current column
+* `oo` : open a cell at the current location (shifting cells right)
+* `or` : open a row after the current row
+* `oc` : open a column after the current column
+* `vv` : replace the current cell with its evaluated value
 
 ### Edit Mode
 Edit mode is entered when you start entering a label or formula.

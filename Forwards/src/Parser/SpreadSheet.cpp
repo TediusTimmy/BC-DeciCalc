@@ -118,6 +118,119 @@ namespace Engine
        }
     }
 
+   void SpreadSheet::insertColumnBefore(size_t col)
+    {
+      if (col < sheet.size())
+       {
+         sheet.insert(sheet.begin() + col, std::vector<std::unique_ptr<Cell> >());
+       }
+    }
+
+   void SpreadSheet::insertRowBefore(size_t row)
+    {
+      bool didAnything = false;
+      for (size_t i = 0U; i < sheet.size(); ++i)
+       {
+         if (row < sheet[i].size())
+          {
+            sheet[i].insert(sheet[i].begin() + row, std::unique_ptr<Cell>());
+            didAnything = true;
+          }
+       }
+      if (true == didAnything)
+       {
+         ++max_row;
+       }
+    }
+
+   void SpreadSheet::swap(size_t col1, size_t col2, size_t row)
+    {
+      Cell* one = getCellAt(col1, row);
+      Cell* two = getCellAt(col2, row);
+
+      if ((nullptr != one) || (nullptr != two))
+       {
+         if (col2 >= sheet.size()) // col2 > col1, always
+          {
+            sheet.resize(col2 + 1U);
+          }
+         if (row >= sheet[col1].size())
+          {
+            sheet[col1].resize(row + 1U);
+          }
+         if (row >= sheet[col2].size())
+          {
+            sheet[col2].resize(row + 1U);
+          }
+         sheet[col1][row].swap(sheet[col2][row]);
+       }
+    }
+
+   void SpreadSheet::insertCellBeforeShiftRight(size_t col, size_t row)
+    {
+      // Bubble in an empty cell from the far right.
+      for (size_t i = sheet.size(); i > col; --i)
+       {
+         swap(i - 1U, i, row);
+       }
+    }
+
+   void SpreadSheet::insertCellBeforeShiftDown(size_t col, size_t row)
+    {
+      if (col < sheet.size())
+       {
+         if (row < sheet[col].size())
+          {
+            if (sheet[col].size() == max_row)
+             {
+               ++max_row;
+             }
+            sheet[col].insert(sheet[col].begin() + row, std::unique_ptr<Cell>());
+          }
+       }
+    }
+
+   void SpreadSheet::removeColumn(size_t col)
+    {
+      if (col < sheet.size())
+       {
+         sheet.erase(sheet.begin() + col);
+       }
+    }
+
+   void SpreadSheet::removeRow(size_t row)
+    {
+      for (size_t i = 0U; i < sheet.size(); ++i)
+       {
+         if (row < sheet[i].size())
+          {
+            sheet[i].erase(sheet[i].begin() + row);
+          }
+       }
+    }
+
+   void SpreadSheet::removeCellShiftLeft(size_t col, size_t row)
+    {
+      // Clear the cell and bubble it out to the far right.
+      clearCellAt(col, row);
+      for (size_t i = col; i < sheet.size(); ++i) // Don't optimize to sheet.size() - 1
+       {
+         swap(i, i + 1U, row);
+       }
+    }
+
+   void SpreadSheet::removeCellShiftUp(size_t col, size_t row)
+    {
+      if (col < sheet.size())
+       {
+         if (row < sheet[col].size())
+          {
+            sheet[col].erase(sheet[col].begin() + row);
+          }
+       }
+    }
+
+
    std::string SpreadSheet::computeCell(CallingContext& context, std::shared_ptr<Types::ValueType>& OUT, size_t col, size_t row, bool rethrow)
     {
       std::string result;

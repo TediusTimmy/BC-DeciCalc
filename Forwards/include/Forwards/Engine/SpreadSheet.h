@@ -71,8 +71,21 @@ namespace Engine
       void clearColumn(size_t col);
       void clearRow(size_t row);
 
+      void insertColumnBefore(size_t col);
+      void insertRowBefore(size_t row);
+      void insertCellBeforeShiftRight(size_t col, size_t row);
+      void insertCellBeforeShiftDown(size_t col, size_t row);
+
+      void removeColumn(size_t col);
+      void removeRow(size_t row);
+      void removeCellShiftLeft(size_t col, size_t row);
+      void removeCellShiftUp(size_t col, size_t row);
+
       std::string computeCell(CallingContext&, std::shared_ptr<Types::ValueType>& OUT, size_t col, size_t row, bool rethrow);
       void recalc(CallingContext&);
+
+   private:
+      void swap(size_t col1, size_t col2, size_t row); // col2 > col1
     };
 
  } // namespace Engine

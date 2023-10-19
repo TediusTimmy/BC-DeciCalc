@@ -41,4 +41,7 @@ void setWidth(std::vector<int>& map, std::size_t col, int width, int def);
 void incWidth(std::vector<int>& map, std::size_t col, int def);
 void decWidth(std::vector<int>& map, std::size_t col, int def);
 
+void insertColumnBefore(std::vector<int>& map, std::size_t col, int def);
+void removeColumn(std::vector<int>& map, std::size_t col);
+
 #endif /* GETANDSET_H */

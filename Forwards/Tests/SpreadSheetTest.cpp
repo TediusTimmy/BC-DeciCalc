@@ -584,3 +584,469 @@ TEST(EngineTests, testSpreadSheet_ClearRowColumn)
 
    shet.clearRow(5U); // Shouldn't crash.
  }
+
+TEST(EngineTests, testSpreadSheet_TestInsertCells)
+ {
+   Forwards::Engine::CallingContext context;
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.initCellAt(0U, 0U);
+   shet.initCellAt(1U, 0U);
+   shet.initCellAt(2U, 0U);
+   shet.initCellAt(0U, 1U);
+   shet.initCellAt(1U, 1U);
+   shet.initCellAt(2U, 1U);
+   shet.initCellAt(0U, 2U);
+   shet.initCellAt(1U, 2U);
+   shet.initCellAt(2U, 2U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.insertCellBeforeShiftDown(1U, 1U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U)); //
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 3U)); //
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(4U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(4U, shet.max_row);
+
+   shet.insertCellBeforeShiftDown(5U, 1U);
+   shet.insertCellBeforeShiftDown(1U, 5U);
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(4U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(4U, shet.max_row);
+
+   shet.insertCellBeforeShiftRight(1U, 1U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U)); // //
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));    //
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(3U, 1U));    //
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 3U)); //
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(4U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(4U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(2U, shet.sheet[3].size());
+   ASSERT_EQ(4U, shet.max_row);
+
+   shet.insertCellBeforeShiftRight(5U, 1U);
+   shet.insertCellBeforeShiftRight(1U, 5U);
+
+   ASSERT_EQ(4U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(4U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(2U, shet.sheet[3].size());
+   ASSERT_EQ(4U, shet.max_row);
+
+   shet.insertCellBeforeShiftDown(0U, 0U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U)); // //
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));    //
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(3U, 1U));    //
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 3U)); //
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(4U, shet.sheet.size());
+   ASSERT_EQ(4U, shet.sheet[0].size());
+   ASSERT_EQ(4U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(2U, shet.sheet[3].size());
+   ASSERT_EQ(4U, shet.max_row);
+
+
+   shet.sheet.clear();
+   shet.max_row = 0U;
+
+   shet.initCellAt(1U, 1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+
+   shet.insertCellBeforeShiftRight(0U, 1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.sheet[2].size());
+   ASSERT_EQ(2U, shet.max_row);
+ }
+
+TEST(EngineTests, testSpreadSheet_TestRemoveCells)
+ {
+   Forwards::Engine::CallingContext context;
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.initCellAt(0U, 0U);
+   shet.initCellAt(1U, 0U);
+   shet.initCellAt(2U, 0U);
+   shet.initCellAt(0U, 1U);
+   shet.initCellAt(1U, 1U);
+   shet.initCellAt(2U, 1U);
+   shet.initCellAt(0U, 2U);
+   shet.initCellAt(1U, 2U);
+   shet.initCellAt(2U, 2U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeCellShiftLeft(0U, 1U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(3U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeCellShiftUp(0U, 1U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(2U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeCellShiftUp(0U, 5U);
+   shet.removeCellShiftUp(5U, 0U);
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(2U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+
+   shet.sheet.clear();
+   shet.max_row = 0U;
+
+   shet.initCellAt(1U, 1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+
+   shet.removeCellShiftLeft(0U, 1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(3U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 3U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 3U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(2U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+ }
+
+TEST(EngineTests, testSpreadSheet_TestRemoveRowCol)
+ {
+   Forwards::Engine::CallingContext context;
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.initCellAt(2U, 2U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(3U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(0U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.sheet[2].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeColumn(1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(3U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeRow(1U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.max_row);
+
+   shet.removeColumn(4U);
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(3U, shet.max_row);
+ }
+
+TEST(EngineTests, testSpreadSheet_TestInsertRowCol)
+ {
+   Forwards::Engine::CallingContext context;
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.initCellAt(0U, 0U);
+
+   ASSERT_NE(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(1U, shet.sheet.size());
+   ASSERT_EQ(1U, shet.sheet[0].size());
+   ASSERT_EQ(1U, shet.max_row);
+
+   shet.insertColumnBefore(0U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(1U, shet.sheet[1].size());
+   ASSERT_EQ(1U, shet.max_row);
+
+   shet.insertRowBefore(0U);
+
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 0U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 1U));
+   ASSERT_NE(nullptr, shet.getCellAt(1U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 1U));
+   ASSERT_EQ(nullptr, shet.getCellAt(0U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(1U, 2U));
+   ASSERT_EQ(nullptr, shet.getCellAt(2U, 2U));
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+
+   shet.insertColumnBefore(4U);
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+
+   shet.insertRowBefore(4U);
+
+   ASSERT_EQ(2U, shet.sheet.size());
+   ASSERT_EQ(0U, shet.sheet[0].size());
+   ASSERT_EQ(2U, shet.sheet[1].size());
+   ASSERT_EQ(2U, shet.max_row);
+ }

@@ -77,3 +77,13 @@ void decWidth(std::vector<int>& map, std::size_t col, int def)
       --map[col];
     }
  }
+
+void insertColumnBefore(std::vector<int>& map, std::size_t col, int def)
+ {
+   map.insert(map.begin() + col, def);
+ }
+
+void removeColumn(std::vector<int>& map, std::size_t col)
+ {
+   map.erase(map.begin() + col);
+ }

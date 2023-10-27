@@ -699,7 +699,11 @@ int ProcessInput(SharedData& data)
       if (MAX_COL != data.c_col)
        {
          ++data.c_col;
-         if ((data.c_col - data.tr_col) >= tc) ++data.tr_col;
+         if ((data.c_col - data.tr_col) >= tc)
+          {
+            size_t cl = CountColumnsLeft(data, data.c_col, x);
+            data.tr_col = data.c_col - cl + 1U;
+          }
        }
       break;
    case 'J':

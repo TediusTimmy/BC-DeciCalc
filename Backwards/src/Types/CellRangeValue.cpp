@@ -60,6 +60,16 @@ namespace Types
       return name;
     }
 
+   std::shared_ptr<ValueType> CellRangeValue::getIndex (size_t index) const
+    {
+      return value->getIndex(index);
+    }
+
+   size_t CellRangeValue::getSize () const
+    {
+      return value->getSize();
+    }
+
    bool CellRangeValue::equal (const CellRangeValue& lhs) const
     {
       return value->equal(lhs);

@@ -46,6 +46,9 @@ namespace Types
       CellRangeHolder() = default;
       virtual ~CellRangeHolder() = default;
 
+      virtual std::shared_ptr<ValueType> getIndex (size_t index) const = 0;
+      virtual size_t getSize() const = 0;
+
       virtual bool equal (const CellRangeValue& lhs) const = 0;
       virtual bool notEqual (const CellRangeValue& lhs) const = 0;
       virtual bool sort (const CellRangeValue& lhs) const = 0;
@@ -65,6 +68,9 @@ namespace Types
       CellRangeValue& operator=(const CellRangeValue&) = delete;
 
       const std::string& getTypeName() const override;
+
+      std::shared_ptr<ValueType> getIndex (size_t index) const;
+      size_t getSize() const;
 
       bool equal (const CellRangeValue& lhs) const override;
       bool notEqual (const CellRangeValue& lhs) const override;

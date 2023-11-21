@@ -172,6 +172,8 @@ This is the language as implemented. Some of the GoogleTests have good examples,
 * Array (ordinally indexed Dictionary?)
 * Dictionary
 * Function Pointer
+* Spreadsheet Expression Reference (CellRef)
+* Spreadsheet Range
 
 ### Operations
 * \+  float addition; string catenation; for collections, the operation is performed over the contents of the collection
@@ -304,12 +306,16 @@ Old-style Pascal comments really round out the language as being valid even when
 * float SetRoundMode (float) # sets the current rounding mode by number; returns its argument
 * float Size (array)  # size of an array
 * float Size (dictionary)  # number of key,value pairs
+* float Size (CellRange)  # number of columns or rows (if there is only one column)
 * float Sqr (float)  # square
 * float SubString (string; float; float)  # from character float 1 to character float 2 (java style)
 * string ToCharacter (float)  # return a one character string of the given ASCII code (or die if it isn't ASCII)
 * string ToString (float)  # return a string representation of a float: scientific notation, 9 significant figures
 * float ValueOf (string)  # parse the string into a float value
 * string Warn (string)  # log a warning string, returns its argument
+
+### Expanded Cell Ranges
+Originally, a cell range was an opaque type in which the only allowed operation was expanding it into an array. I decided to streamline that and make a cell range a collection type. Now, You can call `GetIndex` and `Size` with a range, use `[]` to index into it, and iterate over it with `for ... in ...`. This should be more efficient if you are passing in a really large range.
 
 ### Rounding Mode Decoder Ring
 Directed rounding modes are a part of IEEE-754 for doing algorithm analysis. Basically, it's a simple idea: change the rounding mode and see how the result changes. Note that the rounding mode only applies to addition, subtraction, multiplication, and division. A note on terminology: rounding to nearest means that behave as though we did the math to get the next digit, and then if the digit is 6-9, we round away from zero, and if 1-4 we round toward zero. A 5 is a "tie", and the round-to-nearest modes all specify how ties are handled, with "to even" and "to odd" meaning to make the least-significant digit of the result even or odd, respectively. Also note that the algorithms do analysis such that the next digit is only considered a 5 if it was EXACTLY a 5. If the next few digits are 500000001, then it is treated as a 6.

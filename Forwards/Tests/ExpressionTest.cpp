@@ -1431,6 +1431,73 @@ TEST(EngineTests, testCellRangeExpand)
       // All operations on defaulted will core.
    //EXPECT_THROW(low.equal(defaulted), Backwards::Engine::ProgrammingException);
    //EXPECT_THROW(low.sort(defaulted), Backwards::Engine::ProgrammingException);
+
+   Backwards::Types::CellRangeValue smallest (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(0U, 0U, 0U, 0U)));
+   Backwards::Types::CellRangeValue med (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(3U, 5U, 7U, 9U)));
+   Backwards::Types::CellRangeValue also1 (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(3U, 4U, 3U, 9U)));
+   Backwards::Types::CellRangeValue also2 (std::make_shared<Forwards::Engine::CellRangeExpand>(std::make_shared<Forwards::Types::CellRangeValue>(3U, 4U, 7U, 4U)));
+
+   EXPECT_EQ(1U, smallest.getSize());
+   EXPECT_EQ(2U, low.getSize());
+   EXPECT_EQ(6U, also1.getSize());
+   EXPECT_EQ(5U, also2.getSize());
+
+   std::shared_ptr<Backwards::Types::ValueType> res;
+   std::shared_ptr<Forwards::Engine::CellRefEval> temp1;
+   std::shared_ptr<Forwards::Engine::CellRangeExpand> temp2;
+   std::shared_ptr<Forwards::Types::ValueType> ras;
+
+   res = smallest.getIndex(0U);
+   ASSERT_TRUE(typeid(Backwards::Types::CellRefValue) == typeid(*res.get()));
+   ASSERT_TRUE(typeid(Forwards::Engine::CellRefEval) == typeid(*std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value.get()));
+   temp1 = std::dynamic_pointer_cast<Forwards::Engine::CellRefEval>(std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value);
+   ASSERT_TRUE(typeid(Forwards::Engine::Constant) == typeid(*temp1->value.get()));
+   ASSERT_TRUE(typeid(Forwards::Types::CellRefValue) == typeid(*std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value.get()));
+   ras = std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value;
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colAbsolute);
+   EXPECT_EQ(0U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colRef);
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowAbsolute);
+   EXPECT_EQ(0U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowRef);
+
+   res = med.getIndex(1U);
+   ASSERT_TRUE(typeid(Backwards::Types::CellRangeValue) == typeid(*res.get()));
+   ASSERT_TRUE(typeid(Forwards::Engine::CellRangeExpand) == typeid(*std::dynamic_pointer_cast<Backwards::Types::CellRangeValue>(res)->value.get()));
+   temp2 = std::dynamic_pointer_cast<Forwards::Engine::CellRangeExpand>(std::dynamic_pointer_cast<Backwards::Types::CellRangeValue>(res)->value);
+   ASSERT_TRUE(typeid(Forwards::Types::CellRangeValue) == typeid(*temp2->value.get()));
+   ras = temp2->value;
+   EXPECT_EQ(4U, std::dynamic_pointer_cast<Forwards::Types::CellRangeValue>(ras)->col1);
+   EXPECT_EQ(5U, std::dynamic_pointer_cast<Forwards::Types::CellRangeValue>(ras)->row1);
+   EXPECT_EQ(4U, std::dynamic_pointer_cast<Forwards::Types::CellRangeValue>(ras)->col2);
+   EXPECT_EQ(9U, std::dynamic_pointer_cast<Forwards::Types::CellRangeValue>(ras)->row2);
+
+   res = also1.getIndex(2U);
+   ASSERT_TRUE(typeid(Backwards::Types::CellRefValue) == typeid(*res.get()));
+   ASSERT_TRUE(typeid(Forwards::Engine::CellRefEval) == typeid(*std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value.get()));
+   temp1 = std::dynamic_pointer_cast<Forwards::Engine::CellRefEval>(std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value);
+   ASSERT_TRUE(typeid(Forwards::Engine::Constant) == typeid(*temp1->value.get()));
+   ASSERT_TRUE(typeid(Forwards::Types::CellRefValue) == typeid(*std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value.get()));
+   ras = std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value;
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colAbsolute);
+   EXPECT_EQ(3U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colRef);
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowAbsolute);
+   EXPECT_EQ(6U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowRef);
+
+   res = also2.getIndex(2U);
+   ASSERT_TRUE(typeid(Backwards::Types::CellRefValue) == typeid(*res.get()));
+   ASSERT_TRUE(typeid(Forwards::Engine::CellRefEval) == typeid(*std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value.get()));
+   temp1 = std::dynamic_pointer_cast<Forwards::Engine::CellRefEval>(std::dynamic_pointer_cast<Backwards::Types::CellRefValue>(res)->value);
+   ASSERT_TRUE(typeid(Forwards::Engine::Constant) == typeid(*temp1->value.get()));
+   ASSERT_TRUE(typeid(Forwards::Types::CellRefValue) == typeid(*std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value.get()));
+   ras = std::dynamic_pointer_cast<Forwards::Engine::Constant>(temp1->value)->value;
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colAbsolute);
+   EXPECT_EQ(5U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->colRef);
+   EXPECT_EQ(true, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowAbsolute);
+   EXPECT_EQ(4U, std::dynamic_pointer_cast<Forwards::Types::CellRefValue>(ras)->rowRef);
+
+   EXPECT_THROW(smallest.getIndex(2U), Backwards::Engine::ProgrammingException);
+   EXPECT_THROW(med.getIndex(9U), Backwards::Engine::ProgrammingException);
+   EXPECT_THROW(also1.getIndex(8U), Backwards::Engine::ProgrammingException);
+   EXPECT_THROW(also2.getIndex(7U), Backwards::Engine::ProgrammingException);
  }
 
 TEST(EngineTests, testCellRefEval)

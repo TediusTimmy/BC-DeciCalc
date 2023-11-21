@@ -583,6 +583,8 @@ public:
    mutable bool entered;
 
    virtual std::shared_ptr<Backwards::Types::ValueType> expand (Backwards::Engine::CallingContext&) const { entered = true; return makeFloatValue("1"); }
+   virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t /*index*/) const { return makeFloatValue("3"); }
+   virtual size_t getSize() const { return 99U; }
 
    virtual bool equal (const Backwards::Types::CellRangeValue&) const { return false; }
    virtual bool notEqual (const Backwards::Types::CellRangeValue&) const { return false; }
@@ -603,6 +605,9 @@ public:
 class Pennywise : public Backwards::Types::CellRangeHolder
  {
 public:
+
+   virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t /*index*/) const { return makeFloatValue("7"); }
+   virtual size_t getSize() const { return 5U; }
 
    virtual bool equal (const Backwards::Types::CellRangeValue&) const { return true; }
    virtual bool notEqual (const Backwards::Types::CellRangeValue&) const { return false; }
@@ -648,4 +653,16 @@ TEST(EngineTests, testCellFunctions)
 
    EXPECT_THROW(Backwards::Engine::ExpandRange(context, what), Backwards::Types::TypedOperationException);
    EXPECT_THROW(Backwards::Engine::ExpandRange(context, imperfectRange), Backwards::Engine::ProgrammingException);
+
+   res = Backwards::Engine::GetIndex(perfectRange, makeFloatValue("2"));
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_EQ(BigInt::Fixed("3"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(res)->value);
+
+   EXPECT_THROW(Backwards::Engine::GetIndex(perfectRange, makeFloatValue("200")), Backwards::Types::TypedOperationException);
+   EXPECT_THROW(Backwards::Engine::GetIndex(perfectRange, makeFloatValue("-1")), Backwards::Types::TypedOperationException);
+   EXPECT_THROW(Backwards::Engine::GetIndex(perfectRange, what), Backwards::Types::TypedOperationException);
+
+   res = Backwards::Engine::Size(perfectRange);
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_EQ(BigInt::Fixed("99"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(res)->value);
  }

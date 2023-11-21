@@ -45,6 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Backwards/Engine/Logger.h"
 #include "Backwards/Engine/DebuggerHook.h"
 
+#include "Backwards/Types/CellRangeValue.h"
+#include "Backwards/Types/FloatValue.h"
+
 class StringLogger final : public Backwards::Engine::Logger
  {
 public:
@@ -784,4 +787,84 @@ TEST(AllTests, testICanRecursiveFib)
 
    ASSERT_EQ(1U, logger.logs.size());
    EXPECT_EQ("INFO: 120", logger.logs[0]);
+ }
+
+class Pennywise : public Backwards::Types::CellRangeHolder
+ {
+public:
+
+   virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t /*index*/) const { return std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed("7")); }
+   virtual size_t getSize() const { return 5U; }
+
+   virtual bool equal (const Backwards::Types::CellRangeValue&) const { return true; }
+   virtual bool notEqual (const Backwards::Types::CellRangeValue&) const { return false; }
+   virtual bool sort (const Backwards::Types::CellRangeValue&) const { return false; }
+   virtual size_t hash() const { return 0U; }
+ };
+
+TEST(AllTests, testRangeFor)
+ {
+   Backwards::Input::StringInput string
+      (
+      "for x in range do "
+      "   call Info('Nope') "
+      "end "
+      "set z to 0 "
+      "for x in range call Bob do "
+      "   set z to z + 1 "
+      "   for y in range do "
+      "      select z from "
+      "         case 1 is "
+      "            continue Bob "
+      "         case 2 is "
+      "            break Bob "
+      "      end "
+      "   end "
+      "end "
+      "set y to function () is "
+      "   for x in range do "
+      "      return 1 "
+      "   end "
+      "end "
+      "call y() "
+      );
+   Backwards::Input::Lexer lexer (string, "InputString");
+
+   Backwards::Engine::Scope global;
+   Backwards::Parser::ContextBuilder::createGlobalScope(global); // Create the global scope before the table.
+   Backwards::Parser::GetterSetter gs;
+   Backwards::Parser::SymbolTable table (gs, global);
+   Backwards::Engine::CallingContext context;
+   StringLogger logger;
+   DummyDebugger debugger;
+
+   context.logger = &logger;
+   context.debugger = &debugger;
+   context.globalScope = &global;
+
+   Backwards::Engine::Scope bob;
+   bob.var.emplace(std::make_pair("range", 0U));
+   std::shared_ptr<Pennywise> clown = std::make_shared<Pennywise>();
+   bob.vars.emplace_back(std::make_shared<Backwards::Types::CellRangeValue>(clown));
+   EXPECT_EQ(0U, gs.scopeGetters.size());
+   table.pushScope(&bob);
+   EXPECT_EQ(1U, gs.scopeGetters.size());
+   context.pushScope(&bob);
+
+   std::shared_ptr<Backwards::Engine::Statement> parse = Backwards::Parser::Parser::Parse(lexer, table, logger);
+
+   debugger.entered = false;
+   EXPECT_EQ(0U, logger.logs.size());
+   for (auto log : logger.logs) std::cerr << log << std::endl;
+
+   if (nullptr != parse.get())
+    {
+      parse->execute(context);
+    }
+   else
+    {
+      FAIL() << "Parse returned NULL.";
+    }
+
+   ASSERT_EQ(5U, logger.logs.size());
  }

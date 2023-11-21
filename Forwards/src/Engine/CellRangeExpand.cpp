@@ -103,6 +103,87 @@ namespace Engine
       return result;
     }
 
+   std::shared_ptr<Backwards::Types::ValueType> CellRangeExpand::getIndex (size_t index) const
+    {
+      std::shared_ptr<Backwards::Types::ValueType> result;
+
+         // This should never be true, but if it is...
+      if ((value->col1 == value->col2) && (value->row1 == value->row2))
+       {
+         if (0U == index)
+          {
+            result =
+               std::make_shared<Backwards::Types::CellRefValue>(
+                  std::make_shared<CellRefEval>(
+                     std::make_shared<Constant>(Input::Token(),
+                        std::make_shared<Types::CellRefValue>(true, value->col1, true, value->row1))));
+          }
+       }
+      else if (value->col1 == value->col2)
+       {
+         if (value->row1 + index <= value->row2)
+          {
+            result =
+               std::make_shared<Backwards::Types::CellRefValue>(
+                  std::make_shared<CellRefEval>(
+                     std::make_shared<Constant>(Input::Token(),
+                        std::make_shared<Types::CellRefValue>(true, value->col1, true, value->row1 + index))));
+          }
+       }
+      else if (value->row1 == value->row2)
+       {
+         if (value->col1 + index <= value->col2)
+          {
+            result =
+               std::make_shared<Backwards::Types::CellRefValue>(
+                  std::make_shared<CellRefEval>(
+                     std::make_shared<Constant>(Input::Token(),
+                        std::make_shared<Types::CellRefValue>(true, value->col1 + index, true, value->row1))));
+          }
+       }
+      else
+       {
+         if (value->col1 + index <= value->col2)
+          {
+            result =
+               std::make_shared<Backwards::Types::CellRangeValue>(
+                  std::make_shared<CellRangeExpand>(
+                     std::make_shared<Types::CellRangeValue>(value->col1 + index, value->row1, value->col1 + index, value->row2)));
+          }
+       }
+
+      if (nullptr == result.get()) // Yes, this SHOULD be a TypedOperationException. It also SHOULD have been caught earlier.
+       {
+         throw Backwards::Engine::ProgrammingException("CellRangeExpand::getIndex passed bad index.");
+       }
+
+      return result;
+    }
+
+   size_t CellRangeExpand::getSize() const
+    {
+      size_t result;
+
+      if ((value->col1 == value->col2) && (value->row1 == value->row2))
+       {
+         result = 1U;
+       }
+      else if (value->col1 == value->col2)
+       {
+         result = value->row2 - value->row1 + 1U;
+       }
+//      else if (value->row1 == value->row2)
+//       {
+//         result = value->col2 - value->col1 + 1U;
+//       }
+      else
+       {
+         result = value->col2 - value->col1 + 1U;
+       }
+
+      return result;
+    }
+
    bool CellRangeExpand::equal (const Backwards::Types::CellRangeValue& lhs) const
     {
       try

@@ -50,6 +50,8 @@ namespace Engine
       explicit CellRangeExpand(const std::shared_ptr<Types::CellRangeValue>&);
 
       virtual std::shared_ptr<Backwards::Types::ValueType> expand (Backwards::Engine::CallingContext&) const override;
+      virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t index) const override;
+      virtual size_t getSize() const override;
 
       virtual bool equal (const Backwards::Types::CellRangeValue& lhs) const override;
       virtual bool notEqual (const Backwards::Types::CellRangeValue& lhs) const override;

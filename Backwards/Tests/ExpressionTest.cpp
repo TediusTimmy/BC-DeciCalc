@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Backwards/Types/DictionaryValue.h"
 #include "Backwards/Types/ArrayValue.h"
+#include "Backwards/Types/CellRangeValue.h"
 
 #include "Backwards/Engine/DebuggerHook.h"
 #include "Backwards/Engine/FatalException.h"
@@ -609,4 +610,34 @@ TEST(EngineTests, testBuildFunction)
    ASSERT_NE(nullptr, std::dynamic_pointer_cast<Backwards::Types::FunctionValue>(res)->captures[0].get());
    ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*std::dynamic_pointer_cast<Backwards::Types::FunctionValue>(res)->captures[0].get()));
    EXPECT_EQ(BigInt::Fixed("9"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(std::dynamic_pointer_cast<Backwards::Types::FunctionValue>(res)->captures[0])->value);
+ }
+
+class Pennywise : public Backwards::Types::CellRangeHolder
+ {
+public:
+
+   virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t /*index*/) const { return makeFloatValue("7"); }
+   virtual size_t getSize() const { return 5U; }
+
+   virtual bool equal (const Backwards::Types::CellRangeValue&) const { return true; }
+   virtual bool notEqual (const Backwards::Types::CellRangeValue&) const { return false; }
+   virtual bool sort (const Backwards::Types::CellRangeValue&) const { return false; }
+   virtual size_t hash() const { return 0U; }
+ };
+
+TEST(EngineTests, testCellRange)
+ {
+   Backwards::Engine::CallingContext context;
+
+   std::shared_ptr<Pennywise> clown = std::make_shared<Pennywise>();
+   std::shared_ptr<Backwards::Types::CellRangeValue> low = std::make_shared<Backwards::Types::CellRangeValue>(clown);
+
+   std::shared_ptr<Backwards::Engine::Constant> cellRange = std::make_shared<Backwards::Engine::Constant>(Backwards::Input::Token(), low);
+   std::shared_ptr<Backwards::Engine::Constant> index = std::make_shared<Backwards::Engine::Constant>(Backwards::Input::Token(), makeFloatValue("3"));
+
+   Backwards::Engine::DerefVar derefRange (Backwards::Input::Token(), cellRange, index);
+   std::shared_ptr<Backwards::Types::ValueType> res = derefRange.evaluate(context);
+
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_EQ(BigInt::Fixed("7"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(res)->value);
  }

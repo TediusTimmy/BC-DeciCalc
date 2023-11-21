@@ -1299,6 +1299,9 @@ class Pennywise : public Backwards::Types::CellRangeHolder
  {
 public:
 
+   virtual std::shared_ptr<Backwards::Types::ValueType> getIndex (size_t /*index*/) const { return std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed("7")); }
+   virtual size_t getSize() const { return 5U; }
+
    virtual bool equal (const Backwards::Types::CellRangeValue&) const { return true; }
    virtual bool notEqual (const Backwards::Types::CellRangeValue&) const { return false; }
    virtual bool sort (const Backwards::Types::CellRangeValue&) const { return false; }
@@ -1317,6 +1320,12 @@ TEST(TypesTests, testCellRange)
 
    EXPECT_THROW(defaulted.logical(), Backwards::Types::TypedOperationException);
    EXPECT_THROW(defaulted.neg(), Backwards::Types::TypedOperationException);
+
+   EXPECT_EQ(5U, low.getSize());
+   std::shared_ptr<Backwards::Types::ValueType> temp;
+   temp = low.getIndex(3U);
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*temp.get()));
+   EXPECT_EQ(BigInt::Fixed("7"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(temp)->value);
 
       // Remember: operations are flipped.
    EXPECT_TRUE(med.equal(high));

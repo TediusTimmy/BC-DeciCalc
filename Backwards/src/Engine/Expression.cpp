@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Backwards/Types/FloatValue.h"
 #include "Backwards/Types/ArrayValue.h"
 #include "Backwards/Types/DictionaryValue.h"
+#include "Backwards/Types/CellRangeValue.h"
 #include "Backwards/Engine/FatalException.h"
 #include "Backwards/Engine/ConstantsSingleton.h"
 #include "Backwards/Engine/DebuggerHook.h"
@@ -226,7 +227,7 @@ namespace Engine
       std::shared_ptr<Types::ValueType> result;
       try
        {
-         if (typeid(Types::ArrayValue) == typeid(*LHS))
+         if ((typeid(Types::ArrayValue) == typeid(*LHS)) || (typeid(Types::CellRangeValue) == typeid(*LHS)))
           {
             result = GetIndex(LHS, RHS);
           }

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Backwards/Types/ArrayValue.h"
 #include "Backwards/Types/DictionaryValue.h"
+#include "Backwards/Types/CellRangeValue.h"
 
 #include "Backwards/Engine/ConstantsSingleton.h"
 #include "Backwards/Engine/DebuggerHook.h"
@@ -569,6 +570,41 @@ namespace Engine
       return std::shared_ptr<FlowControl>();
     }
 
+   static std::shared_ptr<FlowControl> rangeIter(CallingContext& context, std::shared_ptr<Types::CellRangeValue> currentValue, const std::shared_ptr<Setter>& setter, const std::shared_ptr<Statement>& seq, size_t id)
+    {
+      for (size_t index = 0; index < currentValue->value->getSize(); ++index)
+       {
+         setter->set(context, currentValue->value->getIndex(index));
+
+         std::shared_ptr<FlowControl> temp = seq->execute(context);
+
+         if (nullptr != temp.get())
+          {
+            switch (temp->type)
+             {
+            case FlowControl::RETURN:
+               return temp; // Pass it up.
+            case FlowControl::BREAK:
+               if (id == temp->target)
+                {
+                  return std::shared_ptr<FlowControl>(); // Loop is done.
+                }
+               else
+                {
+                  return temp; // Not for me, pass it up.
+                }
+            case FlowControl::CONTINUE:
+               if (id != temp->target)
+                {
+                  return temp; // Not for me, pass it up.
+                }
+               // Else do nothing: the previous iteration has stopped and we will move on to the next.
+             }
+          }
+       }
+      return std::shared_ptr<FlowControl>();
+    }
+
    std::shared_ptr<FlowControl> ForStatement::collIter (CallingContext& context, std::shared_ptr<Types::ValueType> currentValue) const
     {
       if (typeid(Types::ArrayValue) == typeid(*currentValue.get()))
@@ -578,6 +614,10 @@ namespace Engine
       else if (typeid(Types::DictionaryValue) == typeid(*currentValue.get()))
        {
          return dictIter(context, std::dynamic_pointer_cast<Types::DictionaryValue>(currentValue), setter, seq, id);
+       }
+      else if (typeid(Types::CellRangeValue) == typeid(*currentValue.get()))
+       {
+         return rangeIter(context, std::dynamic_pointer_cast<Types::CellRangeValue>(currentValue), setter, seq, id);
        }
       else
        {

@@ -150,6 +150,25 @@ namespace Engine
             throw Types::TypedOperationException("Error indexing with non-Float.");
           }
        }
+      else if (typeid(Types::CellRangeValue) == typeid(*first))
+       {
+         if (typeid(Types::FloatValue) == typeid(*second))
+          {
+            long index = static_cast<const Types::FloatValue&>(*second).value.roundToInteger().toInt();
+            if ((index >= 0) && (static_cast<size_t>(index) < static_cast<const Types::CellRangeValue&>(*first).getSize()))
+             {
+               return static_cast<const Types::CellRangeValue&>(*first).getIndex(index);
+             }
+            else
+             {
+               throw Types::TypedOperationException("Array Index Out-of-Bounds.");
+             }
+          }
+         else
+          {
+            throw Types::TypedOperationException("Error indexing with non-Float.");
+          }
+       }
       else
        {
          throw Types::TypedOperationException("Error indexing into non-Array.");
@@ -341,6 +360,10 @@ namespace Engine
       else if (typeid(Types::DictionaryValue) == typeid(*arg))
        {
          return std::make_shared<Types::FloatValue>(BigInt::Fixed(static_cast<long long>(static_cast<const Types::DictionaryValue&>(*arg).value.size()), 0U));
+       }
+      else if (typeid(Types::CellRangeValue) == typeid(*arg))
+       {
+         return std::make_shared<Types::FloatValue>(BigInt::Fixed(static_cast<long long>(static_cast<const Types::CellRangeValue&>(*arg).getSize()), 0U));
        }
       else
        {

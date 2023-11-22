@@ -118,6 +118,9 @@ TEST(FixedTests, testNoBadBoom)
    test.fromString("12.123e3");
    EXPECT_EQ("12123.000", test.toString());
 
+   test.fromString("12.123e+3");
+   EXPECT_EQ("12123.000", test.toString());
+
    test.fromString("12.123e-3");
    EXPECT_EQ("0.012123", test.toString());
 
@@ -125,6 +128,9 @@ TEST(FixedTests, testNoBadBoom)
    EXPECT_EQ("12.123", test.toString());
 
    test.fromString("12.123E3");
+   EXPECT_EQ("12123.000", test.toString());
+
+   test.fromString("12.123E+3");
    EXPECT_EQ("12123.000", test.toString());
 
    test.fromString("12.123E-3");

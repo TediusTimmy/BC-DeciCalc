@@ -303,6 +303,23 @@ namespace BigInt
       iter++;
       while ((*iter >= '0') && (*iter <= '9')) { ++iter; ++Digits; }
 
+      Integer extraScale (1U);
+         // Was an exponent given?
+      if (('e' == *iter) || ('E' == *iter))
+       {
+            // Note: any sane value of exponent here will be well within
+            // the capabilities of the underlying representation.
+         long exponent = std::strtol(iter + 1, nullptr, 10);
+         if (exponent < 0)
+          {
+            Digits -= exponent;
+          }
+         else
+          {
+            extraScale = pow10(static_cast<unsigned long>(exponent));
+          }
+       }
+
          // Now, recompose just the number without the separator.
       if (base != src)
        {
@@ -315,6 +332,7 @@ namespace BigInt
        }
 
       Data.fromString(conv);
+      Data = Data * extraScale;
     }
 
 

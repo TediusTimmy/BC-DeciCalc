@@ -161,6 +161,33 @@ namespace Input
           }
          else
           {
+            if (('e' == input.peek()) || ('E' == input.peek()))
+             {
+               std::string temp = "e";
+               size_t advance = 1U;
+
+               if (('-' == input.peek(advance)) || ('+' == input.peek(advance)))
+                {
+                  temp += static_cast<char>(input.peek(advance));
+                  ++advance;
+                }
+               while (std::isdigit(input.peek(advance)))
+                {
+                  temp += static_cast<char>(input.peek(advance));
+                  ++advance;
+                }
+
+               if (("e-" != temp) && ("e+" != temp) && ("e" != temp))
+                {
+                  text += temp;
+                  while (0U < advance)
+                   {
+                     consume();
+                     --advance;
+                   }
+                }
+             }
+
             tokenType = NUMBER;
           }
        }

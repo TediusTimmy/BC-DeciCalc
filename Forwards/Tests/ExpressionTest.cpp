@@ -117,9 +117,6 @@ TEST(EngineTests, testFloats)
    EXPECT_EQ(BigInt::Fixed("1.5"), std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value);
    EXPECT_EQ("9/6", divide.toString(1U, 1U, 0));
 
-   Forwards::Engine::Divide divideThrow (Forwards::Input::Token(), one, six);
-   EXPECT_THROW(divideThrow.evaluate(context), Backwards::Types::TypedOperationException);
-
    Forwards::Engine::Equals equalsT (Forwards::Input::Token(), one, one);
    res = equalsT.evaluate(context);
 
@@ -240,7 +237,10 @@ TEST(EngineTests, testFloats)
    EXPECT_EQ(BigInt::Fixed("0"), std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value);
 
    Forwards::Engine::Divide divideNil (Forwards::Input::Token(), one, three);
-   EXPECT_THROW(divideNil.evaluate(context), Backwards::Types::TypedOperationException);
+   res = divideNil.evaluate(context);
+
+   ASSERT_TRUE(typeid(Forwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_TRUE(std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value.isInf());
 
    Forwards::Engine::Equals equalsTNil (Forwards::Input::Token(), six, three);
    res = equalsTNil.evaluate(context);

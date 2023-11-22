@@ -17,14 +17,14 @@ The rules for the number of digits past the decimal point that operations will r
 | Multiplication | `min(a + b, max(a, b, s))` |
 | Division | `s` |
 
-Exponentiation and remainder are not native operations in the spreadsheet. These rules allow repeated multiplication operations to converge on the global scale variable, while allowing parallel computations that have increased precision (so long as division isn't used). Also note that the number system is not closed under division, and that division by zero throws an error, which kills all current processing, rather than returning an error value.
+Exponentiation and remainder are not native operations in the spreadsheet. These rules allow repeated multiplication operations to converge on the global scale variable, while allowing parallel computations that have increased precision (so long as division isn't used). Also note that the number system is now closed under division, but that the projective closure was used: there is only a single, unsigned infinity.
 
-The biggest difference between this implementation of BCMath and POSIX bc is that all operations are rounded. The default rounding mode is TIES TO EVEN. This can be changed (but it's not intuitive).
+The biggest difference between this implementation of BCMath and POSIX bc is that all operations are rounded. The default rounding mode is TIES TO EVEN.
 
 
 #### Why fixed-point?
 
-If we look at the motivation behind [PEP 327](https://peps.python.org/pep-0327/#motivation), we see that one intent of implementing decimal was for monetary considerations. And that is why I went with fixed-point: the amount of wrapper code for doing money with arbitrary-precision fixed-point is less than that for doing money with arbitrary-precision floating-point. With fixed-point, you already know the scale that you care about, and you let the number grow in the direction you don't care about (you care about the number of digits to the right of the decimal point, and don't care how the number grows to the left). With floating-point, you have to check every operation for the inexact flag and raise the working precision in order to maintain your pennies.
+If we look at the motivation behind [PEP 327](https://peps.python.org/pep-0327/#motivation), we see that one intent of implementing decimal was for monetary considerations. And that is why I went with fixed-point: the amount of wrapper code for doing money with arbitrary-precision fixed-point is less than that for doing money with arbitrary-precision floating-point. With fixed-point, you already know the scale that you care about, and you let the number grow in the direction you don't care about (you care about the number of digits to the right of the decimal point, and don't care how the number grows to the left). With floating-point, you have to check every operation for the inexact flag and raise the working precision in order to maintain your pennies. (And, I actually think Python doesn't do that correctly.)
 
 The other consideration I had was logarithmic encoding. If you look at [this issue](https://github.com/gavinhoward/bc/issues/66), the individual wants `((169287^137)^920)^13256118217109` or `169287^1670801140084418360`. The only way to handle that with most modern computers is by computing the logarithm. Or, you have Matt Parker's `pi^pi^pi^pi` [video](https://www.youtube.com/watch?v=BdHFLfv-ThQ). Or [Austin trying to compute the number of states of the Minecraft world](https://www.youtube.com/watch?v=kgveHrqM9KI). It is easier to deal with these numbers as the logarithm of the number. In this encoding, the scale of the number (the number of digits in the mantissa) is the precision of the significand in a floating-point number with an arbitrary-precision exponent. (And now you know why the significand of a floating-point number is often called the mantissa: this relationship.)
 
@@ -124,6 +124,7 @@ The following functions are all that is implemented. It is a curated list from t
 * SUM (%)
 * COUNT (%)
 * AVERAGE (%) - literally SUM / COUNT
+* NAN - returns the special Not-a-Number value
 * ABS - absolute value
 * INT - truncate to integer (return value has scale 0)
 * ROUND - round to integer (ties away from zero) (return value has scale 0)
@@ -181,7 +182,6 @@ This is the language as implemented. Some of the GoogleTests have good examples,
 * \-  float unary negation; for collections, the operation is performed over the contents of the collection
 * \*  float multiplication; for collections, the operation is performed over the contents of the collection
 * /   float division; for collections, the operation is performed over the contents of the collection
-* ^   float exponentiation; this operator is right-associative
 * !   logical not
 * \>  greater than, only defined for strings and floats
 * \>= greater than or equal to, only defined for strings and floats
@@ -286,11 +286,14 @@ Old-style Pascal comments really round out the language as being valid even when
 * float IsDictionary (value)  # run-time type identification
 * float IsFloat (value)  # run-time type identification
 * float IsFunction (value)  # run-time type identification
+* float IsInfinity (float)  # too big?
+* float IsNaN (float)  # is this not a number?
 * float IsNil (value)  # run-time type identification : the result from evaluating a cell and it having no contents
 * float IsString (value)  # run-time type identification
 * float Length (string)  # length
 * float Max (float; float)  # if either is NaN, returns NaN; returns the first argument if comparing positive and negative zero
 * float Min (float; float)  # if either is NaN, returns NaN; returns the first argument if comparing positive and negative zero
+* float NaN ()  # returns the special not-a-number value
 * array NewArray ()  # returns an empty array
 * array NewArrayDefault (float, value)  # returns an array of size float with all indices initialized to value
 * dictionary NewDictionary ()  # returns an empty dictionary

@@ -58,31 +58,63 @@ namespace BigInt
 
    bool operator > (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return false;
+       }
       return lhs.compare(rhs) > 0;
     }
 
    bool operator < (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return false;
+       }
       return lhs.compare(rhs) < 0;
     }
 
    bool operator >= (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return false;
+       }
       return lhs.compare(rhs) >= 0;
     }
 
    bool operator <= (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return false;
+       }
       return lhs.compare(rhs) <= 0;
     }
 
    bool operator == (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isInf()) && (true == rhs.isInf()))
+       {
+         return true;
+       }
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return false;
+       }
       return lhs.compare(rhs) == 0;
     }
 
    bool operator != (const Fixed & lhs, const Fixed & rhs)
     {
+      if ((true == lhs.isInf()) && (true == rhs.isInf()))
+       {
+         return false;
+       }
+      if ((true == lhs.isNaN()) || (true == rhs.isNaN()) || (true == lhs.isInf()) || (true == rhs.isInf()))
+       {
+         return true;
+       }
       return lhs.compare(rhs) != 0;
     }
 
@@ -118,6 +150,27 @@ namespace BigInt
 
    Fixed operator + (const Fixed & lhs, const Fixed & rhs)
     {
+      if (true == lhs.nan)
+       {
+         return lhs;
+       }
+      if (true == rhs.nan)
+       {
+         return rhs;
+       }
+      if (true == lhs.infinity)
+       {
+         if (true == rhs.infinity)
+          {
+            return Fixed(false, true);
+          }
+         return lhs;
+       }
+      if (true == rhs.infinity)
+       {
+         return rhs;
+       }
+
       Fixed temp;
 
       if (lhs.Digits > rhs.Digits)
@@ -143,6 +196,27 @@ namespace BigInt
 
    Fixed operator - (const Fixed & lhs, const Fixed & rhs)
     {
+      if (true == lhs.nan)
+       {
+         return lhs;
+       }
+      if (true == rhs.nan)
+       {
+         return rhs;
+       }
+      if (true == lhs.infinity)
+       {
+         if (true == rhs.infinity)
+          {
+            return Fixed(false, true);
+          }
+         return lhs;
+       }
+      if (true == rhs.infinity)
+       {
+         return rhs;
+       }
+
       Fixed temp;
 
       if (lhs.Digits > rhs.Digits)
@@ -168,6 +242,31 @@ namespace BigInt
 
    Fixed operator * (const Fixed & lhs, const Fixed & rhs)
     {
+      if (true == lhs.nan)
+       {
+         return lhs;
+       }
+      if (true == rhs.nan)
+       {
+         return rhs;
+       }
+      if (true == lhs.infinity)
+       {
+         if (true == rhs.isZero())
+          {
+            return Fixed(false, true);
+          }
+         return lhs;
+       }
+      if (true == rhs.infinity)
+       {
+         if (true == lhs.isZero())
+          {
+            return Fixed(false, true);
+          }
+         return rhs;
+       }
+
       Fixed temp;
 
       temp.Data = lhs.Data * rhs.Data;
@@ -182,6 +281,38 @@ namespace BigInt
 
    Fixed operator / (const Fixed & lhs, const Fixed & rhs)
     {
+      if (true == lhs.nan)
+       {
+         return lhs;
+       }
+      if (true == rhs.nan)
+       {
+         return rhs;
+       }
+      if (true == lhs.infinity)
+       {
+         if (true == rhs.infinity)
+          {
+            return Fixed(false, true);
+          }
+         return lhs;
+       }
+      if (true == rhs.infinity)
+       {
+         return Fixed(0UL);
+       }
+      if (true == lhs.isZero())
+       {
+         if (true == rhs.isZero())
+          {
+            return Fixed(false, true);
+          }
+       }
+      if (true == rhs.isZero())
+       {
+         return Fixed(true, false);
+       }
+
       Fixed q = lhs;
       Fixed r = rhs;
       Integer d;
@@ -252,6 +383,14 @@ namespace BigInt
    std::string Fixed::toString (void) const
     {
       std::string result, sign;
+      if (true == infinity)
+       {
+         return "Infinity";
+       }
+      else if (true == nan)
+       {
+         return "Not a Result";
+       }
       result = Data.toString();
       if (Digits == 0) return result;
       if ('-' == result[0])
@@ -282,6 +421,9 @@ namespace BigInt
       std::string conv;
 
       conv.reserve(2048);
+
+      infinity = false;
+      nan = false;
 
          // Fast path for an integer.
       if (*iter == '-') ++iter;

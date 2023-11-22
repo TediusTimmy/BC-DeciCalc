@@ -44,7 +44,8 @@ namespace Engine
       FLOAT_ONE(std::make_shared<Types::FloatValue>(BigInt::Fixed("1"))),
       EMPTY_ARRAY(std::make_shared<Types::ArrayValue>()),
       EMPTY_DICTIONARY(std::make_shared<Types::DictionaryValue>()),
-      ONE_TRUE_NOP(std::make_shared<NOP>(Input::Token()))
+      ONE_TRUE_NOP(std::make_shared<NOP>(Input::Token())),
+      FLOAT_NAN(std::make_shared<Types::FloatValue>(BigInt::Fixed(false, true)))
     {
     }
 

@@ -57,6 +57,8 @@ namespace Engine
 
       std::shared_ptr<Statement> ONE_TRUE_NOP;
 
+      std::shared_ptr<Types::FloatValue> FLOAT_NAN;
+
    private:
       ConstantsSingleton();
     };

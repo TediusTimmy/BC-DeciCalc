@@ -129,6 +129,12 @@ TEST(FixedTests, testNoBadBoom)
 
    test.fromString("12.123E-3");
    EXPECT_EQ("0.012123", test.toString());
+
+   BigInt::Fixed i (true, false);
+   BigInt::Fixed n (false, true);
+
+   EXPECT_EQ("Infinity", i.toString());
+   EXPECT_EQ("Not a Result", n.toString());
  }
 
 TEST(FixedTests, testAdds)
@@ -909,8 +915,8 @@ TEST(FixedTests, testDerverd)
    c = a / b;
    EXPECT_EQ("0", c.toString());
 
-   c = b / a; // Division returns 0 remainder 3, which gets rounded up to 1.
-   EXPECT_EQ("1", c.toString()); // I expect to turn this into an exception anyway.
+   c = b / a;
+   EXPECT_EQ("Infinity", c.toString());
 
    a.fromString("1");
    c = a / b;
@@ -1041,4 +1047,184 @@ TEST(FixedTests, testNewRoundMode)
 
    BigInt::Fixed::setRoundMode(BigInt::ROUND_TIES_EVEN);
 
+ }
+
+TEST(FixedTests, testNowImpossible)
+ {
+   BigInt::Integer three (3UL);
+   BigInt::Integer zero (0UL);
+   BigInt::Integer quot;
+   BigInt::Integer rem;
+
+      // This division case is no longer possible, because infinity detection happens first.
+   BigInt::quotrem(three, zero, quot, rem);
+
+   EXPECT_EQ(0, zero.compare(quot));
+   EXPECT_EQ(0, three.compare(rem));
+ }
+
+TEST(FixedTests, testNewComparisonCases)
+ {
+   BigInt::Fixed a ("1");
+   BigInt::Fixed i (true, false);
+   BigInt::Fixed n (false, true);
+
+   EXPECT_FALSE(i < a);
+   EXPECT_FALSE(a < i);
+   EXPECT_FALSE(n < a);
+   EXPECT_FALSE(a < n);
+   EXPECT_FALSE(i < i);
+   EXPECT_FALSE(n < n);
+
+   EXPECT_FALSE(i <= a);
+   EXPECT_FALSE(a <= i);
+   EXPECT_FALSE(n <= a);
+   EXPECT_FALSE(a <= n);
+   EXPECT_FALSE(i <= i);
+   EXPECT_FALSE(n <= n);
+
+   EXPECT_FALSE(i > a);
+   EXPECT_FALSE(a > i);
+   EXPECT_FALSE(n > a);
+   EXPECT_FALSE(a > n);
+   EXPECT_FALSE(i > i);
+   EXPECT_FALSE(n > n);
+
+   EXPECT_FALSE(i >= a);
+   EXPECT_FALSE(a >= i);
+   EXPECT_FALSE(n >= a);
+   EXPECT_FALSE(a >= n);
+   EXPECT_FALSE(i >= i);
+   EXPECT_FALSE(n >= n);
+
+   EXPECT_FALSE(i == a);
+   EXPECT_FALSE(a == i);
+   EXPECT_FALSE(n == a);
+   EXPECT_FALSE(a == n);
+   EXPECT_TRUE(i == i);
+   EXPECT_FALSE(n == n);
+
+   EXPECT_TRUE(i != a);
+   EXPECT_TRUE(a != i);
+   EXPECT_TRUE(n != a);
+   EXPECT_TRUE(a != n);
+   EXPECT_FALSE(i != i);
+   EXPECT_TRUE(n != n);
+ }
+
+TEST(FixedTests, testNewMathCases)
+ {
+   BigInt::Fixed a ("1");
+   BigInt::Fixed i (true, false);
+   BigInt::Fixed n (false, true);
+   BigInt::Fixed z;
+   BigInt::Fixed r;
+
+   r = a + i;
+   EXPECT_TRUE(r.isInf());
+
+   r = i + a;
+   EXPECT_TRUE(r.isInf());
+
+   r = a + n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n + a;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i + n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n + i;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n + n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i + i;
+   EXPECT_TRUE(r.isNaN());
+
+
+   r = a - i;
+   EXPECT_TRUE(r.isInf());
+
+   r = i - a;
+   EXPECT_TRUE(r.isInf());
+
+   r = a - n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n - a;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i - n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n - i;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n - n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i - i;
+   EXPECT_TRUE(r.isNaN());
+
+
+   r = a * i;
+   EXPECT_TRUE(r.isInf());
+
+   r = i * a;
+   EXPECT_TRUE(r.isInf());
+
+   r = a * n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n * a;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i * n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n * i;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i * i;
+   EXPECT_TRUE(r.isInf());
+
+   r = i * z;
+   EXPECT_TRUE(r.isNaN());
+
+   r = z * i;
+   EXPECT_TRUE(r.isNaN());
+
+
+   r = a / i;
+   EXPECT_TRUE(r.isZero());
+
+   r = i / a;
+   EXPECT_TRUE(r.isInf());
+
+   r = a / n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n / a;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i / n;
+   EXPECT_TRUE(r.isNaN());
+
+   r = n / i;
+   EXPECT_TRUE(r.isNaN());
+
+   r = i / i;
+   EXPECT_TRUE(r.isNaN());
+
+   r = a / z;
+   EXPECT_TRUE(r.isInf());
+
+   r = z / a;
+   EXPECT_TRUE(r.isZero());
+
+   r = z / z;
+   EXPECT_TRUE(r.isNaN());
  }

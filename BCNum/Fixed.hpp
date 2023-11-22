@@ -71,14 +71,19 @@ namespace BigInt
          Integer Data;
          unsigned long Digits;
 
+         bool infinity;
+         bool nan;
+
       public:
 
          Fixed (const Fixed & from) :
-            Data (from.Data), Digits (from.Digits) { }
+            Data (from.Data), Digits (from.Digits), infinity(from.infinity), nan(from.nan) { }
+         Fixed (bool infinity, bool nan) :
+            Data (), Digits (0U), infinity(infinity), nan(nan) { }
          explicit Fixed (unsigned long precision = defPrec) :
-            Data (), Digits (precision) { }
+            Data (), Digits (precision), infinity(false), nan(false) { }
          explicit Fixed (long long i, unsigned long p = defPrec) :
-            Data (static_cast<long>(i)), Digits (p) { } // Long long is used to assist the compiler.
+            Data (static_cast<long>(i)), Digits (p), infinity(false), nan(false) { } // Long long is used to assist the compiler.
          explicit Fixed (const std::string &);
          explicit Fixed (const char *);
          ~Fixed () { /* This has nothing to do. */ }
@@ -89,8 +94,11 @@ namespace BigInt
 
          void changePrecision (unsigned long); //changes Data to match
 
-         bool isSigned (void) const { return Data.isSigned(); }
-         bool isZero (void) const { return Data.isZero(); }
+         bool isSigned (void) const { return !infinity && !nan && Data.isSigned(); }
+         bool isZero (void) const { return !infinity && !nan && Data.isZero(); }
+
+         bool isInf (void) const { return infinity; }
+         bool isNaN (void) const { return nan; }
 
          std::string toString (void) const;
 

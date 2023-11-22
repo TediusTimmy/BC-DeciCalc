@@ -361,16 +361,11 @@ namespace Engine
          switch (RHS->getType())
           {
          case Types::FLOAT:
-            if (!static_cast<Types::FloatValue*>(RHS.get())->value.isZero())
-             {
-               result = std::make_shared<Types::FloatValue>(static_cast<Types::FloatValue*>(LHS.get())->value / static_cast<Types::FloatValue*>(RHS.get())->value);
-             }
-            else
-             {
-               constructMessage("Divide by zero");
-             }
+            result = std::make_shared<Types::FloatValue>(static_cast<Types::FloatValue*>(LHS.get())->value / static_cast<Types::FloatValue*>(RHS.get())->value);
             break;
-         case Types::NIL:
+         case Types::NIL: // Nil is a positive zero, and preserve the sign of infinity.
+            result = std::make_shared<Types::FloatValue>(static_cast<Types::FloatValue*>(LHS.get())->value / FLOAT_ZERO()->value);
+            break;
          case Types::STRING:
          case Types::CELL_REF:
          case Types::CELL_RANGE:

@@ -89,10 +89,6 @@ namespace Types
 
    std::shared_ptr<ValueType> FloatValue::div (const FloatValue& lhs) const
     {
-      if (value.isZero())
-       {
-         throw TypedOperationException("Divide by zero.");
-       }
       return std::make_shared<FloatValue>(lhs.value / value);
     }
 

@@ -498,6 +498,11 @@ namespace Engine
        }
     }
 
+   STDLIB_CONSTANT_DECL(NaN)
+    {
+      return ConstantsSingleton::getInstance().FLOAT_NAN;
+    }
+
 #define MINMAXDEFN(x,y,z) \
    STDLIB_BINARY_DECL(x) \
     { \
@@ -507,6 +512,14 @@ namespace Engine
           { \
             const BigInt::Fixed& fVal = static_cast<const Types::FloatValue&>(*first).value; \
             const BigInt::Fixed& sVal = static_cast<const Types::FloatValue&>(*second).value; \
+            if ((true == fVal.isNaN()) || (true == fVal.isInf())) \
+             { \
+               return first; \
+             } \
+            else if ((true == sVal.isNaN()) || (true == sVal.isInf())) \
+             { \
+               return second; \
+             } \
             return (fVal y sVal) ? first : second; \
           } \
          else \
@@ -556,6 +569,30 @@ namespace Engine
          throw Types::TypedOperationException("Error trying to compute absolute value of non-Float.");
        }
     }
+
+#define BASICONEARGRTTIDEFN(x,y,z) \
+   STDLIB_UNARY_DECL(x) \
+    { \
+      if (typeid(Types::FloatValue) == typeid(*arg)) \
+       { \
+         if (true == static_cast<const Types::FloatValue&>(*arg).value.y()) \
+          { \
+            return ConstantsSingleton::getInstance().FLOAT_ONE; \
+          } \
+         else \
+          { \
+            return ConstantsSingleton::getInstance().FLOAT_ZERO; \
+          } \
+       } \
+      else \
+       { \
+         throw Types::TypedOperationException("Error trying to compute " z " of non-Float."); \
+       } \
+    }
+
+   BASICONEARGRTTIDEFN(IsInfinity, isInf, "is infinity")
+    // Well, technically, I guess it SHOULD return true if the argument is not a Float....
+   BASICONEARGRTTIDEFN(IsNaN, isNaN, "is special not-a-number value")
 
    STDLIB_UNARY_DECL(Sqr)
     {

@@ -128,6 +128,10 @@ extern const char* const STDLIB =
    "return SUM(x) / COUNT(x) "
 "end "
 
+"set NAN to function (x) is "
+   "return NaN() "
+"end "
+
 "set ABS to function (x) is "
    "set temp to EvalCell(x[0]) "
    "if !IsNil(temp) then "

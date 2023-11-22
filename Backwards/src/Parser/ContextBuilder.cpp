@@ -44,7 +44,8 @@ namespace Parser
 
    void ContextBuilder::createGlobalScope(Engine::Scope& global)
     {
-    // 4
+    // 5
+      addFunction("NaN", std::make_shared<Engine::StandardConstantFunction>(Engine::NaN), 0U, global);
       addFunction("NewArray", std::make_shared<Engine::StandardConstantFunction>(Engine::NewArray), 0U, global);
       addFunction("NewDictionary", std::make_shared<Engine::StandardConstantFunction>(Engine::NewDictionary), 0U, global);
       addFunction("GetRoundMode", std::make_shared<Engine::StandardConstantFunction>(Engine::GetRoundMode), 0U, global);
@@ -53,7 +54,7 @@ namespace Parser
     // 1
       addFunction("EnterDebugger", std::make_shared<Engine::StandardConstantFunctionWithContext>(Engine::EnterDebugger), 0U, global);
 
-    // 25
+    // 27
       addFunction("Sqr", std::make_shared<Engine::StandardUnaryFunction>(Engine::Sqr), 1U, global);
       addFunction("Abs", std::make_shared<Engine::StandardUnaryFunction>(Engine::Abs), 1U, global);
       addFunction("Round", std::make_shared<Engine::StandardUnaryFunction>(Engine::Round), 1U, global);
@@ -61,6 +62,8 @@ namespace Parser
       addFunction("Ceil", std::make_shared<Engine::StandardUnaryFunction>(Engine::Ceil), 1U, global);
       addFunction("ToString", std::make_shared<Engine::StandardUnaryFunction>(Engine::ToString), 1U, global);
       addFunction("Length", std::make_shared<Engine::StandardUnaryFunction>(Engine::Length), 1U, global);
+      addFunction("IsNaN", std::make_shared<Engine::StandardUnaryFunction>(Engine::IsNaN), 1U, global);
+      addFunction("IsInfinity", std::make_shared<Engine::StandardUnaryFunction>(Engine::IsInfinity), 1U, global);
       addFunction("ValueOf", std::make_shared<Engine::StandardUnaryFunction>(Engine::ValueOf), 1U, global);
       addFunction("ToCharacter", std::make_shared<Engine::StandardUnaryFunction>(Engine::ToCharacter), 1U, global);
       addFunction("FromCharacter", std::make_shared<Engine::StandardUnaryFunction>(Engine::FromCharacter), 1U, global);

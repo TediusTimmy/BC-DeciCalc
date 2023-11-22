@@ -158,9 +158,6 @@ TEST(TypesTests, testFloats)
    EXPECT_FALSE(med.sort(v7));
 
    EXPECT_NE(0U, low.hash());
-
-   Backwards::Types::FloatValue zero (BigInt::Fixed("0"));
-   EXPECT_THROW(zero.div(low), Backwards::Types::TypedOperationException);
  }
 
 TEST(TypesTests, testStrings)

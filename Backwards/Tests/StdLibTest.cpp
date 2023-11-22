@@ -212,6 +212,9 @@ TEST(EngineTests, testBasicEight) // The seven functions needed for the parser a
 TEST(EngineTests, testJustCalls) // Don't bother validating that the output is correct.
  {
    std::shared_ptr<Backwards::Types::ValueType> res; // I KNOW WHAT I JUST SAID!
+   res = Backwards::Engine::NaN();
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_TRUE(std::dynamic_pointer_cast<Backwards::Types::FloatValue>(res)->value.isNaN());
 
    (void) Backwards::Engine::Abs(makeFloatValue("30"));
    (void) Backwards::Engine::Abs(makeFloatValue("-30"));
@@ -225,6 +228,14 @@ TEST(EngineTests, testJustCalls) // Don't bother validating that the output is c
 
    (void) Backwards::Engine::Ceil(makeFloatValue("30"));
    EXPECT_THROW(Backwards::Engine::Ceil(std::make_shared<Backwards::Types::StringValue>("hello")), Backwards::Types::TypedOperationException);
+
+   (void) Backwards::Engine::IsInfinity(makeFloatValue("30"));
+   (void) Backwards::Engine::IsInfinity(std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed(true, false)));
+   EXPECT_THROW(Backwards::Engine::IsInfinity(std::make_shared<Backwards::Types::StringValue>("hello")), Backwards::Types::TypedOperationException);
+
+   (void) Backwards::Engine::IsNaN(makeFloatValue("30"));
+   (void) Backwards::Engine::IsNaN(std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed(false, true)));
+   EXPECT_THROW(Backwards::Engine::IsNaN(std::make_shared<Backwards::Types::StringValue>("hello")), Backwards::Types::TypedOperationException);
 
    (void) Backwards::Engine::Sqr(makeFloatValue("30"));
    EXPECT_THROW(Backwards::Engine::Sqr(std::make_shared<Backwards::Types::StringValue>("hello")), Backwards::Types::TypedOperationException);
@@ -359,11 +370,21 @@ TEST(EngineTests, testSimpleCalls)
 
    std::shared_ptr<Backwards::Types::FloatValue> one = makeFloatValue("6");
    std::shared_ptr<Backwards::Types::FloatValue> two = makeFloatValue("9");
+   std::shared_ptr<Backwards::Types::ValueType> nan = std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed(false, true));
+   std::shared_ptr<Backwards::Types::ValueType> inf = std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed(true, false));
 
    res = Backwards::Engine::Min(one, two);
    EXPECT_EQ(one.get(), res.get()); // Yes : compare the POINTERS.
    res = Backwards::Engine::Min(two, one);
    EXPECT_EQ(one.get(), res.get());
+   res = Backwards::Engine::Min(nan, one);
+   EXPECT_EQ(nan.get(), res.get());
+   res = Backwards::Engine::Min(one, nan);
+   EXPECT_EQ(nan.get(), res.get());
+   res = Backwards::Engine::Min(inf, one);
+   EXPECT_EQ(inf.get(), res.get());
+   res = Backwards::Engine::Min(one, inf);
+   EXPECT_EQ(inf.get(), res.get());
    EXPECT_THROW(Backwards::Engine::Min(std::make_shared<Backwards::Types::StringValue>("hello"), makeFloatValue("1")), Backwards::Types::TypedOperationException);
    EXPECT_THROW(Backwards::Engine::Min(makeFloatValue("1"), std::make_shared<Backwards::Types::StringValue>("world")), Backwards::Types::TypedOperationException);
 
@@ -371,6 +392,14 @@ TEST(EngineTests, testSimpleCalls)
    EXPECT_EQ(two.get(), res.get());
    res = Backwards::Engine::Max(two, one);
    EXPECT_EQ(two.get(), res.get());
+   res = Backwards::Engine::Max(nan, one);
+   EXPECT_EQ(nan.get(), res.get());
+   res = Backwards::Engine::Max(one, nan);
+   EXPECT_EQ(nan.get(), res.get());
+   res = Backwards::Engine::Max(inf, one);
+   EXPECT_EQ(inf.get(), res.get());
+   res = Backwards::Engine::Max(one, inf);
+   EXPECT_EQ(inf.get(), res.get());
    EXPECT_THROW(Backwards::Engine::Max(std::make_shared<Backwards::Types::StringValue>("hello"), makeFloatValue("1")), Backwards::Types::TypedOperationException);
    EXPECT_THROW(Backwards::Engine::Max(makeFloatValue("1"), std::make_shared<Backwards::Types::StringValue>("world")), Backwards::Types::TypedOperationException);
 

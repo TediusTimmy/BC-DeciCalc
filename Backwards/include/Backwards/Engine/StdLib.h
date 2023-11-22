@@ -45,6 +45,7 @@ namespace Engine
 #define STDLIB_CONSTANT_DECL(x) \
    std::shared_ptr<Types::ValueType> x (void)
 
+   STDLIB_CONSTANT_DECL(NaN);
    STDLIB_CONSTANT_DECL(NewArray);
    STDLIB_CONSTANT_DECL(NewDictionary);
    STDLIB_CONSTANT_DECL(GetRoundMode);
@@ -65,6 +66,8 @@ namespace Engine
    STDLIB_UNARY_DECL(Ceil);
    STDLIB_UNARY_DECL(ToString);
    STDLIB_UNARY_DECL(Length);
+   STDLIB_UNARY_DECL(IsNaN);
+   STDLIB_UNARY_DECL(IsInfinity);
    STDLIB_UNARY_DECL(ValueOf);
    STDLIB_UNARY_DECL(ToCharacter);
    STDLIB_UNARY_DECL(FromCharacter);

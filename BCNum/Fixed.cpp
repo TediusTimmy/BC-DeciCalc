@@ -301,15 +301,12 @@ namespace BigInt
        {
          return Fixed(0UL);
        }
-      if (true == lhs.isZero())
+      if (true == rhs.isZero())
        {
-         if (true == rhs.isZero())
+         if (true == lhs.isZero())
           {
             return Fixed(false, true);
           }
-       }
-      if (true == rhs.isZero())
-       {
          return Fixed(true, false);
        }
 
@@ -431,7 +428,7 @@ namespace BigInt
        {
          while ((*iter >= '0') && (*iter <= '9')) ++iter;
 
-         if ((*iter != '.') && (*iter != ','))
+         if ((*iter != '.') && (*iter != ',') && ('e' != *iter) && ('E' != *iter))
           {
             Data.fromString(src);
             Digits = 0;
@@ -443,23 +440,33 @@ namespace BigInt
       Digits = 0;
       base = iter;
       iter++;
-      while ((*iter >= '0') && (*iter <= '9')) { ++iter; ++Digits; }
+      if ((*base == '.') || (*base == ','))
+       {
+         while ((*iter >= '0') && (*iter <= '9')) { ++iter; ++Digits; }
+       }
 
       Integer extraScale (1U);
-         // Was an exponent given?
+         // Note: any sane value of exponent here will be well within
+         // the capabilities of the underlying representation.
+      long exponent = 0;
+         // The exponent is either immediately after the number,
+         // or after the decimal portion.
       if (('e' == *iter) || ('E' == *iter))
        {
-            // Note: any sane value of exponent here will be well within
-            // the capabilities of the underlying representation.
-         long exponent = std::strtol(iter + 1, nullptr, 10);
-         if (exponent < 0)
-          {
-            Digits -= exponent;
-          }
-         else
-          {
-            extraScale = pow10(static_cast<unsigned long>(exponent));
-          }
+         exponent = std::strtol(iter + 1, nullptr, 10);
+       }
+      else if (('e' == *base) || ('E' == *base))
+       {
+         exponent = std::strtol(base + 1, nullptr, 10);
+       }
+         // Was an exponent given?
+      if (exponent < 0)
+       {
+         Digits -= exponent;
+       }
+      else if (exponent > 0)
+       {
+         extraScale = pow10(static_cast<unsigned long>(exponent));
        }
 
          // Now, recompose just the number without the separator.

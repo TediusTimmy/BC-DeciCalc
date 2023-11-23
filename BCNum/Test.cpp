@@ -141,6 +141,37 @@ TEST(FixedTests, testNoBadBoom)
 
    EXPECT_EQ("Infinity", i.toString());
    EXPECT_EQ("Not a Result", n.toString());
+
+
+   test.fromString("12e0");
+   EXPECT_EQ("12", test.toString());
+
+   test.fromString("12e1");
+   EXPECT_EQ("120", test.toString());
+
+   test.fromString("12e+1");
+   EXPECT_EQ("120", test.toString());
+
+   test.fromString("12e-1");
+   EXPECT_EQ("1.2", test.toString());
+
+   test.fromString("12e"); // None of the lexers should ever give me this,
+   EXPECT_EQ("12", test.toString()); // but make sure it doesn't crash.
+
+   test.fromString("12E0");
+   EXPECT_EQ("12", test.toString());
+
+   test.fromString("12E1");
+   EXPECT_EQ("120", test.toString());
+
+   test.fromString("12E+1");
+   EXPECT_EQ("120", test.toString());
+
+   test.fromString("12E-1");
+   EXPECT_EQ("1.2", test.toString());
+
+   test.fromString("12E"); // None of the lexers should ever give me this,
+   EXPECT_EQ("12", test.toString()); // but make sure it doesn't crash.
  }
 
 TEST(FixedTests, testAdds)

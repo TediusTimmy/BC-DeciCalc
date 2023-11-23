@@ -64,17 +64,17 @@ namespace Parser
     {
    public:
 
-      static std::shared_ptr<Engine::Expression> ParseFullExpression (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> ParseFullExpression (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
 
    private:
 
       static void expect (Input::Lexer& src, Input::Lexeme expected, const std::string& name);
 
-      static std::shared_ptr<Engine::Expression> expression (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
-      static std::shared_ptr<Engine::Expression> simple (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
-      static std::shared_ptr<Engine::Expression> term (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
-      static std::shared_ptr<Engine::Expression> unary (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
-      static std::shared_ptr<Engine::Expression> primary (Input::Lexer& src, Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> expression (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> simple (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> term (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> unary (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
+      static std::shared_ptr<Engine::Expression> primary (Input::Lexer& src, const Engine::GetterMap&, Backwards::Engine::Logger&, size_t, size_t);
 
       static std::shared_ptr<Engine::Expression> cellref (const Input::Token&, size_t, size_t);
     };

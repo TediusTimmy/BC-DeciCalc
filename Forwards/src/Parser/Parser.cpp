@@ -58,7 +58,7 @@ namespace Parser
       const char * what() const throw() { return message.c_str(); }
     };
 
-   std::shared_ptr<Engine::Expression> Parser::ParseFullExpression (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::ParseFullExpression (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> result;
       try
@@ -85,7 +85,7 @@ namespace Parser
       src.getNextToken();
     }
 
-   std::shared_ptr<Engine::Expression> Parser::expression (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::expression (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> lhs (simple(src, scope, logger, col, row));
 
@@ -125,7 +125,7 @@ namespace Parser
       return lhs;
     }
 
-   std::shared_ptr<Engine::Expression> Parser::simple (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::simple (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> lhs (term(src, scope, logger, col, row));
 
@@ -155,7 +155,7 @@ namespace Parser
       return lhs;
     }
 
-   std::shared_ptr<Engine::Expression> Parser::term (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::term (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> lhs (unary(src, scope, logger, col, row));
 
@@ -181,7 +181,7 @@ namespace Parser
       return lhs;
     }
 
-   std::shared_ptr<Engine::Expression> Parser::unary (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::unary (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> ret;
 
@@ -208,7 +208,7 @@ namespace Parser
       return ret;
     }
 
-   std::shared_ptr<Engine::Expression> Parser::primary (Input::Lexer& src, Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
+   std::shared_ptr<Engine::Expression> Parser::primary (Input::Lexer& src, const Engine::GetterMap& scope, Backwards::Engine::Logger& logger, size_t col, size_t row)
     {
       std::shared_ptr<Engine::Expression> ret;
 
@@ -250,14 +250,15 @@ namespace Parser
             expect(src, Input::CLOSE_PARENS, ")");
           }
 
-         if (scope.end() == scope.find(buildToken.text))
+         const auto iter = scope.find(buildToken.text);
+         if (scope.end() == iter)
           {
             std::stringstream str;
             str << "Name >" << buildToken.text << "< is not a function at " << buildToken.location;
             throw ParserException(str.str());
           }
 
-         ret = std::make_shared<Engine::FunctionCall>(buildToken, std::make_shared<Backwards::Engine::Variable>(Backwards::Input::Token(), scope[buildToken.text]), args);
+         ret = std::make_shared<Engine::FunctionCall>(buildToken, std::make_shared<Backwards::Engine::Variable>(Backwards::Input::Token(), iter->second), args);
        }
          break;
       case Input::NUMBER:

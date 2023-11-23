@@ -35,11 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Forwards/Engine/CallingContext.h"
 #include "Forwards/Engine/SpreadSheet.h"
 #include "Forwards/Engine/Cell.h"
+#include "Forwards/Engine/StdLib.h"
 
 #include "Forwards/Engine/CellRangeExpand.h"
 #include "Forwards/Engine/CellRefEval.h"
 
 #include "Forwards/Parser/Parser.h"
+#include "Forwards/Parser/ContextBuilder.h"
 
 #include "Forwards/Types/FloatValue.h"
 #include "Forwards/Types/StringValue.h"
@@ -58,8 +60,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Backwards/Parser/SymbolTable.h"
 #include "Backwards/Parser/Parser.h"
-#include "Backwards/Parser/ContextBuilder.h"
 
+#include "Backwards/Types/FloatValue.h"
+#include "Backwards/Types/StringValue.h"
 #include "Backwards/Types/CellRangeValue.h"
 #include "Backwards/Types/CellRefValue.h"
 
@@ -1282,7 +1285,7 @@ TEST(EngineTests, testFunctionsAndRanges)
 
    Backwards::Engine::Scope global;
    context.globalScope = &global;
-   Backwards::Parser::ContextBuilder::createGlobalScope(global); // Create the global scope before the table.
+   Forwards::Parser::ContextBuilder::createGlobalScope(global); // Create the global scope before the table.
    Backwards::Parser::GetterSetter gs;
    Backwards::Parser::SymbolTable table (gs, global);
    Backwards::Input::FileInput console ("../Tests/StdLib.txt");
@@ -1575,4 +1578,38 @@ TEST(EngineTests, testCellRangeExpand_EqualCases)
    EXPECT_TRUE(un.sort(quatre) | quatre.sort(un));
    EXPECT_TRUE(un.sort(cinq) | cinq.sort(un));
    EXPECT_FALSE(un.sort(six) | six.sort(un));
+ }
+
+TEST(EngineTests, testCellEval)
+ {
+   std::shared_ptr<Backwards::Types::ValueType> res;
+   Forwards::Engine::CallingContext context;
+   StringLogger logger;
+   context.logger = &logger;
+
+   Forwards::Engine::SpreadSheet shet;
+   context.theSheet = &shet;
+
+   shet.sheet.resize(1U);
+   shet.sheet[0].resize(1U);
+
+   shet.sheet[0][0] = std::make_unique<Forwards::Engine::Cell>();
+
+   Forwards::Engine::CellFrame frame (shet.sheet[0][0].get(), 0U, 0U);
+   EXPECT_EQ(nullptr, context.topCell());
+   context.pushCell(&frame);
+
+   Forwards::Engine::GetterMap map;
+   context.map = &map;
+
+   res = Forwards::Engine::CellEval(context, std::make_shared<Backwards::Types::StringValue>("2 + 3"));
+
+   ASSERT_TRUE(typeid(Backwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_EQ(BigInt::Fixed("5"), std::dynamic_pointer_cast<Backwards::Types::FloatValue>(res)->value);
+
+   EXPECT_THROW(Forwards::Engine::CellEval(context, std::make_shared<Backwards::Types::FloatValue>(BigInt::Fixed("23"))), Backwards::Types::TypedOperationException);
+   EXPECT_THROW(Forwards::Engine::CellEval(context, std::make_shared<Backwards::Types::StringValue>("Hello")), Backwards::Types::TypedOperationException);
+
+   Backwards::Engine::CallingContext badContext;
+   EXPECT_THROW(Forwards::Engine::CellEval(badContext, std::make_shared<Backwards::Types::StringValue>("2 + 3")), Backwards::Engine::ProgrammingException);
  }

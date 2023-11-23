@@ -32,7 +32,7 @@ debug: all
 
 
 bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/Screen.o obj/BatchMode.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
-	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/*.a -lncurses -lgmp
+	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/Forwards.a lib/*.a -lncurses -lgmp
 
 obj/main.o: Curses/main.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -IOddsAndEnds -c -o obj/main.o Curses/main.cpp
@@ -139,7 +139,7 @@ obj/Backwards/ValueType.o: Backwards/src/Types/ValueType.cpp | obj/Backwards
 	$(CCP) $(CFLAGS) $(B_INCLUDE) -c -o obj/Backwards/ValueType.o Backwards/src/Types/ValueType.cpp
 
 
-lib/Forwards.a: obj/Forwards/CallingContext.o obj/Forwards/CellRangeExpand.o obj/Forwards/CellRefEval.o obj/Forwards/Expression.o obj/Forwards/Lexer.o obj/Forwards/Parser.o obj/Forwards/SpreadSheet.o obj/Forwards/CellRangeValue.o obj/Forwards/CellRefValue.o obj/Forwards/FloatValue.o obj/Forwards/NilValue.o obj/Forwards/StringValue.o | lib
+lib/Forwards.a: obj/Forwards/CallingContext.o obj/Forwards/CellRangeExpand.o obj/Forwards/CellRefEval.o obj/Forwards/Expression.o obj/Forwards/Lexer.o obj/Forwards/CellEval.o obj/Forwards/ContextBuilder.o obj/Forwards/Parser.o obj/Forwards/SpreadSheet.o obj/Forwards/CellRangeValue.o obj/Forwards/CellRefValue.o obj/Forwards/FloatValue.o obj/Forwards/NilValue.o obj/Forwards/StringValue.o | lib
 	ar -rsc lib/Forwards.a obj/Forwards/*.o
 
 obj/Forwards/CallingContext.o: Forwards/src/Engine/CallingContext.cpp | obj/Forwards
@@ -156,6 +156,12 @@ obj/Forwards/Expression.o: Forwards/src/Engine/Expression.cpp | obj/Forwards
 
 obj/Forwards/Lexer.o: Forwards/src/Input/Lexer.cpp | obj/Forwards
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/Lexer.o Forwards/src/Input/Lexer.cpp
+
+obj/Forwards/CellEval.o: Forwards/src/Parser/CellEval.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/CellEval.o Forwards/src/Parser/CellEval.cpp
+
+obj/Forwards/ContextBuilder.o: Forwards/src/Parser/ContextBuilder.cpp | obj/Forwards
+	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/ContextBuilder.o Forwards/src/Parser/ContextBuilder.cpp
 
 obj/Forwards/Parser.o: Forwards/src/Parser/Parser.cpp | obj/Forwards
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/Forwards/Parser.o Forwards/src/Parser/Parser.cpp

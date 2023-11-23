@@ -175,4 +175,12 @@ extern const char* const STDLIB =
 "set GETROUND to function (x) is "
    "return GetRoundMode() "
 "end "
+
+"set EVAL to function (x) is "
+   "set temp to EvalCell(x[0]) "
+   "if !IsNil(temp) then "
+      "set temp to CellEval(temp) "
+   "end "
+   "return temp "
+"end "
 ;

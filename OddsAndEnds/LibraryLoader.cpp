@@ -40,13 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Backwards/Parser/SymbolTable.h"
 #include "Backwards/Parser/Parser.h"
-#include "Backwards/Parser/ContextBuilder.h"
 
 #include "Backwards/Engine/FatalException.h"
 #include "Backwards/Engine/Logger.h"
 #include "Backwards/Engine/Statement.h"
 
 #include "Forwards/Engine/CallingContext.h"
+#include "Forwards/Parser/ContextBuilder.h"
 #include "Forwards/Parser/Parser.h"
 #include "Forwards/Parser/StringLogger.h"
 
@@ -108,7 +108,7 @@ int PreLoadLibraries (int argc, char ** argv, std::vector<std::pair<std::string,
 
 void LoadLibraries (const std::vector<std::pair<std::string, std::string> >& allLibs, Forwards::Engine::CallingContext& context)
  {
-   Backwards::Parser::ContextBuilder::createGlobalScope(*context.globalScope); // Create the global scope before the table.
+   Forwards::Parser::ContextBuilder::createGlobalScope(*context.globalScope); // Create the global scope before the table.
    Backwards::Parser::GetterSetter gs;
    Backwards::Parser::SymbolTable table (gs, *context.globalScope);
 

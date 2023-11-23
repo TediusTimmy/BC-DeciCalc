@@ -41,7 +41,7 @@ I didn't rename the type from `Float` to `Fixed`, like I should have, but it was
 Standard Library
 ----------------
 
-The following functions have been modified/removed/added:
+The following functions have been modified/added:
 
 * MIN - now returns 'Empty' rather than positive infinity for an empty input
 * MAX - now returns 'Empty' rather than negative infinity for an empty input
@@ -49,6 +49,7 @@ The following functions have been modified/removed/added:
 * SETSCALE - sets the scale setting
 * GETROUND - gets the rounding setting
 * SETROUND - sets the rounding setting
+* EVAL - evaluate a label
 
 New Standard Library
 --------------------

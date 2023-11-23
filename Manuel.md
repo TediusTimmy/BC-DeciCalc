@@ -132,6 +132,7 @@ The following functions are all that is implemented. It is a curated list from t
 * SETSCALE - sets the scale setting
 * GETROUND - gets the rounding setting
 * SETROUND - sets the rounding setting
+* EVAL - evaluate a label as a cell
 
 
 ## New Standard Library
@@ -262,6 +263,7 @@ Old-style Pascal comments really round out the language as being valid even when
 ### Standard Library
 * float Abs (float)  # absolute value
 * float Ceil (float)  # ceiling
+* value CellEval (string)  # parse and evaluate the given string as a cell expression, return its evaluated value
 * float ContainsKey (dictionary, value)  # determine if value is a key in dictionary (the language lacks a means to ask for forgiveness)
 * string DebugPrint (string)  # log a debugging string, returns its argument
 * float EnterDebugger ()  # enters the integrated debugger (if present), returns zero

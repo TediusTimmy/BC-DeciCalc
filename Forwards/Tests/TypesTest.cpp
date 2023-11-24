@@ -126,6 +126,14 @@ TEST(TypesTests, testCellRef)
    EXPECT_EQ(Forwards::Types::CELL_REF, defaulted.getType());
    EXPECT_EQ(Forwards::Types::CELL_REF, low.getType());
    EXPECT_EQ(Forwards::Types::CELL_REF, med.getType());
+
+   EXPECT_EQ("ZZW999999997", _11.toString(1U, 1U));
+   EXPECT_EQ("ZZW1", _11.toString(1U, 4U));
+   EXPECT_EQ("ZZZ999999999", _11.toString(4U, 3U));
+
+   Forwards::Types::CellRefValue _12 (false, 5, false, 4);
+   EXPECT_EQ("ZZZ999999999", _12.toString(18278U - 6U, 999999999U - 5U));
+   EXPECT_EQ("A1", _12.toString(18278U - 5U, 999999999U - 4U));
  }
 
 TEST(TypesTests, testCellRange)

@@ -82,7 +82,7 @@ namespace Engine
       std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
       std::string toString(size_t, size_t, int) const override;
 
-      static std::shared_ptr<Types::ValueType> finalConst(std::shared_ptr<Types::CellRefValue>, CallingContext&, const Input::Token&);
+      static std::shared_ptr<Types::ValueType> finalConst(std::shared_ptr<Types::CellRefValue>, CallingContext&);
     };
 
 #define FFBinaryOperation(x) \

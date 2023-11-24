@@ -115,7 +115,7 @@ namespace Engine
       std::shared_ptr<Types::ValueType> result = value;
       if (Types::CELL_REF == result->getType())
        {
-         result = finalConst(std::static_pointer_cast<Types::CellRefValue>(result), context, token);
+         result = finalConst(std::static_pointer_cast<Types::CellRefValue>(result), context);
        }
       return result;
     }
@@ -125,7 +125,7 @@ namespace Engine
       return value->toString(col, row);
     }
 
-   std::shared_ptr<Types::ValueType> Constant::finalConst (std::shared_ptr<Types::CellRefValue> value, CallingContext& context, const Input::Token& token)
+   std::shared_ptr<Types::ValueType> Constant::finalConst (std::shared_ptr<Types::CellRefValue> value, CallingContext& context)
     {
          // Determine column and row.
       int64_t col, row;
@@ -137,23 +137,17 @@ namespace Engine
       else if (true == value->colAbsolute)
        {
          col = value->colRef;
-         row = context.topCell()->row + value->rowRef;
+         row = Types::CellRefValue::getRow(context.topCell()->row, value->rowRef);
        }
       else if (true == value->rowAbsolute)
        {
-         col = context.topCell()->col + value->colRef;
+         col = Types::CellRefValue::getColumn(context.topCell()->col, value->colRef);
          row = value->rowRef;
        }
       else
        {
-         col = context.topCell()->col + value->colRef;
-         row = context.topCell()->row + value->rowRef;
-       }
-
-         // If negative overflow, Error.
-      if ((col < 0) || (row < 0))
-       {
-         constructMessage("Invalid cell reference", token);
+         col = Types::CellRefValue::getColumn(context.topCell()->col, value->colRef);
+         row = Types::CellRefValue::getRow(context.topCell()->row, value->rowRef);
        }
 
       Cell* cell = context.theSheet->getCellAt(col, row);

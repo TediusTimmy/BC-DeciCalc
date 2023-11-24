@@ -56,6 +56,9 @@ namespace Types
       std::string toString(size_t column, size_t row) const override;
       ValueTypes getType() const override;
 
+      static size_t getColumn(size_t fromColumn, int64_t offset);
+      static size_t getRow(size_t fromRow, int64_t offset);
+
     };
 
  } // namespace Types

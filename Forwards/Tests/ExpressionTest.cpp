@@ -1180,10 +1180,10 @@ TEST(EngineTests, testFinalConst)
    EXPECT_EQ(BigInt::Fixed("6"), std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value);
 
    std::shared_ptr<Forwards::Engine::Constant> F1 = std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, -1, false, 0));
-   EXPECT_THROW(F1->evaluate(context), Backwards::Types::TypedOperationException);
+   EXPECT_NO_THROW(F1->evaluate(context));
 
    std::shared_ptr<Forwards::Engine::Constant> F2 = std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 0, false, -1));
-   EXPECT_THROW(F2->evaluate(context), Backwards::Types::TypedOperationException);
+   EXPECT_NO_THROW(F2->evaluate(context));
 
    std::shared_ptr<Forwards::Engine::Constant> B1 = std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 4, false, 1));
    std::shared_ptr<Forwards::Engine::Constant> B2 = std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), std::make_shared<Forwards::Types::CellRefValue>(false, 1, false, 4));

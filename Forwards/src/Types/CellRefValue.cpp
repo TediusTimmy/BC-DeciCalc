@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Forwards/Types/ValueType.h"
 #include "Forwards/Types/CellRefValue.h"
 
+#define MAX_COL 18278U
+#define MAX_ROW 999999999U
+
 namespace Forwards
  {
 
@@ -54,22 +57,53 @@ namespace Types
 
    std::string CellRefValue::toString(size_t column, size_t row) const
     {
+      size_t finalCol = getColumn(column, colRef);
+      size_t finalRow = getRow(row, rowRef);
+
       if (colAbsolute && rowAbsolute)
        {
          return "$" + columnToString(colRef) + "$" + std::to_string(rowRef + 1);
        }
       else if (colAbsolute)
        {
-         return "$" + columnToString(colRef) + std::to_string(static_cast<size_t>(row + rowRef + 1));
+         return "$" + columnToString(colRef) + std::to_string(static_cast<size_t>(finalRow + 1));
        }
       else if (rowAbsolute)
        {
-         return columnToString(static_cast<size_t>(column + colRef)) + "$" + std::to_string(rowRef + 1);
+         return columnToString(static_cast<size_t>(finalCol)) + "$" + std::to_string(rowRef + 1);
        }
       else
        {
-         return columnToString(static_cast<size_t>(column + colRef)) + std::to_string(static_cast<size_t>(row + rowRef + 1));
+         return columnToString(static_cast<size_t>(finalCol)) + std::to_string(static_cast<size_t>(finalRow + 1));
        }
+    }
+
+   size_t CellRefValue::getColumn(size_t fromColumn, int64_t offset)
+    {
+      size_t finalCol = fromColumn + offset;
+      if ((offset < 0) && (static_cast<size_t>(-offset) > fromColumn))
+       {
+         finalCol = fromColumn + offset + MAX_COL;
+       }
+      else if (fromColumn + offset >= MAX_COL)
+       {
+         finalCol = fromColumn + offset - MAX_COL;
+       }
+      return finalCol;
+    }
+
+   size_t CellRefValue::getRow(size_t fromRow, int64_t offset)
+    {
+      size_t finalRow = fromRow + offset;
+      if ((offset < 0) && (static_cast<size_t>(-offset) > fromRow))
+       {
+         finalRow = fromRow + offset + MAX_ROW;
+       }
+      else if (fromRow + offset >= MAX_ROW)
+       {
+         finalRow = fromRow + offset - MAX_ROW;
+       }
+      return finalRow;
     }
 
    std::string ValueType::columnToString(size_t column)

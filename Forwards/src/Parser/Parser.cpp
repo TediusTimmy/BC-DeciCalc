@@ -261,6 +261,13 @@ namespace Parser
          ret = std::make_shared<Engine::FunctionCall>(buildToken, std::make_shared<Backwards::Engine::Variable>(Backwards::Input::Token(), iter->second), args);
        }
          break;
+      case Input::NAME:
+       {
+         Input::Token buildToken = src.getNextToken();
+
+         ret = std::make_shared<Engine::Name>(buildToken, buildToken.text);
+       }
+         break;
       case Input::NUMBER:
        {
          Input::Token buildToken = src.getNextToken();

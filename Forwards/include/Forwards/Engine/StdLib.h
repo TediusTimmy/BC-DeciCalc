@@ -47,6 +47,24 @@ namespace Engine
 
    STDLIB_UNARY_DECL_WITH_CONTEXT(CellEval);
 
+
+   typedef std::shared_ptr<Backwards::Types::ValueType> (*BinaryFunctionPointerWithContext) (Backwards::Engine::CallingContext& context,
+      const std::shared_ptr<Backwards::Types::ValueType>&, const std::shared_ptr<Backwards::Types::ValueType>&);
+
+   class StandardBinaryFunctionWithContext final : public Backwards::Engine::Statement
+    {
+   public:
+      BinaryFunctionPointerWithContext function;
+      StandardBinaryFunctionWithContext(BinaryFunctionPointerWithContext);
+      std::shared_ptr<Backwards::Engine::FlowControl> execute (Backwards::Engine::CallingContext&) const;
+    };
+
+#define STDLIB_BINARY_DECL_WITH_CONTEXT(x) \
+   std::shared_ptr<Backwards::Types::ValueType> x (Backwards::Engine::CallingContext& context, \
+      const std::shared_ptr<Backwards::Types::ValueType>& first, const std::shared_ptr<Backwards::Types::ValueType>& second)
+
+   STDLIB_BINARY_DECL_WITH_CONTEXT(Let);
+
  } // namespace Engine
 
  } // namespace Forwards

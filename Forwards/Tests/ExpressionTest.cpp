@@ -1613,3 +1613,29 @@ TEST(EngineTests, testCellEval)
    Backwards::Engine::CallingContext badContext;
    EXPECT_THROW(Forwards::Engine::CellEval(badContext, std::make_shared<Backwards::Types::StringValue>("2 + 3")), Backwards::Engine::ProgrammingException);
  }
+
+TEST(EngineTests, testName)
+ {
+   std::shared_ptr<Forwards::Engine::Constant> one = std::make_shared<Forwards::Engine::Constant>(Forwards::Input::Token(), makeFloatValue("6"));
+   std::shared_ptr<Forwards::Types::ValueType> res;
+   Forwards::Engine::CallingContext context;
+   StringLogger logger;
+   context.logger = &logger;
+   Forwards::Engine::NameMap names;
+   context.names = &names;
+   names.insert(std::make_pair("_Billy", one));
+
+   Forwards::Engine::Name name (Forwards::Input::Token(), "_Billy");
+   res = name.evaluate(context);
+
+   ASSERT_TRUE(typeid(Forwards::Types::FloatValue) == typeid(*res.get()));
+   EXPECT_EQ(BigInt::Fixed("6"), std::dynamic_pointer_cast<Forwards::Types::FloatValue>(res)->value);
+   EXPECT_EQ("_Billy", name.toString(1U, 1U, 0));
+
+
+   Forwards::Engine::Name nameBad (Forwards::Input::Token(), "_Johnny");
+   res = nameBad.evaluate(context);
+
+   EXPECT_TRUE(typeid(Forwards::Types::NilValue) == typeid(*res.get()));
+   EXPECT_EQ("_Johnny", nameBad.toString(1U, 1U, 0));
+ }

@@ -183,4 +183,8 @@ extern const char* const STDLIB =
    "end "
    "return temp "
 "end "
+
+"set LET to function (x) is "
+   "return Let(EvalCell(x[0]); x[1]) "
+"end "
 ;

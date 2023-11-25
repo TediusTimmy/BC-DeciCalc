@@ -91,6 +91,8 @@ TEST(LexerTests, testEverythingAndTheKitchenSink)
    tests.push_back(std::make_pair("1,2E-3",               Forwards::Input::NUMBER));
    tests.push_back(std::make_pair("@program",             Forwards::Input::IDENTIFIER));
    tests.push_back(std::make_pair("@",                    Forwards::Input::INVALID));
+   tests.push_back(std::make_pair("_$3_fiddy",            Forwards::Input::NAME));
+   tests.push_back(std::make_pair("_",                    Forwards::Input::INVALID));
    tests.push_back(std::make_pair("=",                    Forwards::Input::EQUALITY));
    tests.push_back(std::make_pair("<>",                   Forwards::Input::INEQUALITY));
    tests.push_back(std::make_pair(":",                    Forwards::Input::RANGE));

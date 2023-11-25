@@ -79,7 +79,7 @@ namespace Input
       Lexeme tokenType = END_OF_FILE;
       std::string text;
 
-      if (std::isalpha(input.peek())|| ('$' == input.peek()))
+      if (std::isalpha(input.peek()) || ('$' == input.peek()))
        { // Read in a cell reference
          text = static_cast<char>(std::toupper(input.peek()));
          int alphas = 0;
@@ -189,6 +189,22 @@ namespace Input
              }
 
             tokenType = NUMBER;
+          }
+       }
+      else if ('_' == input.peek())
+       {
+         while (('_' == input.peek()) || std::isalpha(input.peek()) || std::isdigit(input.peek()) || ('$' == input.peek()))
+          {
+            text += static_cast<char>(input.peek());
+            consume();
+          }
+         if ("_" != text)
+          {
+            tokenType = NAME;
+          }
+         else
+          {
+            tokenType = INVALID;
           }
        }
       else

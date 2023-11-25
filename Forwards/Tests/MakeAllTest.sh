@@ -19,7 +19,7 @@ cd ../Parser
 mv ./*.o ../../obj
 
 cd ../../bin
-g++ -o AllTest -g -Wall -Wextra -Wpedantic --coverage -O0 -I../../../External/googletest/include -I../include -I../../BCNum -I../../Backwards/include ../Tests/ExpressionTest.cpp ../Tests/LexerTest.cpp ../Tests/ParserTest.cpp ../Tests/SpreadSheetTest.cpp ../Tests/TypesTest.cpp ../obj/*.o ../../../External/googletest/lib/libgtest.a ../../../External/googletest/lib/libgtest_main.a ../obj/*.a -lgmp
+g++ -o AllTest -g -Wall -Wextra -Wpedantic --coverage -O0 -I../../../External/googletest/include -I../include -I../../BCNum -I../../Backwards/include ../Tests/ExpressionTest.cpp ../Tests/LexerTest.cpp ../Tests/ParserTest.cpp ../Tests/SpreadSheetTest.cpp ../Tests/TypesTest.cpp ../Tests/StdLibTest.cpp ../obj/*.o ../../../External/googletest/lib/libgtest.a ../../../External/googletest/lib/libgtest_main.a ../obj/*.a -lgmp
 ../../../External/lcov/bin/lcov --rc lcov_branch_coverage=1 --no-external --capture --initial --directory ../src --directory ../include --output-file All_Base.info
 ./AllTest.exe
 ../../../External/lcov/bin/lcov --rc lcov_branch_coverage=1 --no-external --capture --directory ../src --directory ../include --directory . --output-file All_Run.info

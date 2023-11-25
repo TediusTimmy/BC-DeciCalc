@@ -110,6 +110,8 @@ The easiest mode is label mode: it is just free-form text. It should probably wo
 
 Then, there is formula mode. Formula mode accepts formulas. It uses A1 cell references, despite immediately converting them to R1C1 under the covers, and thus the $A$1 fixed-reference format. Anchoring to a row or column only matters when you are copy/pasting cells. Formulas can refer to cells, have constants in them (though scientific notation is not supported), perform addition `+`/subtraction `-`/multiplication `*`/division `/`, select ranges `:`, or call functions `@FUN`. Functions start with `@` like in early spreadsheet applications; their arguments are separated by semicolons `;`. You can do comparisons with `=`, `>=`, `<=`, `>`, `>`, or `<>`: the result is 1 for true and 0 for false. Use `&` to concatenate the string representations of two cells. The only half-attempt at internationalization that is supported is that `12,5` and `12.5` are treated the same. When you type a comma on numeric input, all of the numeric outputs will change to displaying a comma as the decimal separator.
 
+Finally, there are "names". Anything that begins with an underscore (`_`) is a name. Names are to make formulas easier to understand, but do note that they are defined within cells in the spreadsheet and need to be defined before use. One may want a cell that says `_GrossSales-_GrossCosts` to get their net profit. To do this is clunky, for instance: put the label `_GrossSales` in `A1`; put the label `_GrossCosts` in `A2`; put the formula `@LET(A1;$F$15)` in `A3`; and finally the formula `@LET(A2;$G$19)` in `A4`. Now the cell `L15` could contain `_GrossSales-_GrossCosts`, assuming the default evaluation order. The `LET` function will not complain if the name is bad, but the parser only recognizes letters, numbers, underscores, and dollar signs (and it IS case sensitive, unlike function names or cell references).
+
 Example:  
 `A$1+@SUM(C2:D3)+4/7`
 
@@ -133,6 +135,7 @@ The following functions are all that is implemented. It is a curated list from t
 * GETROUND - gets the rounding setting
 * SETROUND - sets the rounding setting
 * EVAL - evaluate a label as a cell
+* LET - define a name
 
 
 ## New Standard Library

@@ -50,6 +50,7 @@ The following functions have been modified/added:
 * GETROUND - gets the rounding setting
 * SETROUND - sets the rounding setting
 * EVAL - evaluate a label
+* LET - define a name
 
 New Standard Library
 --------------------

@@ -331,6 +331,7 @@ namespace Engine
     {
       context.inUserInput = false;
       ++context.generation;
+      context.names->clear();
       if (c_major) // Going in column-major order
        {
          if (left_right) // Going from left-to-right

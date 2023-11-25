@@ -19,5 +19,5 @@ g++ -I../../include -I../../../BCNum -I../../../Backwards/include -s -O3 -c -Wal
 mv ./*.o ../../obj
 
 cd ../../bin
-g++ -o AllTest -s -Wall -Wextra -Wpedantic -O3 -I../../../External/googletest/include -I../include -I../../BCNum -I../../Backwards/include ../Tests/ExpressionTest.cpp ../Tests/LexerTest.cpp ../Tests/ParserTest.cpp ../Tests/SpreadSheetTest.cpp ../Tests/TypesTest.cpp ../obj/*.o ../../../External/googletest/lib/libgtest.a ../../../External/googletest/lib/libgtest_main.a ../obj/*.a -lgmp
+g++ -o AllTest -s -Wall -Wextra -Wpedantic -O3 -I../../../External/googletest/include -I../include -I../../BCNum -I../../Backwards/include ../Tests/ExpressionTest.cpp ../Tests/LexerTest.cpp ../Tests/ParserTest.cpp ../Tests/SpreadSheetTest.cpp ../Tests/TypesTest.cpp ../Tests/StdLibTest.cpp ../obj/*.o ../../../External/googletest/lib/libgtest.a ../../../External/googletest/lib/libgtest_main.a ../obj/*.a -lgmp
 ./AllTest.exe

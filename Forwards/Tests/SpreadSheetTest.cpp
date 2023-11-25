@@ -272,6 +272,8 @@ TEST(EngineTests, testSpreadSheet_Recalc_TBLR) // A1 is evaluated first. It call
    Forwards::Engine::CallingContext context;
    Forwards::Engine::SpreadSheet shet;
    context.theSheet = &shet;
+   Forwards::Engine::NameMap names;
+   context.names = &names;
 
    shet.initCellAt(0U, 0U);
    shet.initCellAt(1U, 1U);
@@ -301,6 +303,8 @@ TEST(EngineTests, testSpreadSheet_Recalc_BTRL) // B2 is evaluated first. It call
    Forwards::Engine::CallingContext context;
    Forwards::Engine::SpreadSheet shet;
    context.theSheet = &shet;
+   Forwards::Engine::NameMap names;
+   context.names = &names;
 
    shet.top_down = false;
    shet.left_right = false;
@@ -335,6 +339,8 @@ TEST(EngineTests, testSpreadSheet_Recalc_NoHang)
    Forwards::Engine::CallingContext context;
    Forwards::Engine::SpreadSheet shet;
    context.theSheet = &shet;
+   Forwards::Engine::NameMap names;
+   context.names = &names;
 
    shet.initCellAt(0U, 5U);
    shet.initCellAt(1U, 2U);

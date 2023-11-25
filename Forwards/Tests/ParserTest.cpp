@@ -382,3 +382,28 @@ TEST(ParserTests, testSomeFunctionsBad)
       FAIL() << "Parse returned NULL.";
     }
  }
+
+TEST(ParserTests, testName)
+ {
+   std::string line = "_Larry";
+   Backwards::Input::StringInput string (line);
+   Forwards::Input::Lexer lexer (string);
+
+   Forwards::Engine::CallingContext context;
+   Backwards::Engine::Scope global;
+   StringLogger logger;
+
+   context.logger = &logger;
+   context.debugger = nullptr;
+   context.globalScope = &global;
+
+   Forwards::Engine::GetterMap map;
+
+   std::shared_ptr<Forwards::Engine::Expression> parse = Forwards::Parser::Parser::ParseFullExpression(lexer, map, logger, 1U, 1U);
+
+   if (nullptr == parse.get())
+    {
+      FAIL() << "Parse returned NULL.";
+    }
+   ASSERT_TRUE(typeid(Forwards::Engine::Name) == typeid(*parse.get()));
+ }

@@ -1160,6 +1160,29 @@ namespace Engine
       return result;
     }
 
+
+   Name::Name(const Input::Token& token, const std::string& name) : Expression(token), name(name)
+    {
+    }
+
+   std::shared_ptr<Types::ValueType> Name::evaluate (CallingContext& context) const
+    {
+      const auto iter = context.names->find(name);
+      if (context.names->end() == iter)
+       {
+         return std::make_shared<Types::NilValue>();
+       }
+      else
+       {
+         return iter->second->evaluate(context);
+       }
+    }
+
+   std::string Name::toString(size_t, size_t, int) const
+    {
+      return name;
+    }
+
  } // namespace Forwards
 
  } // namespace Backwards

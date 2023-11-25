@@ -50,6 +50,7 @@ namespace Input
       CELL_REFERENCE,
       IDENTIFIER,
       NUMBER,
+      NAME,
 
       OPEN_PARENS,
       CLOSE_PARENS,

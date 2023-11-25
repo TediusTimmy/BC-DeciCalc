@@ -47,6 +47,9 @@ namespace Parser
 
     // 1
       Backwards::Parser::ContextBuilder::addFunction("CellEval", std::make_shared<Backwards::Engine::StandardUnaryFunctionWithContext>(Engine::CellEval), 1U, global);
+
+    // 1
+      Backwards::Parser::ContextBuilder::addFunction("Let", std::make_shared<Forwards::Engine::StandardBinaryFunctionWithContext>(Engine::Let), 2U, global);
     }
 
  } // namespace Parser

@@ -61,6 +61,8 @@ int main (int argc, char ** argv)
    context.theSheet = &sheet;
    Forwards::Engine::GetterMap map;
    context.map = &map;
+   Forwards::Engine::NameMap names;
+   context.names = &names;
 
    std::list<std::string> batches;
    std::vector<std::pair<std::string, std::string> > argLibs;

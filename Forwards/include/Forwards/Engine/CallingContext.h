@@ -44,7 +44,9 @@ namespace Engine
 
    class Cell;
    class SpreadSheet;
+   class Expression;
    typedef std::map<std::string, std::shared_ptr<Backwards::Engine::Getter> > GetterMap;
+   typedef std::map<std::string, std::shared_ptr<Expression> > NameMap;
 
    class CellFrame
     {
@@ -65,6 +67,7 @@ namespace Engine
       size_t generation;
       SpreadSheet* theSheet;
       GetterMap* map;
+      NameMap* names;
 
       CellFrame* topCell();
       void pushCell(CellFrame* cell);

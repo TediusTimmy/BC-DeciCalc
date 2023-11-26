@@ -55,8 +55,8 @@ namespace Engine
     {
    public:
       BinaryFunctionPointerWithContext function;
-      StandardBinaryFunctionWithContext(BinaryFunctionPointerWithContext);
-      std::shared_ptr<Backwards::Engine::FlowControl> execute (Backwards::Engine::CallingContext&) const;
+      explicit StandardBinaryFunctionWithContext(BinaryFunctionPointerWithContext);
+      std::shared_ptr<Backwards::Engine::FlowControl> execute (Backwards::Engine::CallingContext&) const override;
     };
 
 #define STDLIB_BINARY_DECL_WITH_CONTEXT(x) \

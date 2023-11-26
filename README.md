@@ -17,6 +17,8 @@ Also August 2023: Save file format 3: the save file format will save loaded libr
 * Libraries saved in the spreadsheet have all comments and formatting stripped from them.
 * The save file format maintains a backwards-compatible HTML format that can be viewed with a web browser (albeit, the table is transposed). If no libraries are loaded and all columns are default width, then the spreadsheet is forwards-compatible.
 
+November 2023: I have implemented features that are well beyond anything that I wanted out of this. It has taken on a life of its own, and is probably more capable than I even intended it to be. I hope you find it useful, but I intend no more major changes (must ... say ... NO ... to ... LAMBDA).
+
 
 Limitations
 -----------

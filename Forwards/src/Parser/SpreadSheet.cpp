@@ -244,7 +244,7 @@ namespace Engine
       CellFrame newFrame (cell, col, row);
 
          // If we have already evaluated this cell this generation, stop.
-      if (context.generation == cell->previousGeneration)
+      if ((context.generation == cell->previousGeneration) && (nullptr != cell->value.get()))
        {
          OUT = cell->previousValue;
          return result;
@@ -252,7 +252,7 @@ namespace Engine
 
          // If this is a LABEL, then set the value.
       std::shared_ptr<Expression> value = cell->value;
-      if ((LABEL == cell->type) && (nullptr == cell->value.get()))
+      if ((LABEL == cell->type) && (nullptr == value.get()))
        {
          value = std::make_shared<Constant>(Input::Token(), std::make_shared<Types::StringValue>(cell->currentInput));
        }

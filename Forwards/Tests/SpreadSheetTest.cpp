@@ -90,7 +90,7 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    shet.clearCellAt(1U, 5U);
    shet.clearCellAt(5U, 1U);
 
-   EXPECT_EQ("", shet.computeCell(context, res, 5U, 1U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 5U, 1U));
 
    std::string hello = "Hello";
    Forwards::Engine::Cell* cell = shet.getCellAt(2U, 2U);
@@ -103,7 +103,7 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    cell->previousGeneration = 12U;
    context.inUserInput = true;
 
-   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U));
 
    EXPECT_EQ(nullptr, cell->value.get()); // Post conditions: no change
    EXPECT_EQ(hello, cell->currentInput);
@@ -117,7 +117,7 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    context.inUserInput = false; // regular update
    context.generation = 6U;
 
-   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U));
 
    EXPECT_NE(nullptr, cell->value.get()); // Post conditions: cell updated
    EXPECT_EQ("", cell->currentInput);
@@ -125,11 +125,11 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    EXPECT_EQ(6U, cell->previousGeneration);
 
    cell->previousValue.reset();
-   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U));
    EXPECT_EQ(nullptr, res.get());
 
    context.inUserInput = true;
-   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U, true));
+   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U));
    EXPECT_EQ(nullptr, res.get());
 
 
@@ -140,7 +140,7 @@ TEST(EngineTests, testSpreadSheet_EasyCases)
    context.generation = 6U;
 
    context.inUserInput = true;
-   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 2U, 2U));
 
    EXPECT_NE(nullptr, cell->value.get()); // Post conditions: no change
    EXPECT_EQ("", cell->currentInput);
@@ -167,7 +167,7 @@ TEST(EngineTests, testSpreadSheet_ParseCases)
    cell->type = Forwards::Engine::VALUE;
    cell->currentInput = "12 * * 3";
 
-   EXPECT_EQ("Expected >primary expression< but found >*< at 6", shet.computeCell(context, res, 0U, 0U, false));
+   EXPECT_EQ("Expected >primary expression< but found >*< at 6", shet.computeCell(context, res, 0U, 0U));
    EXPECT_EQ(nullptr, res.get());
 
    context.inUserInput = true;
@@ -178,7 +178,7 @@ TEST(EngineTests, testSpreadSheet_ParseCases)
    cell->previousGeneration = 0U;
    context.inUserInput = true;
 
-   EXPECT_EQ("", shet.computeCell(context, res, 0U, 0U, false));
+   EXPECT_EQ("", shet.computeCell(context, res, 0U, 0U));
 
    EXPECT_EQ(nullptr, cell->value.get()); // Post conditions: no change
    EXPECT_EQ("12 * 3", cell->currentInput);
@@ -220,11 +220,11 @@ TEST(EngineTests, testSpreadSheet_ExceptionCases)
    cell->type = Forwards::Engine::VALUE;
    cell->currentInput = "A1+B1";
 
-   EXPECT_EQ("Error adding Float to String at 3", shet.computeCell(context, res, 1U, 1U, false));
+   EXPECT_EQ("Error adding Float to String at 3", shet.computeCell(context, res, 1U, 1U));
    EXPECT_EQ(nullptr, res.get());
 
    ++context.generation;
-   EXPECT_THROW(shet.computeCell(context, res, 1U, 1U, true), Backwards::Types::TypedOperationException);
+   EXPECT_NO_THROW(shet.computeCell(context, 1U, 1U, false));
 
     {
       Backwards::Engine::Scope global;
@@ -257,7 +257,7 @@ TEST(EngineTests, testSpreadSheet_ExceptionCases)
       cell->currentInput = "@BAD";
 
       ++context.generation;
-      EXPECT_EQ("Error adding Float to String", shet.computeCell(context, res, 1U, 1U, false));
+      EXPECT_EQ("Error adding Float to String", shet.computeCell(context, res, 1U, 1U));
       EXPECT_EQ(nullptr, res.get());
     }
  }

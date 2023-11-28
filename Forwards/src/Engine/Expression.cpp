@@ -171,7 +171,7 @@ namespace Engine
 
          // Guess we need to do work.
       std::shared_ptr<Types::ValueType> result;
-      (void) context.theSheet->computeCell(context, result, col, row, true);
+      result = context.theSheet->computeCell(context, col, row, true);
       if (nullptr == result.get())
        {
          result = std::make_shared<Types::NilValue>();

@@ -231,7 +231,7 @@ namespace Engine
     }
 
 
-   std::string SpreadSheet::computeCell(CallingContext& context, std::shared_ptr<Types::ValueType>& OUT, size_t col, size_t row, bool rethrow)
+   std::string SpreadSheet::computeCell(CallingContext& context, std::shared_ptr<Types::ValueType>& OUT, size_t col, size_t row)
     {
       std::string result;
       OUT.reset(); // Ensure to clear OUT variable.
@@ -304,19 +304,11 @@ namespace Engine
          context.topCell()->cell->previousGeneration = context.generation;
          context.topCell()->cell->previousValue = OUT;
          context.popCell();
-         if (true == rethrow)
-          {
-            throw;
-          }
        }
       catch (...)
        {
          context.topCell()->cell->inEvaluation = false;
          context.popCell();
-         if (true == rethrow)
-          {
-            throw;
-          }
        }
 
       size_t c = result.find('\n');
@@ -326,6 +318,83 @@ namespace Engine
        }
       return result;
     }
+
+
+   std::shared_ptr<Types::ValueType> SpreadSheet::computeCell(CallingContext& context, size_t col, size_t row, bool rethrow)
+    {
+      std::shared_ptr<Types::ValueType> OUT;
+
+      Cell* cell = getCellAt(col, row);
+      if (nullptr == cell)
+       {
+         return OUT;
+       }
+      CellFrame newFrame (cell, col, row);
+
+         // If we have already evaluated this cell this generation, stop.
+      if (context.generation == cell->previousGeneration)
+       {
+         return cell->previousValue;
+       }
+
+         // If this is a LABEL, then set the value.
+      std::shared_ptr<Expression> value = cell->value;
+      if ((LABEL == cell->type) && (nullptr == value.get()))
+       {
+         value = std::make_shared<Constant>(Input::Token(), std::make_shared<Types::StringValue>(cell->currentInput));
+       }
+         // Else, this is a VALUE, and we need to parse it.
+      if (nullptr == value.get())
+       {
+         Backwards::Input::StringInput interlinked (cell->currentInput);
+         Input::Lexer lexer (interlinked);
+         Backwards::Engine::Logger* temp = context.logger;
+         Parser::StringLogger newLogger;
+         context.logger = &newLogger;
+         value = Parser::Parser::ParseFullExpression(lexer, *context.map, *context.logger, col, row);
+         context.logger = temp;
+       }
+
+         // If the parse failed, leave. Result will have the first parser message.
+      if (nullptr == value.get())
+       {
+         return OUT;
+       }
+
+         // If this is a regular update, update the cell. Eww....
+      if (false == context.inUserInput)
+       {
+         cell->currentInput = "";
+         cell->value = value;
+       }
+
+      try
+       {
+         context.pushCell(&newFrame);
+            // Evaluate the new cell.
+         context.topCell()->cell->inEvaluation = true;
+         context.topCell()->cell->recursed = false;
+         OUT = value->evaluate(context);
+         context.topCell()->cell->inEvaluation = false;
+         context.topCell()->cell->previousGeneration = context.generation;
+         context.topCell()->cell->previousValue = OUT;
+         context.popCell();
+       }
+      catch (...)
+       {
+         context.topCell()->cell->inEvaluation = false;
+         context.topCell()->cell->previousGeneration = context.generation;
+         context.topCell()->cell->previousValue = OUT;
+         context.popCell();
+         if (true == rethrow)
+          {
+            throw;
+          }
+       }
+
+      return OUT;
+    }
+
 
    void SpreadSheet::recalc(CallingContext& context)
     {
@@ -342,8 +411,7 @@ namespace Engine
                 {
                   for (size_t row = 0U; row < sheet[col].size(); ++row)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -353,8 +421,7 @@ namespace Engine
                 {
                   for (size_t row = sheet[col].size() - 1U; row != (static_cast<size_t>(0U) - 1U); --row)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -367,8 +434,7 @@ namespace Engine
                 {
                   for (size_t row = 0U; row < sheet[col].size(); ++row)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -378,8 +444,7 @@ namespace Engine
                 {
                   for (size_t row = sheet[col].size() - 1U; row != (static_cast<size_t>(0U) - 1U); --row)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -395,8 +460,7 @@ namespace Engine
                 {
                   for (size_t col = 0U; col < sheet.size(); ++col)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -406,8 +470,7 @@ namespace Engine
                 {
                   for (size_t col = 0U; col < sheet.size(); ++col)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -420,8 +483,7 @@ namespace Engine
                 {
                   for (size_t col = sheet.size() - 1U; col != (static_cast<size_t>(0U) - 1U); --col)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }
@@ -431,8 +493,7 @@ namespace Engine
                 {
                   for (size_t col = sheet.size() - 1U; col != (static_cast<size_t>(0U) - 1U); --col)
                    {
-                     std::shared_ptr<Types::ValueType> trash;
-                     (void) computeCell(context, trash, col, row, false);
+                     (void) computeCell(context, col, row, false);
                    }
                 }
              }

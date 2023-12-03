@@ -51,6 +51,7 @@ namespace Input
       IDENTIFIER,
       NUMBER,
       NAME,
+      STRING,
 
       OPEN_PARENS,
       CLOSE_PARENS,

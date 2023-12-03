@@ -48,7 +48,7 @@ namespace Types
       return name;
     }
 
-   std::string NilValue::toString(size_t, size_t) const
+   std::string NilValue::toString(size_t, size_t, bool) const
     {
       return getTypeName();
     }

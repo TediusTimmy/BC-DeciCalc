@@ -52,7 +52,7 @@ namespace Types
       return name;
     }
 
-   std::string FloatValue::toString(size_t, size_t) const
+   std::string FloatValue::toString(size_t, size_t, bool) const
     {
       return value.toString();
     }

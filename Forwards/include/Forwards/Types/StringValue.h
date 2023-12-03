@@ -52,7 +52,7 @@ namespace Types
       explicit StringValue(const std::string& value);
 
       const std::string& getTypeName() const override;
-      std::string toString(size_t, size_t) const override;
+      std::string toString(size_t, size_t, bool) const override;
       ValueTypes getType() const override;
 
     };

@@ -53,7 +53,7 @@ namespace Types
       CellRangeValue(size_t col1, size_t row1, size_t col2, size_t row2);
 
       const std::string& getTypeName() const override;
-      std::string toString(size_t, size_t) const override;
+      std::string toString(size_t, size_t, bool) const override;
       ValueTypes getType() const override;
 
     };

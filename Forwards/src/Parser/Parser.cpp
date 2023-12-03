@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Backwards/Engine/Logger.h"
 
 #include "Forwards/Types/FloatValue.h"
+#include "Forwards/Types/StringValue.h"
 #include "Forwards/Types/CellRefValue.h"
 
 #include <sstream>
@@ -273,6 +274,13 @@ namespace Parser
          Input::Token buildToken = src.getNextToken();
 
          ret = std::make_shared<Engine::Constant>(buildToken, std::make_shared<Types::FloatValue>(BigInt::Fixed(buildToken.text)));
+       }
+         break;
+      case Input::STRING:
+       {
+         Input::Token buildToken = src.getNextToken();
+
+         ret = std::make_shared<Engine::Constant>(buildToken, std::make_shared<Types::StringValue>(buildToken.text));
        }
          break;
       case Input::OPEN_PARENS:

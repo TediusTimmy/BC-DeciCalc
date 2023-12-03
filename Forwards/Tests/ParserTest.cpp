@@ -105,6 +105,34 @@ TEST(ParserTests, testSomeMoreParse)
     }
  }
 
+TEST(ParserTests, testAStringParse)
+ {
+   std::string line = "\"Hello \"&\"\"\"World\"\"\"";
+   Backwards::Input::StringInput string (line);
+   Forwards::Input::Lexer lexer (string);
+
+   Forwards::Engine::CallingContext context;
+   Backwards::Engine::Scope global;
+   StringLogger logger;
+
+   context.logger = &logger;
+   context.debugger = nullptr;
+   context.globalScope = &global;
+
+   Forwards::Engine::GetterMap map;
+
+   std::shared_ptr<Forwards::Engine::Expression> parse = Forwards::Parser::Parser::ParseFullExpression(lexer, map, logger, 1U, 1U);
+
+   if (nullptr != parse.get())
+    {
+      EXPECT_EQ(line, parse->toString(1U, 1U));
+    }
+   else
+    {
+      FAIL() << "Parse returned NULL.";
+    }
+ }
+
 TEST(ParserTests, testSomeReferences)
  {
    std::string line = "A1+B2+$A1+A$1+$A$1";

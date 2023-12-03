@@ -53,7 +53,7 @@ namespace Types
     }
 
       // The Range type is ephemeral, and this will only be called in an absolute sense: it isn't used to rebuild an expression.
-   std::string CellRangeValue::toString(size_t, size_t) const
+   std::string CellRangeValue::toString(size_t, size_t, bool) const
     {
       return columnToString(col1) + std::to_string(row1 + 1) + ":" + columnToString(col2) + std::to_string(row2 + 1);
     }

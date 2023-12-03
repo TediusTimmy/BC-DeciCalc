@@ -48,10 +48,10 @@ TEST(TypesTests, testFloats)
 
    EXPECT_EQ("Float", defaulted.getTypeName());
 
-   EXPECT_EQ("0", defaulted.toString(0U, 0U));
-   EXPECT_EQ("1", low.toString(0U, 0U));
-   EXPECT_EQ("5", med.toString(0U, 0U));
-   EXPECT_EQ("10", high.toString(0U, 0U));
+   EXPECT_EQ("0", defaulted.toString(0U, 0U, false));
+   EXPECT_EQ("1", low.toString(0U, 0U, false));
+   EXPECT_EQ("5", med.toString(0U, 0U, false));
+   EXPECT_EQ("10", high.toString(0U, 0U, false));
 
    EXPECT_EQ(Forwards::Types::FLOAT, defaulted.getType());
    EXPECT_EQ(Forwards::Types::FLOAT, low.getType());
@@ -67,14 +67,32 @@ TEST(TypesTests, testStrings)
 
    EXPECT_EQ("String", defaulted.getTypeName());
 
-   EXPECT_EQ("", defaulted.toString(0U, 0U));
-   EXPECT_EQ("A", low.toString(0U, 0U));
-   EXPECT_EQ("M", med.toString(0U, 0U));
-   EXPECT_EQ("Z", high.toString(0U, 0U));
+   EXPECT_EQ("", defaulted.toString(0U, 0U, false));
+   EXPECT_EQ("A", low.toString(0U, 0U, false));
+   EXPECT_EQ("M", med.toString(0U, 0U, false));
+   EXPECT_EQ("Z", high.toString(0U, 0U, false));
 
    EXPECT_EQ(Forwards::Types::STRING, defaulted.getType());
    EXPECT_EQ(Forwards::Types::STRING, low.getType());
    EXPECT_EQ(Forwards::Types::STRING, med.getType());
+
+   Forwards::Types::StringValue toquote1 ("hello");
+   Forwards::Types::StringValue toquote2 ("hello \" there");
+   Forwards::Types::StringValue toquote3 ("hello \"there\" you");
+   Forwards::Types::StringValue toquote4 ("\"hello there");
+   Forwards::Types::StringValue toquote5 ("hello there\"");
+   Forwards::Types::StringValue toquote6 ("\"hello there\"");
+   Forwards::Types::StringValue toquote7 ("\"");
+   Forwards::Types::StringValue toquote8 ("\"\"");
+
+   EXPECT_EQ("\"hello\"", toquote1.toString(0U, 0U, true));
+   EXPECT_EQ("\"hello \"\" there\"", toquote2.toString(0U, 0U, true));
+   EXPECT_EQ("\"hello \"\"there\"\" you\"", toquote3.toString(0U, 0U, true));
+   EXPECT_EQ("\"\"\"hello there\"", toquote4.toString(0U, 0U, true));
+   EXPECT_EQ("\"hello there\"\"\"", toquote5.toString(0U, 0U, true));
+   EXPECT_EQ("\"\"\"hello there\"\"\"", toquote6.toString(0U, 0U, true));
+   EXPECT_EQ("\"\"\"\"", toquote7.toString(0U, 0U, true));
+   EXPECT_EQ("\"\"\"\"\"\"", toquote8.toString(0U, 0U, true));
  }
 
 TEST(TypesTests, testNil)
@@ -86,10 +104,10 @@ TEST(TypesTests, testNil)
 
    EXPECT_EQ("Nil", defaulted.getTypeName());
 
-   EXPECT_EQ("Nil", defaulted.toString(0U, 0U));
-   EXPECT_EQ("Nil", low.toString(0U, 0U));
-   EXPECT_EQ("Nil", med.toString(0U, 0U));
-   EXPECT_EQ("Nil", high.toString(0U, 0U));
+   EXPECT_EQ("Nil", defaulted.toString(0U, 0U, false));
+   EXPECT_EQ("Nil", low.toString(0U, 0U, false));
+   EXPECT_EQ("Nil", med.toString(0U, 0U, false));
+   EXPECT_EQ("Nil", high.toString(0U, 0U, false));
 
    EXPECT_EQ(Forwards::Types::NIL, defaulted.getType());
    EXPECT_EQ(Forwards::Types::NIL, low.getType());
@@ -106,34 +124,34 @@ TEST(TypesTests, testCellRef)
 
    EXPECT_EQ("CellRef", defaulted.getTypeName());
 
-   EXPECT_EQ("B2", defaulted.toString(1U, 1U));
-   EXPECT_EQ("F6", defaulted.toString(5U, 5U));
-   EXPECT_EQ("$F7", low.toString(1U, 1U));
-   EXPECT_EQ("$F11", low.toString(5U, 5U));
-   EXPECT_EQ("H$7", med.toString(1U, 1U));
-   EXPECT_EQ("M$7", med.toString(6U, 6U));
-   EXPECT_EQ("$D$5", high.toString(1U, 1U));
-   EXPECT_EQ("$D$5", high.toString(8U, 8U));
-   EXPECT_EQ("B2", _11.toString(6U, 5U));
-   EXPECT_EQ("G6", _11.toString(11U, 9U));
+   EXPECT_EQ("B2", defaulted.toString(1U, 1U, false));
+   EXPECT_EQ("F6", defaulted.toString(5U, 5U, false));
+   EXPECT_EQ("$F7", low.toString(1U, 1U, false));
+   EXPECT_EQ("$F11", low.toString(5U, 5U, false));
+   EXPECT_EQ("H$7", med.toString(1U, 1U, false));
+   EXPECT_EQ("M$7", med.toString(6U, 6U, false));
+   EXPECT_EQ("$D$5", high.toString(1U, 1U, false));
+   EXPECT_EQ("$D$5", high.toString(8U, 8U, false));
+   EXPECT_EQ("B2", _11.toString(6U, 5U, false));
+   EXPECT_EQ("G6", _11.toString(11U, 9U, false));
 
-   EXPECT_EQ("Z1", defaulted.toString(25U, 0U));
-   EXPECT_EQ("AA1", defaulted.toString(26U, 0U));
-   EXPECT_EQ("ZZ1", defaulted.toString(701U, 0U));
-   EXPECT_EQ("AAA1", defaulted.toString(702U, 0U));
-   EXPECT_EQ("ZZZ1", defaulted.toString(18277U, 0U));
+   EXPECT_EQ("Z1", defaulted.toString(25U, 0U, false));
+   EXPECT_EQ("AA1", defaulted.toString(26U, 0U, false));
+   EXPECT_EQ("ZZ1", defaulted.toString(701U, 0U, false));
+   EXPECT_EQ("AAA1", defaulted.toString(702U, 0U, false));
+   EXPECT_EQ("ZZZ1", defaulted.toString(18277U, 0U, false));
 
    EXPECT_EQ(Forwards::Types::CELL_REF, defaulted.getType());
    EXPECT_EQ(Forwards::Types::CELL_REF, low.getType());
    EXPECT_EQ(Forwards::Types::CELL_REF, med.getType());
 
-   EXPECT_EQ("ZZW999999997", _11.toString(1U, 1U));
-   EXPECT_EQ("ZZW1", _11.toString(1U, 4U));
-   EXPECT_EQ("ZZZ999999999", _11.toString(4U, 3U));
+   EXPECT_EQ("ZZW999999997", _11.toString(1U, 1U, false));
+   EXPECT_EQ("ZZW1", _11.toString(1U, 4U, false));
+   EXPECT_EQ("ZZZ999999999", _11.toString(4U, 3U, false));
 
    Forwards::Types::CellRefValue _12 (false, 5, false, 4);
-   EXPECT_EQ("ZZZ999999999", _12.toString(18278U - 6U, 999999999U - 5U));
-   EXPECT_EQ("A1", _12.toString(18278U - 5U, 999999999U - 4U));
+   EXPECT_EQ("ZZZ999999999", _12.toString(18278U - 6U, 999999999U - 5U, false));
+   EXPECT_EQ("A1", _12.toString(18278U - 5U, 999999999U - 4U, false));
  }
 
 TEST(TypesTests, testCellRange)
@@ -145,14 +163,14 @@ TEST(TypesTests, testCellRange)
 
    EXPECT_EQ("CellRange", defaulted.getTypeName());
 
-   EXPECT_EQ("B2:B2", defaulted.toString(0U, 0U));
-   EXPECT_EQ("B2:B2", defaulted.toString(5U, 5U));
-   EXPECT_EQ("B2:C3", low.toString(0U, 0U));
-   EXPECT_EQ("B2:C3", low.toString(5U, 5U));
-   EXPECT_EQ("D6:H10", med.toString(0U, 0U));
-   EXPECT_EQ("D6:H10", med.toString(6U, 6U));
-   EXPECT_EQ("J8:F4", high.toString(0U, 0U));
-   EXPECT_EQ("J8:F4", high.toString(8U, 8U));
+   EXPECT_EQ("B2:B2", defaulted.toString(0U, 0U, false));
+   EXPECT_EQ("B2:B2", defaulted.toString(5U, 5U, false));
+   EXPECT_EQ("B2:C3", low.toString(0U, 0U, false));
+   EXPECT_EQ("B2:C3", low.toString(5U, 5U, false));
+   EXPECT_EQ("D6:H10", med.toString(0U, 0U, false));
+   EXPECT_EQ("D6:H10", med.toString(6U, 6U, false));
+   EXPECT_EQ("J8:F4", high.toString(0U, 0U, false));
+   EXPECT_EQ("J8:F4", high.toString(8U, 8U, false));
 
    EXPECT_EQ(Forwards::Types::CELL_RANGE, defaulted.getType());
    EXPECT_EQ(Forwards::Types::CELL_RANGE, low.getType());

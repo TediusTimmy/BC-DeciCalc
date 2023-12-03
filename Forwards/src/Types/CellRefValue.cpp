@@ -55,7 +55,7 @@ namespace Types
       return name;
     }
 
-   std::string CellRefValue::toString(size_t column, size_t row) const
+   std::string CellRefValue::toString(size_t column, size_t row, bool) const
     {
       size_t finalCol = getColumn(column, colRef);
       size_t finalRow = getRow(row, rowRef);

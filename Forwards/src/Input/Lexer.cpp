@@ -215,6 +215,31 @@ namespace Input
             text = "END-OF-INPUT";
             tokenType = END_OF_FILE;
             break;
+         case '"':
+            consume();
+            tokenType = STRING;
+            while (Backwards::Input::ENDOFFILE != input.peek())
+             {
+               if ('"' == input.peek())
+                {
+                  if ('"' == input.peek(1U))
+                   {
+                     consume();
+                   }
+                  else
+                   {
+                     break;
+                   }
+                }
+               text += static_cast<char>(input.peek());
+               consume();
+             }
+            if (Backwards::Input::ENDOFFILE == input.peek())
+             {
+               tokenType = INVALID;
+             }
+            consume();
+            break;
          case ';':
             consume();
             text = ";";

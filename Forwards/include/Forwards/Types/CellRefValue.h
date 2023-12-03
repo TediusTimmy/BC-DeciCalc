@@ -53,7 +53,7 @@ namespace Types
       CellRefValue(bool colAbsolute, int64_t colRef, bool rowAbsolute, int64_t rowRef);
 
       const std::string& getTypeName() const override;
-      std::string toString(size_t column, size_t row) const override;
+      std::string toString(size_t column, size_t row, bool) const override;
       ValueTypes getType() const override;
 
       static size_t getColumn(size_t fromColumn, int64_t offset);

@@ -52,8 +52,24 @@ namespace Types
       return name;
     }
 
-   std::string StringValue::toString(size_t, size_t) const
+   static std::string lexify(const std::string& src)
     {
+      std::string result = src;
+      size_t n = result.find('"', 0U);
+      while (std::string::npos != n)
+       {
+         result.insert(result.begin() + n, '"');
+         n = result.find('"', n + 2U);
+       }
+      return result;
+    }
+
+   std::string StringValue::toString(size_t, size_t, bool asExpr) const
+    {
+      if (true == asExpr)
+       {
+         return "\"" + lexify(value) + "\"";
+       }
       return value;
     }
 

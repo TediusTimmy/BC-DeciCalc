@@ -212,8 +212,9 @@ void UpdateScreen(SharedData& data)
             // finished VALUE or LABEL
          else if (nullptr != curCell->value)
           {
-            std::string content = curCell->value->toString(data.c_col, data.c_row);
-            if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
+            std::string content ("ERROR");
+            if (Forwards::Engine::VALUE == curCell->type) content = setComma(curCell->value->toString(data.c_col, data.c_row), data.useComma);
+            else if (Forwards::Engine::LABEL == curCell->type) content = curCell->value->evaluate(*data.context)->toString(data.c_col, data.c_row);
             if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
@@ -253,8 +254,9 @@ void UpdateScreen(SharedData& data)
           {
             if (nullptr != curCell->value.get())
              {
-               std::string content = curCell->value->toString(data.c_col, data.c_row);
-               if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
+               std::string content ("ERROR");
+               if (Forwards::Engine::VALUE == curCell->type) content = setComma(curCell->value->toString(data.c_col, data.c_row), data.useComma);
+               else if (Forwards::Engine::LABEL == curCell->type) content = curCell->value->evaluate(*data.context)->toString(data.c_col, data.c_row);
                if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
                printw("%s", content.c_str());
                for (int i = (x - content.size()); i > 0; --i) addch(' ');

@@ -42,7 +42,7 @@ namespace BigInt
  {
    class DataHolder;
 
-   class Integer
+   class Integer final
     {
 
       private:

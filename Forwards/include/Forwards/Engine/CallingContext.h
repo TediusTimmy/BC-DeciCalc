@@ -48,7 +48,7 @@ namespace Engine
    typedef std::map<std::string, std::shared_ptr<Backwards::Engine::Getter> > GetterMap;
    typedef std::map<std::string, std::shared_ptr<Expression> > NameMap;
 
-   class CellFrame
+   class CellFrame final
     {
    public:
       CellFrame(Cell* cell, size_t col, size_t row) : cell(cell), col(col), row(row) { }
@@ -58,7 +58,7 @@ namespace Engine
       size_t row;
     };
 
-   class CallingContext : public Backwards::Engine::CallingContext
+   class CallingContext final : public Backwards::Engine::CallingContext
     {
    public:
       CallingContext();

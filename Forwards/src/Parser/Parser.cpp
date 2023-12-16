@@ -46,7 +46,7 @@ namespace Forwards
 namespace Parser
  {
 
-   class ParserException : public std::exception
+   class ParserException final : public std::exception
     {
    private:
       std::string message;

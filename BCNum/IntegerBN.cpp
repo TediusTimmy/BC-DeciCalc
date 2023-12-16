@@ -53,7 +53,7 @@ namespace BigInt
     }
 
    static size_t FREE_LIST_SIZE = 128U; // FREE_LIST_SIZE MUST BE a power of 2.
-   class StaticHolder
+   class StaticHolder final
     {
    private:
       std::vector<BIGNUM*> freeList;
@@ -115,7 +115,7 @@ namespace BigInt
        }
     };
 
-   class DataHolder
+   class DataHolder final
     {
    public:
       BIGNUM* Data;

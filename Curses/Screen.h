@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SCREEN_H
 #define SCREEN_H
 
-class SharedData
+class SharedData final
  {
 public:
    size_t c_col;

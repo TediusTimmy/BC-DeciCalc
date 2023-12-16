@@ -48,7 +48,7 @@ namespace BigInt
       ROUND_DOUBLE
     };
 
-   class Fixed
+   class Fixed final
     {
 
       private:

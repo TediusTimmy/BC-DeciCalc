@@ -34,7 +34,7 @@ SUCH DAMAGE.
 namespace BigInt
  {
 
-   class DataHolder
+   class DataHolder final
     {
    public:
       mpz_t Data;

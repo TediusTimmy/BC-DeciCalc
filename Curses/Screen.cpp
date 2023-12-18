@@ -726,11 +726,17 @@ int ProcessInput(SharedData& data)
       if (data.c_row < static_cast<size_t>(y - 4))
        {
          data.c_row = 0U;
-         data.tr_row = 0U;
        }
       else
        {
          data.c_row -= (y - 4);
+       }
+      if (data.tr_row < static_cast<size_t>(y - 4))
+       {
+         data.tr_row = 0U;
+       }
+      else
+       {
          data.tr_row -= (y - 4);
        }
       break;

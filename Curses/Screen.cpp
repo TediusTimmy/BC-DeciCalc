@@ -862,7 +862,7 @@ int ProcessInput(SharedData& data)
        {
          if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
           {
-            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row);
+            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row, curCell->type == Forwards::Engine::VALUE ? 0 : -1);
             curCell->value.reset();
           }
 
@@ -922,7 +922,7 @@ int ProcessInput(SharedData& data)
        {
          if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
           {
-            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row);
+            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row, curCell->type == Forwards::Engine::VALUE ? 0 : -1);
             curCell->value.reset();
           }
 

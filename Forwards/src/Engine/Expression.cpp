@@ -120,9 +120,9 @@ namespace Engine
       return result;
     }
 
-   std::string Constant::toString(size_t col, size_t row, int) const
+   std::string Constant::toString(size_t col, size_t row, int flag) const
     {
-      return value->toString(col, row, true);
+      return value->toString(col, row, flag >= 0);
     }
 
    std::shared_ptr<Types::ValueType> Constant::finalConst (std::shared_ptr<Types::CellRefValue> value, CallingContext& context)

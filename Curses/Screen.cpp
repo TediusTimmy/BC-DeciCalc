@@ -862,7 +862,8 @@ int ProcessInput(SharedData& data)
        {
          if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
           {
-            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row, curCell->type == Forwards::Engine::VALUE ? 0 : -1);
+            if (curCell->type == Forwards::Engine::VALUE) curCell->currentInput = curCell->value->toString(data.c_col, data.c_row);
+            else if (curCell->type == Forwards::Engine::LABEL) curCell->currentInput = curCell->value->evaluate(*data.context)->toString(data.c_col, data.c_row);
             curCell->value.reset();
           }
 
@@ -922,7 +923,8 @@ int ProcessInput(SharedData& data)
        {
          if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
           {
-            curCell->currentInput = curCell->value->toString(data.c_col, data.c_row, curCell->type == Forwards::Engine::VALUE ? 0 : -1);
+            if (curCell->type == Forwards::Engine::VALUE) curCell->currentInput = curCell->value->toString(data.c_col, data.c_row);
+            else if (curCell->type == Forwards::Engine::LABEL) curCell->currentInput = curCell->value->evaluate(*data.context)->toString(data.c_col, data.c_row);
             curCell->value.reset();
           }
 

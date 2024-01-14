@@ -109,14 +109,14 @@ std::string setComma(const std::string& str, bool useComma)
    return result;
  }
 
-std::string getStringPreviousValue(Cell* curCell, SharedData& data)
+std::string getStringPreviousValue(Forwards::Engine::Cell* curCell, SharedData& data)
  {
    std::string content = curCell->previousValue->toString(data.c_col, data.c_row);
    if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
    return content;
  }
 
-std::string getStringDisplayValue(Cell* curCell, SharedData& data)
+std::string getStringDisplayValue(Forwards::Engine::Cell* curCell, SharedData& data)
  {
    std::string content ("ERROR");
    if (Forwards::Engine::VALUE == curCell->type) content = setComma(curCell->value->toString(data.c_col, data.c_row), data.useComma);

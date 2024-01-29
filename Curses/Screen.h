@@ -32,6 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SCREEN_H
 #define SCREEN_H
 
+enum MODE
+ {
+   CELL_MODIFICATION,
+   GOTO_CELL
+ };
+
 class SharedData final
  {
 public:
@@ -45,6 +51,9 @@ public:
    size_t baseChar;
    size_t editChar;
    bool useComma;
+
+   std::string tempString;
+   MODE mode;
 
    size_t def_col_width;
    std::vector<int> col_widths;

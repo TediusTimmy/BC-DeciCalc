@@ -58,17 +58,17 @@ void GetRC(const std::string& from, int64_t& col, int64_t& row)
       col = -1;
       return;
     }
-   col = *iter - 'A';
+   col = (*iter & ~' ') - 'A';
    ++iter;
    if (std::isalpha(*iter))
     {
-      col = (col * 26) + (*iter - 'A');
+      col = (col * 26) + ((*iter & ~' ') - 'A');
       ++iter;
       ++alphas;
     }
    if (std::isalpha(*iter))
     {
-      col = (col * 26) + (*iter - 'A');
+      col = (col * 26) + ((*iter & ~' ') - 'A');
       ++iter;
       ++alphas;
     }
@@ -249,42 +249,39 @@ void UpdateScreen(SharedData& data)
     {
       attron(COLOR_PAIR(1));
       Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
-      if (nullptr != curCell)
+      if (true == data.inputMode)
        {
-         if (true == data.inputMode)
+         std::string content = data.tempString.substr(data.baseChar, std::string::npos);
+         if (content.size() > static_cast<size_t>(x))
           {
-            std::string content = curCell->currentInput.substr(data.baseChar, std::string::npos);
-            if (content.size() > static_cast<size_t>(x))
+            content.resize(x);
+          }
+         mx = data.editChar - data.baseChar;
+         printw("%s", content.c_str());
+         for (int i = (x - content.size()); i > 0; --i) addch(' ');
+       }
+      else if (nullptr != curCell)
+       {
+         if (nullptr != curCell->value.get())
+          {
+            std::string content = getStringDisplayValue(curCell, data);
+            if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
+            printw("%s", content.c_str());
+            for (int i = (x - content.size()); i > 0; --i) addch(' ');
+          }
+         else if ("" != curCell->currentInput)
+          {
+            std::string content = curCell->currentInput;
+            if (content.size() > static_cast<size_t>(x - 5))
              {
-               content.resize(x);
+               content = content.substr(content.size() - x + 5, std::string::npos);
              }
-            mx = data.editChar - data.baseChar;
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
           }
          else
           {
-            if (nullptr != curCell->value.get())
-             {
-               std::string content = getStringDisplayValue(curCell, data);
-               if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
-               printw("%s", content.c_str());
-               for (int i = (x - content.size()); i > 0; --i) addch(' ');
-             }
-            else if ("" != curCell->currentInput)
-             {
-               std::string content = curCell->currentInput;
-               if (content.size() > static_cast<size_t>(x - 5))
-                {
-                  content = content.substr(content.size() - x + 5, std::string::npos);
-                }
-               printw("%s", content.c_str());
-               for (int i = (x - content.size()); i > 0; --i) addch(' ');
-             }
-            else
-             {
-               for (int i = 0; i < x; ++i) addch(' ');
-             }
+            for (int i = 0; i < x; ++i) addch(' ');
           }
        }
       else
@@ -484,6 +481,23 @@ size_t CountColumnsLeft(const SharedData& data, size_t fromHere, int x)
    return tc;
  }
 
+void doMove(SharedData& data)
+ {
+   int x, y;
+   getmaxyx(stdscr, y, x); // CODING HORROR!!!
+   int64_t row, col;
+   GetRC(data.tempString, col, row);
+   if ((-1 == col) || (-1 == row))
+      return;
+   size_t cl = CountColumnsLeft(data, MAX_COL, x);
+   data.c_col = col;
+   data.tr_col = col;
+   data.c_row = row;
+   data.tr_row = row;
+   if (((MAX_COL - cl) < static_cast<size_t>(col)) && (static_cast<size_t>(col) <= MAX_COL)) data.tr_col = MAX_COL - cl + 1;
+   if ((data.tr_row + y - 4) > MAX_ROW) data.tr_row = MAX_ROW - y + 5;
+ }
+
 int ProcessInput(SharedData& data)
  {
    int returnValue = 1;
@@ -499,19 +513,19 @@ int ProcessInput(SharedData& data)
       bool done = true;
       if ((c >= ' ') && (c <= '~'))
        {
-         if (data.editChar == curCell->currentInput.size())
+         if (data.editChar == data.tempString.size())
           {
-            curCell->currentInput += c;
+            data.tempString += c;
           }
          else
           {
             if (true == data.insertMode)
              {
-               curCell->currentInput = curCell->currentInput.substr(0U, data.editChar) + static_cast<char>(c) + curCell->currentInput.substr(data.editChar, std::string::npos);
+               data.tempString = data.tempString.substr(0U, data.editChar) + static_cast<char>(c) + data.tempString.substr(data.editChar, std::string::npos);
              }
             else
              {
-               curCell->currentInput[data.editChar] = c;
+               data.tempString[data.editChar] = c;
              }
           }
          ++data.editChar;
@@ -521,7 +535,7 @@ int ProcessInput(SharedData& data)
             ++data.baseChar;
           }
 
-         if (Forwards::Engine::VALUE == curCell->type)
+         if ((nullptr != curCell) && (Forwards::Engine::VALUE == curCell->type))
           {
             if ('.' == c) data.useComma = false;
             if (',' == c) data.useComma = true;
@@ -529,26 +543,26 @@ int ProcessInput(SharedData& data)
        }
       else if ((c == KEY_BACKSPACE) || (c == '\b') || (c == 0177))
        {
-         if (("" != curCell->currentInput) && (0U != data.editChar))
+         if (("" != data.tempString) && (0U != data.editChar))
           {
-            if (data.editChar == curCell->currentInput.size())
+            if (data.editChar == data.tempString.size())
              {
-               if (curCell->currentInput.size() > 1U)
+               if (data.tempString.size() > 1U)
                 {
-                  curCell->currentInput = curCell->currentInput.substr(0U, curCell->currentInput.size() - 1U);
+                  data.tempString = data.tempString.substr(0U, data.tempString.size() - 1U);
                 }
                else
                 {
-                  curCell->currentInput = "";
+                  data.tempString = "";
                 }
              }
             else
              {
-               curCell->currentInput = curCell->currentInput.substr(0U, data.editChar - 1U) + curCell->currentInput.substr(data.editChar, std::string::npos);
+               data.tempString = data.tempString.substr(0U, data.editChar - 1U) + data.tempString.substr(data.editChar, std::string::npos);
              }
             --data.editChar;
 
-            if ((data.editChar + data.baseChar) > curCell->currentInput.size())
+            if ((data.editChar + data.baseChar) > data.tempString.size())
              {
                --data.baseChar;
              }
@@ -556,20 +570,20 @@ int ProcessInput(SharedData& data)
        }
       else if (c == KEY_DC)
        {
-         if ("" != curCell->currentInput)
+         if ("" != data.tempString)
           {
-            if (data.editChar != curCell->currentInput.size())
+            if (data.editChar != data.tempString.size())
              {
-               if (curCell->currentInput.size() > 1U)
+               if (data.tempString.size() > 1U)
                 {
-                  curCell->currentInput = curCell->currentInput.substr(0U, data.editChar) + curCell->currentInput.substr(data.editChar + 1U, std::string::npos);
+                  data.tempString = data.tempString.substr(0U, data.editChar) + data.tempString.substr(data.editChar + 1U, std::string::npos);
                 }
                else
                 {
-                  curCell->currentInput = "";
+                  data.tempString = "";
                 }
 
-               if ((data.editChar + data.baseChar) > curCell->currentInput.size())
+               if ((data.editChar + data.baseChar) > data.tempString.size())
                 {
                   --data.baseChar;
                 }
@@ -590,7 +604,7 @@ int ProcessInput(SharedData& data)
        }
       else if (c == KEY_RIGHT)
        {
-         if (data.editChar != curCell->currentInput.size())
+         if (data.editChar != data.tempString.size())
           {
             ++data.editChar;
 
@@ -619,7 +633,7 @@ int ProcessInput(SharedData& data)
        }
       else if (c == KEY_END)
        {
-         data.editChar = curCell->currentInput.size();
+         data.editChar = data.tempString.size();
          if (data.editChar > (x - 5U))
           {
             data.baseChar = data.editChar - x + 5U;
@@ -632,22 +646,40 @@ int ProcessInput(SharedData& data)
       else if ((c == '\n') || (c == '\r') || (c == KEY_ENTER))
        {
          data.inputMode = false;
-         curCell->previousValue.reset();
-         data.context->theSheet->recalc(*data.context);
+         if (CELL_MODIFICATION == data.mode)
+          {
+            curCell->currentInput = data.tempString;
+            curCell->previousValue.reset();
+            data.context->theSheet->recalc(*data.context);
+          }
+         else if (GOTO_CELL == data.mode)
+          {
+            doMove(data);
+          }
+         data.tempString = "";
        }
       else if ((KEY_DOWN == c) || (KEY_UP == c) || (KEY_NPAGE == c) || (KEY_PPAGE == c))
        {
+         if (CELL_MODIFICATION == data.mode)
+          {
+            data.inputMode = false;
+            curCell->currentInput = data.tempString;
+            data.tempString = "";
+            data.context->theSheet->recalc(*data.context);
+            done = false;
+            if (KEY_NPAGE == c)
+             {
+               c = KEY_RIGHT;
+             }
+            else if (KEY_PPAGE == c)
+             {
+               c = KEY_LEFT;
+             }
+          }
+       }
+      else if (27 == c) // ESCape Key
+       {
          data.inputMode = false;
-         data.context->theSheet->recalc(*data.context);
-         done = false;
-         if (KEY_NPAGE == c)
-          {
-            c = KEY_RIGHT;
-          }
-         else if (KEY_PPAGE == c)
-          {
-            c = KEY_LEFT;
-          }
        }
 
       if (true == done)
@@ -659,27 +691,12 @@ int ProcessInput(SharedData& data)
    switch (c)
     {
    case 'g':
-    {
-      int64_t row, col;
-      std::string temp;
-      int ch = getch();
-      while (('\n' != ch) && ('\r' != ch) && (KEY_ENTER != ch))
-       {
-         if ((ch >= 'a') && (ch <= 'z')) ch &= ~' ';
-         temp += ch;
-         ch = getch();
-       }
-      GetRC(temp, col, row);
-      if ((-1 == col) || (-1 == row))
-         break;
-      size_t cl = CountColumnsLeft(data, MAX_COL, x);
-      data.c_col = col;
-      data.tr_col = col;
-      data.c_row = row;
-      data.tr_row = row;
-      if (((MAX_COL - cl) < static_cast<size_t>(col)) && (static_cast<size_t>(col) <= MAX_COL)) data.tr_col = MAX_COL - cl + 1;
-      if ((data.tr_row + y - 4) > MAX_ROW) data.tr_row = MAX_ROW - y + 5;
-    }
+      data.inputMode = true;
+      data.tempString = "";
+      data.mode = GOTO_CELL;
+
+      data.baseChar = 0U;
+      data.editChar = 0U;
       break;
    case 'j':
    case KEY_DOWN:
@@ -791,6 +808,8 @@ int ProcessInput(SharedData& data)
       curCell->currentInput = "";
       curCell->value.reset();
       data.inputMode = true;
+      data.tempString = "";
+      data.mode = CELL_MODIFICATION;
       data.baseChar = 0U;
       data.editChar = 0U;
     }
@@ -806,6 +825,8 @@ int ProcessInput(SharedData& data)
       curCell->currentInput = "";
       curCell->value.reset();
       data.inputMode = true;
+      data.tempString = "";
+      data.mode = CELL_MODIFICATION;
       data.baseChar = 0U;
       data.editChar = 0U;
     }
@@ -886,6 +907,8 @@ int ProcessInput(SharedData& data)
           }
 
          data.inputMode = true;
+         data.tempString = curCell->currentInput;
+         data.mode = CELL_MODIFICATION;
        }
     }
       break;
@@ -951,6 +974,8 @@ int ProcessInput(SharedData& data)
           }
        }
       data.inputMode = true;
+      data.tempString = curCell->currentInput;
+      data.mode = CELL_MODIFICATION;
     }
       break;
    case ':':

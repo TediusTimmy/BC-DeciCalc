@@ -89,6 +89,7 @@ Most of the navigation and commands are taken from the Unix tool `sc`. The tool 
 * `or` : open a row after the current row
 * `oc` : open a column after the current column
 * `vv` : replace the current cell with its evaluated value
+* `` ` `` : Reset the screen (for systems that don't have SIGWINCH)
 
 ### Edit Mode
 Edit mode is entered when you start entering a label or formula.

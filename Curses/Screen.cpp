@@ -1081,6 +1081,9 @@ int ProcessInput(SharedData& data)
           }
        }
       break;
+   case '`':
+      endwin();
+      break;
     }
 
    return returnValue;

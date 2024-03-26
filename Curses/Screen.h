@@ -57,6 +57,7 @@ public:
    MODE mode;
 
    std::deque<int> inputBuffer;
+   bool blinky;
 
    size_t def_col_width;
    std::vector<int> col_widths;

@@ -133,6 +133,7 @@ void InitScreen(void)
    keypad(stdscr, TRUE);
    noecho();
    nonl();
+   nodelay(stdscr, TRUE);
 
    init_pair(1, COLOR_WHITE, COLOR_BLUE);
    init_pair(2, COLOR_BLACK, COLOR_WHITE);
@@ -171,25 +172,34 @@ void UpdateScreen(SharedData& data)
          if (nullptr != curCell->previousValue)
           {
             std::string content = getStringPreviousValue(curCell, data);
-            if (content.size() > static_cast<size_t>(x - 22)) content.resize(x - 22);
+            if (content.size() > static_cast<size_t>(x - 23)) content.resize(x - 23);
             printw("%s", content.c_str());
-            for (int i = (x - 21 - content.size()); i > 0; --i) addch(' ');
+            for (int i = (x - 22 - content.size()); i > 0; --i) addch(' ');
           }
          else if (nullptr == curCell->value.get())
           {
-            for (int i = x - 21; i > 0; --i) addch(' ');
+            for (int i = x - 22; i > 0; --i) addch(' ');
           }
          else
           {
             attron(COLOR_PAIR(5));
-            for (int i = x - 21; i > 0; --i) addch(' ');
+            for (int i = x - 22; i > 0; --i) addch(' ');
             attron(COLOR_PAIR(2));
           }
        }
       else
        {
-         for (int i = x - 15; i > 0; --i) addch(' ');
+         for (int i = x - 16; i > 0; --i) addch(' ');
        }
+      if (!!data.blinky)
+       {
+         addch('#');
+       }
+      else
+       {
+         addch(' ');
+       }
+      data.blinky = !data.blinky;
       if (data.context->theSheet->c_major)
        {
          addch(data.context->theSheet->top_down ? 'T' : 'B');
@@ -504,15 +514,38 @@ void doMove(SharedData& data)
    if ((data.tr_row + y - 4) > MAX_ROW) data.tr_row = MAX_ROW - y + 5;
  }
 
+bool updateChOrFail(int& c, SharedData& data)
+ {
+   if (false == data.inputBuffer.empty())
+    {
+      c = data.inputBuffer.front();
+      data.inputBuffer.pop_front();
+      return true;
+    }
+   data.inputBuffer.push_front(c);
+   return false;
+ }
+
 int ProcessInput(SharedData& data)
  {
    int returnValue = 1;
-   int c = getch();
    int x, y;
    getmaxyx(stdscr, y, x); // CODING HORROR!!!
 
    size_t tc = CountColumns(data, data.tr_col, x);
    Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
+
+   int c = getch();
+   while (ERR != c)
+    {
+      data.inputBuffer.push_back(c);
+      c = getch();
+    }
+   if (false == data.inputBuffer.empty())
+    {
+      c = data.inputBuffer.front();
+      data.inputBuffer.pop_front();
+    }
 
    if (true == data.inputMode)
     {
@@ -858,7 +891,7 @@ int ProcessInput(SharedData& data)
       break;
    case 'q':
    case KEY_F(7):
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       if ('y' == c)
        {
          data.saveRequested = true;
@@ -873,7 +906,7 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'd':
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       switch (c)
        {
       case 'd':
@@ -889,7 +922,8 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'y':
-      if ('y' == getch())
+      if (false == updateChOrFail(c, data)) break;
+      if ('y' == c)
        {
          if ((nullptr != curCell) && (nullptr != curCell->value.get()))
           {
@@ -899,7 +933,8 @@ int ProcessInput(SharedData& data)
        }
       break;
    case 'p':
-      if ('p' == getch())
+      if (false == updateChOrFail(c, data)) break;
+      if ('p' == c)
        {
          if (nullptr == curCell)
           {
@@ -1008,7 +1043,7 @@ int ProcessInput(SharedData& data)
     }
       break;
    case ':':
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       switch (c)
        {
       case ')':
@@ -1069,7 +1104,7 @@ int ProcessInput(SharedData& data)
        }
       break;
    case 'x':
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       switch (c)
        {
       case 'x':
@@ -1089,7 +1124,7 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'i':
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       switch (c)
        {
       case 'i':
@@ -1106,7 +1141,7 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'o':
-      c = getch();
+      if (false == updateChOrFail(c, data)) break;
       switch (c)
        {
       case 'o':
@@ -1123,7 +1158,8 @@ int ProcessInput(SharedData& data)
       data.context->theSheet->recalc(*data.context);
       break;
    case 'v':
-      if ('v' == getch())
+      if (false == updateChOrFail(c, data)) break;
+      if ('v' == c)
        {
          if (nullptr != curCell)
           {

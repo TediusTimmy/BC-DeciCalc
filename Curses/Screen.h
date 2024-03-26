@@ -53,7 +53,10 @@ public:
    bool useComma;
 
    std::string tempString;
+   std::string origString;
    MODE mode;
+
+   std::deque<int> inputBuffer;
 
    size_t def_col_width;
    std::vector<int> col_widths;

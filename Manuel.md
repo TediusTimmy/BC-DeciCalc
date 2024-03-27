@@ -51,6 +51,18 @@ Cons:
 
 Most of the navigation and commands are taken from the Unix tool `sc`. The tool `sc` was originally written with `vi` users in mind, and many choices reflect that. The color scheme, and that F7 exits, is taken from WordPerfect.
 
+### The Spreadsheet Screen
+The contents of the top line:
+* First, the currently selected cell
+* Whether that cell is a formula (VALUE) or a LABEL
+* The last computed value for that cell
+* If the character `#` is present, then the background thread is processing. NOTE : _changes to the sheet cannot be done while the sheet is updating_.
+* One of: `TL`, `TR`, `BL`, `BR`, `LT`, `LB`, `RT`, or `RB`. If the first character is `T` or `B`, then the sheet is computed in column-major order. If it is `L` or `R`, then the sheet is computed in row-major order.
+
+The second line is either: the formula in the current cell, or the computed value of the cell (if one is modifying the cell).  
+The third line is the modification line: the formula or string in the current cell.  
+Below this is the sheet proper. Hopefully, navigating the sheet proper is intuitive.
+
 ### Commands
 * Arrow keys : navigate. One can also use the vi keys `hjkl`.
 * Page Up / Page Down : move to the next screen of rows. One can also use `JK`.
@@ -342,5 +354,5 @@ Directed rounding modes are a part of IEEE-754 for doing algorithm analysis. Bas
 
 The final rounding mode probably needs some explanation: it is round to zero, unless the last digit of the result is a zero or five, then it is round away from zero. This mode allows computations made at a higher precision to be double rounded later to a lower precision (correctly). The least significant digit is treated as a sticky digit ought to be for eventual rounding.
 
-NOTE: Some testing violently reminded me that the algorithms for EXP and LOG don't work in rounding modes 2 or 7 (and LOG doesn't work in 3 either). They expect a value to go to zero that can never go to zero: we divide two numbers expecting to eventually get zero but these rounding mode prohibits this. The termination conditions for LOG and EXP were reworked so that they can be used in all rounding modes. Also, the algorithm for SQRT (and thus LOG) did not work in rounding mode 8. For whatever reason, it is very likely to hit cases where it bounces between two solutions one unit in the last place apart. You would think that implies that the SQRT algorithm was broken for all rounding modes, but I haven't seen cases in the wild that are broken for other rounding modes. Anyway, this has been fixed (if the last two solutions differ by an ulp, then we increase working precision).  
+NOTE: Some testing violently reminded me that the algorithms for EXP and LOG don't work in rounding modes 2 or 7 (and LOG doesn't work in 3 either). They expect a value to go to zero that can never go to zero: we divide two numbers expecting to eventually get zero but these rounding modes prohibits this. The termination conditions for LOG and EXP were reworked so that they can be used in all rounding modes. Also, the algorithm for SQRT (and thus LOG) did not work in rounding mode 8. For whatever reason, it is very likely to hit cases where it bounces between two solutions one unit in the last place apart. You would think that implies that the SQRT algorithm was broken for all rounding modes, but I haven't seen cases in the wild that are broken for other rounding modes. Anyway, this has been fixed (if the last two solutions differ by an ulp, then we increase working precision).  
 In addition to this, the functions LOG, EXP, POW, and SQRT have been modified so that they internally use the new double rounding mode. This should make the output more consistent when you change the rounding mode. Is it the right thing to do? Probably not. However, it hides the numerical instability of those algorithms when one is analyzing some other algorithm. There's an irony that I changed the algorithms to work with any rounding mode, then changed them to always use a rounding mode that they always worked with (except SQRT).

@@ -32,7 +32,7 @@ debug: all
 
 
 bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/Screen.o obj/BatchMode.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
-	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/Forwards.a lib/*.a -lncurses -lgmp
+	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc.exe obj/*.o lib/Forwards.a lib/*.a -lncurses -lgmp -lpthread
 
 obj/main.o: Curses/main.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -IOddsAndEnds -c -o obj/main.o Curses/main.cpp

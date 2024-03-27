@@ -570,6 +570,13 @@ int ProcessInput(SharedData& data)
       data.inputBuffer.pop_front();
     }
 
+   if (ERR == c)
+    {
+      std::chrono::system_clock::time_point last;
+      last = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
+      std::this_thread::sleep_until(last);
+    }
+
    if (true == data.inputMode)
     {
       bool done = true;

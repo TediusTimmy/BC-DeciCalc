@@ -57,7 +57,6 @@ public:
    MODE mode;
 
    std::deque<int> inputBuffer;
-   bool blinky;
 
    size_t def_col_width;
    std::vector<int> col_widths;
@@ -70,9 +69,10 @@ public:
    bool saveRequested;
  };
 
-void InitScreen(void);
+void InitScreen(SharedData&);
 void UpdateScreen(SharedData&);
 int ProcessInput(SharedData&);
+void WaitToSave(void);
 void DestroyScreen(void);
 
 #endif /* SCREEN_H */

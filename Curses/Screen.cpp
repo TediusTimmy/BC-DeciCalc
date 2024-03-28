@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Screen.h"
 #include "GetAndSet.h"
 
+const int RECALC_POLL_MILLIS = 40; // 25 Hz
+const int NO_INPUT_SLEEP_MILLIS = 10; // 100 Hz (when no input; always AFAP when processing input)
+
 const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
 
@@ -140,7 +143,7 @@ void threadrun (SharedData& data)
          data.context->theSheet->recalc(*data.context);
          blinky = false;
        }
-      last = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
+      last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
     }
  }
@@ -237,10 +240,10 @@ void UpdateScreen(SharedData& data)
          // Line 2
     {
       Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
-      if ((false == blinky) && (nullptr != curCell))
+      if (nullptr != curCell)
        {
             // unfinished VALUE : parse current contents
-         if ((Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
+         if ((false == blinky) && (Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
           {
             data.context->inUserInput = true;
             --data.context->generation;
@@ -573,7 +576,7 @@ int ProcessInput(SharedData& data)
    if (ERR == c)
     {
       std::chrono::system_clock::time_point last;
-      last = std::chrono::system_clock::now() + std::chrono::milliseconds(10);
+      last = std::chrono::system_clock::now() + std::chrono::milliseconds(NO_INPUT_SLEEP_MILLIS);
       std::this_thread::sleep_until(last);
     }
 
@@ -1225,7 +1228,7 @@ void WaitToSave(void)
    std::chrono::system_clock::time_point last;
    while (true == blinky)
     {
-      last = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
+      last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
     }
  }

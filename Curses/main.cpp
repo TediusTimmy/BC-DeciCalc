@@ -130,7 +130,6 @@ int main (int argc, char ** argv)
       UpdateScreen(state);
       if (true == state.saveRequested)
        {
-         WaitToSave();
          SaveFile(saveFileName, &sheet, state.col_widths, state.def_col_width, fileLibs);
          state.saveRequested = false;
        }

@@ -116,6 +116,10 @@ Edit mode is entered when you start entering a label or formula.
 
 The sheet automatically recalculates after you finish entering a label or formula, and when you paste a cell. If a cell references a cell that hasn't been computed yet, then that cell will be computed, unless we are already in the process of computing that cell (circular reference).
 
+### Background Processing Notes
+
+The program now handles sheet updates in a background thread. There is an indicator next to the sheet recalculation order as to whether background processing is occurring. If there is a `#` in the top-right corner of the screen, the sheet is being processed. During sheet processing, no commands that modify the sheet will be executed. In addition, the second line of information will not be displayed for cells that haven't processed yet. Saving ... ought to work. If you save while exiting, the program will wait for the sheet to recalculate before completely exiting. (If your sheet seems hung on a computation, save with `W` and then `qn`.)
+
 
 ## Entering Data
 

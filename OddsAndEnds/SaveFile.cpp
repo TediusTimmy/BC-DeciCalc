@@ -157,6 +157,7 @@ void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet* theShe
              {
                std::string toPrint;
                if (nullptr != cell->previousValue.get()) toPrint = cell->previousValue->toString(col, row);
+               else toPrint = cell->currentInput;
                file << "<td>&lt;" << harden(toPrint) << "</td>";
              }
           }

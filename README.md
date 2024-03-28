@@ -19,6 +19,8 @@ Also August 2023: Save file format 3: the save file format will save loaded libr
 
 November 2023: I have implemented features that are well beyond anything that I wanted out of this. It has taken on a life of its own, and is probably more capable than I even intended it to be. I hope you find it useful, but I intend no more major changes (must ... say ... NO ... to ... LAMBDA).
 
+March 2024: Back in January, I got drunk and emailed Thomas Dickey, the maintainer of ncurses, and in a long, ranting email, I expressed my stance that my spreadsheet application was better than his tape calculator. But, also in the email, I asked for a project to make the spreadsheet better. He had a simple response: use non-blocking IO. It was very gracious of him to respond, and with a useful response. I've sat on that for two months because of implications. Really, if I made IO non-blocking, it would HAVE to be accompanied with making the sheet update non-blocking. At that point, though, why not add automation or automatic updates? Why not incorporate Backway (somehow)? Why not just make a spreadsheet-based curses game engine? Yeah: I went overboard in overthinking things. Finally, I decided to just make IO and sheet update non-blocking.
+
 
 Limitations
 -----------

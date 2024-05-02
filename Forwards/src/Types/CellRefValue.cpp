@@ -135,6 +135,11 @@ namespace Types
       return CELL_REF;
     }
 
+   size_t CellRefValue::getLength() const
+    {
+      return 0U; // Should never be called.
+    }
+
  } // namespace Types
 
  } // namespace Forwards

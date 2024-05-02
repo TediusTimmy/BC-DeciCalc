@@ -61,6 +61,7 @@ namespace BigInt
          bool is0mod5 (void) const;
 
          std::string toString () const;
+         size_t getLength () const;
 
          void fromString (const std::string&);
          void fromString (const char *);

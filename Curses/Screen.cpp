@@ -412,7 +412,15 @@ void UpdateScreen(SharedData& data)
                 }
                if (nullptr != curCell->previousValue)
                 {
-                  std::string content = getStringPreviousValue(curCell, data);
+                  std::string content ("---");
+                  if ((Forwards::Types::FLOAT != curCell->previousValue->getType()) || (curCell->previousValue->getLength() < 1024U))
+                   {
+                     content = getStringPreviousValue(curCell, data);
+                   }
+                  else
+                   {
+                     attron(COLOR_PAIR(5));
+                   }
                   if (content.size() > static_cast<size_t>(nextWidth))
                    {
                      if (Forwards::Types::FLOAT == curCell->previousValue->getType()) // Make numbers note that they are truncated.

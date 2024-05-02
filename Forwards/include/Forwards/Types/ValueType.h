@@ -64,6 +64,7 @@ namespace Types
       virtual const std::string& getTypeName() const = 0;
       virtual std::string toString(size_t column, size_t row, bool asExpr = false) const = 0;
       virtual ValueTypes getType() const = 0;
+      virtual size_t getLength () const = 0;
 
       static std::string columnToString(size_t column);
     };

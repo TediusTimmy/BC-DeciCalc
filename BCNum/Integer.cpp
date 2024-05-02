@@ -296,6 +296,12 @@ namespace BigInt
       return result;
     }
 
+   size_t Integer::getLength () const
+    {
+      if (isZero()) return 1U;
+      return (Sign ? 1U : 0U) + mpz_sizeinbase(Data->Data, 10);
+    }
+
 
 
    void quotrem (const Integer& lhs, const Integer& rhs,

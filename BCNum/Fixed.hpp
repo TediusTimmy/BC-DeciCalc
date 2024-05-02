@@ -101,6 +101,7 @@ namespace BigInt
          bool isNaN (void) const { return nan; }
 
          std::string toString (void) const;
+         size_t getLength (void) const;
 
          void fromString (const std::string & src)
             { fromString(src.c_str()); }

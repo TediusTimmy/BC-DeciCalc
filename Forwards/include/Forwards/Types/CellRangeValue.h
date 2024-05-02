@@ -55,6 +55,7 @@ namespace Types
       const std::string& getTypeName() const override;
       std::string toString(size_t, size_t, bool) const override;
       ValueTypes getType() const override;
+      size_t getLength() const override;
 
     };
 

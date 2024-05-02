@@ -388,6 +388,12 @@ namespace BigInt
       return result;
     }
 
+   size_t Integer::getLength () const
+    {
+      if (isZero()) return 1U;
+      return (Sign ? 1U : 0U) + static_cast<size_t>(BN_num_bits(Data->Data) * 0.301029995663981195214) + 1U; // common log of 2
+    }
+
 
 
    void quotrem (const Integer& lhs, const Integer& rhs,

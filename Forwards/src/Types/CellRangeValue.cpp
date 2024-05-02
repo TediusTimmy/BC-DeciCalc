@@ -63,6 +63,11 @@ namespace Types
       return CELL_RANGE;
     }
 
+   size_t CellRangeValue::getLength() const
+    {
+      return 0U; // Should never be called.
+    }
+
  } // namespace Types
 
  } // namespace Forwards

@@ -411,6 +411,25 @@ namespace BigInt
       return result;
     }
 
+   size_t Fixed::getLength (void) const
+    {
+      if (true == infinity)
+       {
+         return 8U; // Keep this up-to-date with above.
+       }
+      else if (true == nan)
+       {
+         return 12U; // Keep this up-to-date with above.
+       }
+      size_t sep = (0U == Digits) ? 0U : 1U;
+      size_t digits = Data.getLength();
+      if (digits < Digits)
+       {
+         digits = Digits + 1U; // Leading zero
+       }
+      return digits + sep;
+    }
+
 
    void Fixed::fromString (const char* src)
     {

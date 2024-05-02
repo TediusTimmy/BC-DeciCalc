@@ -90,6 +90,7 @@ TEST(FixedTests, testNoBadBoom)
 
    test.fromString("0");
    EXPECT_EQ("0", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    test.fromString("0.00");
    EXPECT_EQ("0.00", test.toString());
@@ -111,9 +112,13 @@ TEST(FixedTests, testNoBadBoom)
    EXPECT_EQ("12.123", test.toString());
    EXPECT_EQ("-12.123", test2.toString());
 
+   EXPECT_EQ(test.toString().length(), test.getLength());
+   EXPECT_EQ(test2.toString().length(), test2.getLength());
+
 
    test.fromString("12.123e0");
    EXPECT_EQ("12.123", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    test.fromString("12.123e3");
    EXPECT_EQ("12123.000", test.toString());
@@ -123,24 +128,30 @@ TEST(FixedTests, testNoBadBoom)
 
    test.fromString("12.123e-3");
    EXPECT_EQ("0.012123", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    test.fromString("12.123E0");
    EXPECT_EQ("12.123", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    test.fromString("12.123E3");
    EXPECT_EQ("12123.000", test.toString());
 
    test.fromString("12.123E+3");
    EXPECT_EQ("12123.000", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    test.fromString("12.123E-3");
    EXPECT_EQ("0.012123", test.toString());
+   EXPECT_EQ(test.toString().length(), test.getLength());
 
    BigInt::Fixed i (true, false);
    BigInt::Fixed n (false, true);
 
    EXPECT_EQ("Infinity", i.toString());
+   EXPECT_EQ(i.toString().length(), i.getLength());
    EXPECT_EQ("Not a Result", n.toString());
+   EXPECT_EQ(n.toString().length(), n.getLength());
 
 
    test.fromString("12e0");

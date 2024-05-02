@@ -78,6 +78,11 @@ namespace Types
       return STRING;
     }
 
+   size_t StringValue::getLength() const
+    {
+      return value.length();
+    }
+
  } // namespace Types
 
  } // namespace Forwards

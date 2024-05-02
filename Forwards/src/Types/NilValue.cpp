@@ -58,6 +58,11 @@ namespace Types
       return NIL;
     }
 
+   size_t NilValue::getLength() const
+    {
+      return 3U; // Should never be called.
+    }
+
  } // namespace Types
 
  } // namespace Forwards

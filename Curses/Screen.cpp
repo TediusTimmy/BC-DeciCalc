@@ -55,7 +55,10 @@ const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
 
 volatile bool blinky = true;
-std::thread updateThread;
+std::thread updateThread1;
+std::thread updateThread2;
+volatile bool stinky = false;
+std::shared_ptr<std::string> funky;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)
  {
@@ -118,11 +121,16 @@ std::string setComma(const std::string& str, bool useComma)
    return result;
  }
 
-std::string getStringPreviousValue(Forwards::Engine::Cell* curCell, SharedData& data)
+std::string getStringPreviousValuePtr(Forwards::Engine::Cell* curCell, const std::shared_ptr<Forwards::Types::ValueType>& previousValue, SharedData& data)
  {
-   std::string content = curCell->previousValue->toString(data.c_col, data.c_row);
+   std::string content = previousValue->toString(data.c_col, data.c_row);
    if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);
    return content;
+ }
+
+std::string getStringPreviousValue(Forwards::Engine::Cell* curCell, SharedData& data)
+ {
+   return getStringPreviousValuePtr(curCell, curCell->previousValue, data);
  }
 
 std::string getStringDisplayValue(Forwards::Engine::Cell* curCell, SharedData& data)
@@ -133,15 +141,43 @@ std::string getStringDisplayValue(Forwards::Engine::Cell* curCell, SharedData& d
    return content;
  }
 
-void threadrun (SharedData& data)
+void sheetrun (SharedData& data)
  {
    std::chrono::system_clock::time_point last;
    for (;;)
     {
       if (true == blinky)
        {
+         stinky = true;
          data.context->theSheet->recalc(*data.context);
          blinky = false;
+         stinky = true;
+       }
+      last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
+      std::this_thread::sleep_until(last);
+    }
+ }
+
+void linerun (SharedData& data)
+ {
+   std::chrono::system_clock::time_point last;
+   for (;;)
+    {
+      if (true == stinky)
+       {
+         funky.reset();
+         Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
+         std::string result;
+         if (nullptr != curCell)
+          {
+            std::shared_ptr<Forwards::Types::ValueType> temp = curCell->previousValue;
+            if (nullptr != temp.get())
+             {
+               result = getStringPreviousValuePtr(curCell, temp, data);
+             }
+          }
+         std::make_shared<std::string>(std::move(result)).swap(funky);
+         stinky = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -165,8 +201,10 @@ void InitScreen(SharedData& data)
    init_pair(4, COLOR_BLUE, COLOR_BLACK);
    init_pair(5, COLOR_WHITE, COLOR_RED);
 
-   updateThread = std::thread(threadrun, std::ref(data));
-   updateThread.detach();
+   updateThread1 = std::thread(sheetrun, std::ref(data));
+   updateThread1.detach();
+   updateThread2 = std::thread(linerun, std::ref(data));
+   updateThread2.detach();
  }
 
 void UpdateScreen(SharedData& data)
@@ -196,9 +234,10 @@ void UpdateScreen(SharedData& data)
             printw("LABEL ");
           }
 
-         if (nullptr != curCell->previousValue)
+         std::shared_ptr<std::string> temp = funky;
+         if (nullptr != temp.get())
           {
-            std::string content = getStringPreviousValue(curCell, data);
+            std::string content = *temp;
             if (content.size() > static_cast<size_t>(x - 23)) content.resize(x - 23);
             printw("%s", content.c_str());
             for (int i = (x - 22 - content.size()); i > 0; --i) addch(' ');
@@ -793,6 +832,7 @@ int ProcessInput(SharedData& data)
        {
          ++data.c_row;
          if ((static_cast<int>(data.c_row - data.tr_row)) >= (y - 4)) ++data.tr_row;
+         stinky = true;
        }
       break;
    case 'k':
@@ -801,6 +841,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_row;
          if (data.c_row < data.tr_row) --data.tr_row;
+         stinky = true;
        }
       break;
    case 'h':
@@ -809,6 +850,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_col;
          if (data.c_col < data.tr_col) --data.tr_col;
+         stinky = true;
        }
       break;
    case 'l':
@@ -821,6 +863,7 @@ int ProcessInput(SharedData& data)
             size_t cl = CountColumnsLeft(data, data.c_col, x);
             data.tr_col = data.c_col - cl + 1U;
           }
+         stinky = true;
        }
       break;
    case 'J':
@@ -835,6 +878,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row = MAX_ROW - y + 5;
        }
+      stinky = true;
       break;
    case 'K':
    case KEY_PPAGE:
@@ -854,6 +898,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row -= (y - 4);
        }
+      stinky = true;
       break;
    case 'H':
     {
@@ -868,6 +913,7 @@ int ProcessInput(SharedData& data)
          data.c_col = 0;
          data.tr_col = 0;
        }
+      stinky = true;
     }
       break;
    case 'L':
@@ -879,12 +925,14 @@ int ProcessInput(SharedData& data)
          data.c_col = MAX_COL;
          data.tr_col = MAX_COL - cl + 1;
        }
+      stinky = true;
       break;
    case KEY_HOME:
       data.c_col = 0U;
       data.tr_col = 0U;
       data.c_row = 0U;
       data.tr_row = 0U;
+      stinky = true;
       break;
    case '<':
       if (true == blinky) break;

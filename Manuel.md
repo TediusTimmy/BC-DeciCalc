@@ -102,6 +102,7 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `oc` : open a column after the current column
 * `vv` : replace the current cell with its evaluated value
 * `` ` `` : Reset the screen (for systems that don't have SIGWINCH)
+* `~` : turn line 2 calculation on/off. Line 2 computation automatically shuts itself off after an update that takes over 80 milliseconds.
 
 ### Edit Mode
 Edit mode is entered when you start entering a label or formula.

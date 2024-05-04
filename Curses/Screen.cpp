@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 const int RECALC_POLL_MILLIS = 40; // 25 Hz
 const int NO_INPUT_SLEEP_MILLIS = 10; // 100 Hz (when no input; always AFAP when processing input)
+const int AUTO_DISABLE_MILLIS = 80; // If it takes longer than this to compute line 2: subsequently line 2 will be disabled.
 
 const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
@@ -279,8 +280,9 @@ void UpdateScreen(SharedData& data)
          // Line 2
     {
       Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
-      if (nullptr != curCell)
+      if ((false == data.noLine2) && (nullptr != curCell))
        {
+         std::chrono::system_clock::time_point last = std::chrono::system_clock::now() + std::chrono::milliseconds(AUTO_DISABLE_MILLIS);
             // unfinished VALUE : parse current contents
          if ((false == blinky) && (Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
           {
@@ -319,6 +321,10 @@ void UpdateScreen(SharedData& data)
             if (content.size() > static_cast<size_t>(x - 1)) content.resize(x - 1);
             printw("%s", content.c_str());
             for (int i = (x - content.size()); i > 0; --i) addch(' ');
+          }
+         if (std::chrono::system_clock::now() > last)
+          {
+            data.noLine2 = true;
           }
        }
       else
@@ -1273,6 +1279,9 @@ int ProcessInput(SharedData& data)
       break;
    case '`':
       endwin();
+      break;
+   case '~':
+      data.noLine2 = !data.noLine2;
       break;
     }
 

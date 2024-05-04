@@ -55,6 +55,7 @@ public:
    std::string tempString;
    std::string origString;
    MODE mode;
+   bool noLine2;
 
    std::deque<int> inputBuffer;
 

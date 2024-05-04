@@ -83,6 +83,8 @@ int main (int argc, char ** argv)
    state.insertMode = true;
    state.useComma = false;
 
+   state.noLine2 = false;
+
    state.def_col_width = DEF_COLUMN_WIDTH;
 
    state.yankedType = Forwards::Engine::ERROR;

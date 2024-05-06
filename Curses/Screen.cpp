@@ -129,7 +129,7 @@ std::string getStringPreviousValuePtr(const Forwards::Engine::Cell* const curCel
    return content;
  }
 
-std::string getStringPreviousValue(Forwards::Engine::Cell* curCell, SharedData& data)
+std::string getStringPreviousValue(const Forwards::Engine::Cell* const curCell, SharedData& data)
  {
    return getStringPreviousValuePtr(curCell, curCell->previousValue, data);
  }
@@ -167,7 +167,7 @@ void linerun (SharedData& data)
       if (true == stinky)
        {
          funky.reset();
-         Forwards::Engine::Cell* curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
+         const Forwards::Engine::Cell* const curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
          std::string result;
          if (nullptr != curCell)
           {

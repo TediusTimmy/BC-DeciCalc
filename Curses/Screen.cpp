@@ -122,7 +122,7 @@ std::string setComma(const std::string& str, bool useComma)
    return result;
  }
 
-std::string getStringPreviousValuePtr(Forwards::Engine::Cell* curCell, const std::shared_ptr<Forwards::Types::ValueType>& previousValue, SharedData& data)
+std::string getStringPreviousValuePtr(const Forwards::Engine::Cell* const curCell, const std::shared_ptr<Forwards::Types::ValueType>& previousValue, SharedData& data)
  {
    std::string content = previousValue->toString(data.c_col, data.c_row);
    if (Forwards::Engine::VALUE == curCell->type) content = setComma(content, data.useComma);

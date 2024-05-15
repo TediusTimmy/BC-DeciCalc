@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
 #include <thread>
+#include <atomic>
 
 #include "Forwards/Engine/CallingContext.h"
 #include "Forwards/Engine/Cell.h"
@@ -55,10 +56,10 @@ const int AUTO_DISABLE_MILLIS = 80; // If it takes longer than this to compute l
 const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
 
-volatile bool blinky = true;
+std::atomic<bool> blinky {true};
 std::thread updateThread1;
 std::thread updateThread2;
-volatile bool stinky = false;
+std::atomic<bool> stinky {false};
 std::shared_ptr<std::string> funky;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)

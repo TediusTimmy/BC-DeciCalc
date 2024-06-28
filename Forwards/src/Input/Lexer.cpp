@@ -193,12 +193,13 @@ namespace Input
        }
       else if ('_' == input.peek())
        {
+         consume();
          while (('_' == input.peek()) || std::isalpha(input.peek()) || std::isdigit(input.peek()) || ('$' == input.peek()))
           {
             text += static_cast<char>(input.peek());
             consume();
           }
-         if ("_" != text)
+         if (false == text.empty())
           {
             tokenType = NAME;
           }

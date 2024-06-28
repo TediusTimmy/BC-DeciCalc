@@ -266,7 +266,7 @@ namespace Parser
        {
          Input::Token buildToken = src.getNextToken();
 
-         ret = std::make_shared<Engine::Name>(buildToken, buildToken.text);
+         ret = std::make_shared<Engine::Name>(buildToken);
        }
          break;
       case Input::NUMBER:

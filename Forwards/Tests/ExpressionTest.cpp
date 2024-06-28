@@ -1623,9 +1623,9 @@ TEST(EngineTests, testName)
    context.logger = &logger;
    Forwards::Engine::NameMap names;
    context.names = &names;
-   names.insert(std::make_pair("_Billy", one));
+   names.insert(std::make_pair("Billy", one));
 
-   Forwards::Engine::Name name (Forwards::Input::Token(), "_Billy");
+   Forwards::Engine::Name name (Forwards::Input::Token(Forwards::Input::NAME, "Billy", 0U));
    res = name.evaluate(context);
 
    ASSERT_TRUE(typeid(Forwards::Types::FloatValue) == typeid(*res.get()));
@@ -1633,7 +1633,7 @@ TEST(EngineTests, testName)
    EXPECT_EQ("_Billy", name.toString(1U, 1U, 0));
 
 
-   Forwards::Engine::Name nameBad (Forwards::Input::Token(), "_Johnny");
+   Forwards::Engine::Name nameBad (Forwards::Input::Token(Forwards::Input::NAME, "Johnny", 0U));
    res = nameBad.evaluate(context);
 
    EXPECT_TRUE(typeid(Forwards::Types::NilValue) == typeid(*res.get()));

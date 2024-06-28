@@ -139,10 +139,9 @@ namespace Engine
    class Name final : public Expression
     {
    public:
-      std::string name;
       std::shared_ptr<Expression> arg;
 
-      Name(const Input::Token&, const std::string&);
+      explicit Name(const Input::Token&);
 
       std::shared_ptr<Types::ValueType> evaluate (CallingContext&) const override;
       std::string toString(size_t, size_t, int) const override;

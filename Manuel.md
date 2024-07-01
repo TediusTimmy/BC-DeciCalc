@@ -78,7 +78,8 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `dr` : clear all cells in the current row
 * `dc` : clear all cells in the current column
 * `yy` : copy the current cell
-* `pp` : paste the current cell
+* `yd` : clear the copy buffer
+* `pp` : paste to the current cell
 * `e` : edit the current cell's contents
 * Shift left/right (also F9/F12) : widen or narrow the current column. Columns can be between 1 and 40 cells wide.
 * `#` : Switch between column-major and row-major recalculation.

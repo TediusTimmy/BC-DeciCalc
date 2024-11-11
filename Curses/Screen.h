@@ -62,8 +62,11 @@ public:
    size_t def_col_width;
    std::vector<int> col_widths;
 
-   Forwards::Engine::CellType yankedType;
-   std::shared_ptr<Forwards::Engine::Expression> yanked;
+   std::vector<Forwards::Engine::CellType> yankedType;
+   std::vector<std::shared_ptr<Forwards::Engine::Expression> > yanked;
+   size_t yankedCols;
+   size_t m_col;
+   size_t m_row;
 
    Forwards::Engine::CallingContext* context;
 

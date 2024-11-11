@@ -74,12 +74,21 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `q` or F7 : exit. You must next press either 'y' to save and exit, or 'n' to not save and exit, in order to actually exit.
 * `!` : recalculate the sheet
 * `W` : save the sheet
+* `m` : set a copy marker at this cell location
 * `dd` : clear (delete) the current cell
 * `dr` : clear all cells in the current row
 * `dc` : clear all cells in the current column
+* `dm` : clear all cells in the rectangle between the current cell and the marker
 * `yy` : copy the current cell
 * `yd` : clear the copy buffer
+* `yc` : copy the current column
+* `yr` : copy the current row
+* `ym` : copy the rectangle between the current cell and the marker
 * `pp` : paste to the current cell
+* `pc` : paste to the current column
+* `pr` : paste to the current row
+* `pm` : paste the copied data as marked with this the top-right corner
+* `pM` : paste the copied data transposed with this the top-right corner
 * `e` : edit the current cell's contents
 * Shift left/right (also F9/F12) : widen or narrow the current column. Columns can be between 1 and 40 cells wide.
 * `#` : Switch between column-major and row-major recalculation.

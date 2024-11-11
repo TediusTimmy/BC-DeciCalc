@@ -87,7 +87,9 @@ int main (int argc, char ** argv)
 
    state.def_col_width = DEF_COLUMN_WIDTH;
 
-   state.yankedType = Forwards::Engine::ERROR;
+   state.yankedCols = 0U;
+   state.m_row = 0U;
+   state.m_col = 0U;
 
    state.context = &context;
 

@@ -1017,40 +1017,242 @@ int ProcessInput(SharedData& data)
       case 'r':
          data.context->theSheet->clearRow(data.c_row);
          break;
+      case 'm':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         for (size_t tc = bc; tc <= mc; ++tc)
+            for (size_t tr = br; tr <= mr; ++tr)
+               data.context->theSheet->clearCellAt(tc, tr);
+       }
+         break;
        }
       blinky = true;
+      break;
+   case 'm':
+      data.m_row = data.c_row;
+      data.m_col = data.c_col;
       break;
    case 'y':
       if (false == updateChOrFail(c, data)) break;
       if (true == blinky) break;
-      if ('y' == c)
+      switch (c)
        {
+      case 'y':
          if ((nullptr != curCell) && (nullptr != curCell->value.get()))
           {
-            data.yankedType = curCell->type;
-            data.yanked = curCell->value;
+            data.yankedType.resize(1U);
+            data.yankedType[0] = curCell->type;
+            data.yanked.resize(1U);
+            data.yanked[0] = curCell->value;
+            data.yankedCols = 1U;
+          }
+         break;
+      case 'c':
+       {
+         size_t maxRow = 0U;
+         if (data.c_col < data.context->theSheet->sheet.size())
+          {
+            maxRow = data.context->theSheet->sheet[data.c_col].size();
+          }
+         while (nullptr == data.context->theSheet->getCellAt(data.c_col, maxRow))
+          {
+            if (0 != maxRow)
+             {
+               --maxRow;
+             }
+            else
+             {
+               break;
+             }
+          }
+         data.yankedCols = 1U;
+         data.yankedType.resize(maxRow + 1U);
+         data.yanked.resize(maxRow + 1U);
+         for (size_t i = 0U; i <= maxRow; ++i)
+          {
+            Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(data.c_col, i);
+            if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+             {
+               data.yankedType[i] = tempCell->type;
+               data.yanked[i] = tempCell->value;
+             }
+            else
+             {
+               data.yankedType[i] = Forwards::Engine::ERROR;
+             }
           }
        }
-      else if ('d' == c)
+         break;
+      case 'r':
        {
-         data.yankedType = Forwards::Engine::ERROR;
-         data.yanked.reset();
+         size_t maxCol = data.context->theSheet->sheet.size();
+         while (nullptr == data.context->theSheet->getCellAt(maxCol, data.c_row))
+          {
+            if (0U != maxCol)
+             {
+               --maxCol;
+             }
+            else
+             {
+               break;
+             }
+          }
+         data.yankedCols = maxCol + 1U;
+         data.yankedType.resize(maxCol + 1U);
+         data.yanked.resize(maxCol + 1U);
+         for (size_t i = 0U; i <= maxCol; ++i)
+          {
+            Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(i, data.c_row);
+            if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+             {
+               data.yankedType[i] = tempCell->type;
+               data.yanked[i] = tempCell->value;
+             }
+            else
+             {
+               data.yankedType[i] = Forwards::Engine::ERROR;
+             }
+          }
+       }
+         break;
+      case 'm':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         data.yankedType.clear();
+         data.yanked.clear();
+         for (size_t tc = bc; tc <= mc; ++tc)
+            for (size_t tr = br; tr <= mr; ++tr)
+             {
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+               if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+                {
+                  data.yankedType.push_back(tempCell->type);
+                  data.yanked.push_back(tempCell->value);
+                }
+               else
+                {
+                  data.yankedType.push_back(Forwards::Engine::ERROR);
+                  data.yanked.push_back(std::shared_ptr<Forwards::Engine::Expression>());
+                }
+             }
+         data.yankedCols = mc - bc + 1U;
+       }
+         break;
+      case 'd':
+         data.yankedType.clear();
+         data.yanked.clear();
+         data.yankedCols = 0U;
+         break;
        }
       break;
    case 'p':
       if (false == updateChOrFail(c, data)) break;
       if (true == blinky) break;
-      if ('p' == c)
+      if (0U == data.yankedCols) break;
+      switch (c)
        {
-         if (Forwards::Engine::ERROR == data.yankedType) break;
-         if (nullptr == curCell)
+      case 'p':
+         if (Forwards::Engine::ERROR != data.yankedType[0])
           {
-            data.context->theSheet->initCellAt(data.c_col, data.c_row);
-            curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
+            if (nullptr == curCell)
+             {
+               data.context->theSheet->initCellAt(data.c_col, data.c_row);
+               curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
+             }
+            curCell->type = data.yankedType[0];
+            curCell->value = data.yanked[0];
+            blinky = true;
           }
-         curCell->type = data.yankedType;
-         curCell->value = data.yanked;
+         break;
+      case 'c':
+         for (size_t i = 0U; i < data.yanked.size(); ++i)
+          {
+            if (Forwards::Engine::ERROR != data.yankedType[i])
+             {
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(data.c_col, i);
+               if (nullptr == tempCell)
+                {
+                  data.context->theSheet->initCellAt(data.c_col, i);
+                  tempCell = data.context->theSheet->getCellAt(data.c_col, i);
+                }
+               tempCell->type = data.yankedType[i];
+               tempCell->value = data.yanked[i];
+             }
+          }
          blinky = true;
+         break;
+      case 'r':
+       {
+         size_t maxCol = std::min(data.yanked.size(), MAX_COL + 1U);
+         for (size_t i = 0U; i < maxCol; ++i)
+          {
+            if (Forwards::Engine::ERROR != data.yankedType[i])
+             {
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(i, data.c_row);
+               if (nullptr == tempCell)
+                {
+                  data.context->theSheet->initCellAt(i, data.c_row);
+                  tempCell = data.context->theSheet->getCellAt(i, data.c_row);
+                }
+               tempCell->type = data.yankedType[i];
+               tempCell->value = data.yanked[i];
+             }
+          }
+         blinky = true;
+       }
+         break;
+      case 'm':
+       {
+         size_t rs = data.yanked.size() / data.yankedCols;
+         size_t i = 0U;
+         for (size_t tc = data.c_col; tc < data.c_col + data.yankedCols; ++tc)
+            for (size_t tr = data.c_row; tr < data.c_row + rs; ++tr)
+             {
+               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (tc <= MAX_COL) && (tr <= MAX_ROW))
+                {
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+                  if (nullptr == tempCell)
+                   {
+                     data.context->theSheet->initCellAt(tc, tr);
+                     tempCell = data.context->theSheet->getCellAt(tc, tr);
+                   }
+                  tempCell->type = data.yankedType[i];
+                  tempCell->value = data.yanked[i];
+                }
+               ++i;
+             }
+         blinky = true;
+       }
+         break;
+      case 'M':
+       {
+         size_t rs = data.yanked.size() / data.yankedCols;
+         size_t i = 0U;
+         for (size_t tr = data.c_row; tr < data.c_row + data.yankedCols; ++tr)
+            for (size_t tc = data.c_col; tc < data.c_col + rs; ++tc)
+             {
+               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (tc <= MAX_COL) && (tr <= MAX_ROW))
+                {
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+                  if (nullptr == tempCell)
+                   {
+                     data.context->theSheet->initCellAt(tc, tr);
+                     tempCell = data.context->theSheet->getCellAt(tc, tr);
+                   }
+                  tempCell->type = data.yankedType[i];
+                  tempCell->value = data.yanked[i];
+                }
+               ++i;
+             }
+         blinky = true;
+       }
+         break;
        }
       break;
    case 'e':

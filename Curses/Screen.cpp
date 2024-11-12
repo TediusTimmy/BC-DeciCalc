@@ -1023,9 +1023,9 @@ int ProcessInput(SharedData& data)
          size_t mc = std::max(data.c_col, data.m_col);
          size_t br = std::min(data.c_row, data.m_row);
          size_t mr = std::max(data.c_row, data.m_row);
-         for (size_t tc = bc; tc <= mc; ++tc)
-            for (size_t tr = br; tr <= mr; ++tr)
-               data.context->theSheet->clearCellAt(tc, tr);
+         for (size_t _c = bc; _c <= mc; ++_c)
+            for (size_t _r = br; _r <= mr; ++_r)
+               data.context->theSheet->clearCellAt(_c, _r);
        }
          break;
        }
@@ -1126,10 +1126,10 @@ int ProcessInput(SharedData& data)
          size_t mr = std::max(data.c_row, data.m_row);
          data.yankedType.clear();
          data.yanked.clear();
-         for (size_t tc = bc; tc <= mc; ++tc)
-            for (size_t tr = br; tr <= mr; ++tr)
+         for (size_t _c = bc; _c <= mc; ++_c)
+            for (size_t _r = br; _r <= mr; ++_r)
              {
-               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
                if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
                 {
                   data.yankedType.push_back(tempCell->type);
@@ -1211,16 +1211,16 @@ int ProcessInput(SharedData& data)
        {
          size_t rs = data.yanked.size() / data.yankedCols;
          size_t i = 0U;
-         for (size_t tc = data.c_col; tc < data.c_col + data.yankedCols; ++tc)
-            for (size_t tr = data.c_row; tr < data.c_row + rs; ++tr)
+         for (size_t _c = data.c_col; _c < data.c_col + data.yankedCols; ++_c)
+            for (size_t _r = data.c_row; _r < data.c_row + rs; ++_r)
              {
-               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (tc <= MAX_COL) && (tr <= MAX_ROW))
+               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (_c <= MAX_COL) && (_r <= MAX_ROW))
                 {
-                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
                   if (nullptr == tempCell)
                    {
-                     data.context->theSheet->initCellAt(tc, tr);
-                     tempCell = data.context->theSheet->getCellAt(tc, tr);
+                     data.context->theSheet->initCellAt(_c, _r);
+                     tempCell = data.context->theSheet->getCellAt(_c, _r);
                    }
                   tempCell->type = data.yankedType[i];
                   tempCell->value = data.yanked[i];
@@ -1234,16 +1234,16 @@ int ProcessInput(SharedData& data)
        {
          size_t rs = data.yanked.size() / data.yankedCols;
          size_t i = 0U;
-         for (size_t tr = data.c_row; tr < data.c_row + data.yankedCols; ++tr)
-            for (size_t tc = data.c_col; tc < data.c_col + rs; ++tc)
+         for (size_t _r = data.c_row; _r < data.c_row + data.yankedCols; ++_r)
+            for (size_t _c = data.c_col; _c < data.c_col + rs; ++_c)
              {
-               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (tc <= MAX_COL) && (tr <= MAX_ROW))
+               if ((Forwards::Engine::ERROR != data.yankedType[i]) && (_c <= MAX_COL) && (_r <= MAX_ROW))
                 {
-                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(tc, tr);
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
                   if (nullptr == tempCell)
                    {
-                     data.context->theSheet->initCellAt(tc, tr);
-                     tempCell = data.context->theSheet->getCellAt(tc, tr);
+                     data.context->theSheet->initCellAt(_c, _r);
+                     tempCell = data.context->theSheet->getCellAt(_c, _r);
                    }
                   tempCell->type = data.yankedType[i];
                   tempCell->value = data.yanked[i];

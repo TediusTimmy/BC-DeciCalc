@@ -520,6 +520,17 @@ TEST(ParserTests, testLetsDoMath)
     {
       FAIL() << failure;
     }
+
+   try
+    {
+      Backwards::Input::StringInput string ( " { 12; 13; 14}[{0; 1}[1]] " );
+      Backwards::Input::Lexer lexer (string, "InputString");
+      EXPECT_EQ(13.0, parseAndEvaluateDouble(lexer, table, logger, context));
+    }
+   catch (const char * failure)
+    {
+      FAIL() << failure;
+    }
  }
 
 TEST(ParserTests, testThrowSomeExceptionsExpressions)

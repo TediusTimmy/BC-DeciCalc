@@ -292,7 +292,7 @@ namespace Parser
           }
          else
           {
-            rhs = builder(src, table, logger);
+            rhs = expression(src, table, logger);
             expect(src, Input::CLOSE_BRACKET, "]");
           }
 

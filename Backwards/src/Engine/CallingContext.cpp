@@ -186,7 +186,7 @@ namespace Engine
        {
          throw FatalException("Read of local variable with bad location.");
        }
-      if (nullptr == context.globalScope->vars[location].get())
+      if (nullptr == context.topScope()->vars[location].get())
        {
          throw FatalException("Read of local variable before set.");
        }

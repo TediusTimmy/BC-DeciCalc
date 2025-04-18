@@ -297,16 +297,16 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
          n = n + 4U;
          while (std::string::npos != n)
           {
-            if (n == curCol.find("</tr>", n))
+            if (0 == curCol.compare(n, 5U, "</tr>"))
              {
                n = std::string::npos;
              }
-            else if (n == curCol.find("<td />", n))
+            else if (0 == curCol.compare(n, 6U, "<td />"))
              {
                n = n + 6U;
                ++row;
              }
-            else if (n == curCol.find("<td>", n))
+            else if (0 == curCol.compare(n, 4U, "<td>"))
              {
                n = n + 4U;
                std::string content = soften(curCol.substr(n, curCol.find("</td>", n) - n));

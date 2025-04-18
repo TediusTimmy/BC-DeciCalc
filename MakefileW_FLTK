@@ -36,7 +36,7 @@ debug: all
 
 
 bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
-	$(CCP) $(CFLAGS) $(BFLAGS) $(FLTK_COMP_FLAGS) -o bin/DeciCalc.exe obj/*.o lib/Forwards.a lib/*.a $(FLTK_LINK_FLAGS) -lgmp
+	$(CCP) $(CFLAGS) $(BFLAGS) $(FLTK_COMP_FLAGS) -o bin/DeciCalc-FLTK.exe obj/*.o lib/Forwards.a lib/*.a $(FLTK_LINK_FLAGS) -lgmp
 
 obj/main.o: FLTK/main.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/main.o FLTK/main.cpp

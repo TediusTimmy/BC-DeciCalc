@@ -71,12 +71,16 @@ std::atomic<bool> blinky {true};
 std::thread updateThread;
 
 #define COLUMN_SCALE 8
-#define SIZE_VIEW 100
+#define SIZE_VIEW_COLS 100
+#define SIZE_VIEW_ROWS 500
 
 void lr_cb (Fl_Widget*, void*);
 void td_cb (Fl_Widget*, void*);
 void cr_cb (Fl_Widget*, void*);
 void open_cb (Fl_Widget*, void*);
+void import_cb (Fl_Widget*, void*);
+void save_cb (Fl_Widget*, void*);
+void exit_cb (Fl_Widget*, void*);
 void input_cb(Fl_Widget*, void*);
 
 
@@ -86,8 +90,9 @@ Fl_Menu_Item static_menu_array [] =
  {
    {"&File",      0, nullptr, nullptr, FL_SUBMENU},
    {"&Open",      0, open_cb},
-   {"&Save"},
-   {"E&xit"},
+   {"&Import",    0, import_cb},
+   {"&Save",      0, save_cb},
+   {"E&xit",      0, exit_cb},
    {nullptr},
    {"Settings",   0, nullptr, nullptr, FL_SUBMENU},
    {"Left-Right", 0, lr_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
@@ -118,6 +123,8 @@ public:
    std::shared_ptr<Forwards::Engine::Expression> yanked;
 
    Forwards::Engine::CallingContext* context;
+
+   std::vector<std::pair<std::string, std::string> > fileLibs;
  };
 
 
@@ -220,6 +227,8 @@ void sheetrun (void)
       if (true == blinky)
        {
          G_shared->context->theSheet->recalc(*G_shared->context);
+         G_table->damage(FL_DAMAGE_ALL);
+         Fl::awake();
          blinky = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
@@ -501,12 +510,40 @@ void cr_cb (Fl_Widget*, void*)
 
 void open_cb (Fl_Widget*, void*)
  {
-   std::vector<std::pair<std::string, std::string> > fileLibs;
    const char* fileName = fl_file_chooser("Open file...", nullptr, nullptr, 0);
-   LoadFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, fileLibs);
-   LoadLibraries(fileLibs, *G_shared->context);
-   blinky = true;
-   G_table->damage(FL_DAMAGE_ALL);
+   if (nullptr != fileName)
+    {
+      G_shared->fileLibs.clear();
+      LoadFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, G_shared->fileLibs);
+      LoadLibraries(G_shared->fileLibs, *G_shared->context);
+      blinky = true;
+      G_table->damage(FL_DAMAGE_ALL);
+    }
+ }
+
+void import_cb (Fl_Widget*, void*)
+ {
+   const char* fileName = fl_file_chooser("Import CSV...", nullptr, nullptr, 0);
+   if (nullptr != fileName)
+    {
+      ImportCSV(fileName, G_shared->context->theSheet);
+      blinky = true;
+      G_table->damage(FL_DAMAGE_ALL);
+    }
+ }
+
+void save_cb (Fl_Widget*, void*)
+ {
+   const char* fileName = fl_file_chooser("Save as...", nullptr, nullptr, 0);
+   if (nullptr != fileName)
+    {
+      SaveFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, G_shared->fileLibs);
+    }
+ }
+
+void exit_cb (Fl_Widget*, void*)
+ {
+   std::exit(0);
  }
 
 void input_cb(Fl_Widget*, void*)
@@ -555,8 +592,8 @@ void location_cb(Fl_Widget*, void*)
     {
       G_shared->tr_col = col;
       G_shared->tr_row = row;
-      if ((MAX_COL - SIZE_VIEW + 1) < static_cast<size_t>(col)) G_shared->tr_col = MAX_COL - SIZE_VIEW + 1;
-      if ((MAX_ROW - SIZE_VIEW + 1) < static_cast<size_t>(row)) G_shared->tr_row = MAX_ROW - SIZE_VIEW + 1;
+      if ((MAX_COL - SIZE_VIEW_COLS + 1) < static_cast<size_t>(col)) G_shared->tr_col = MAX_COL - SIZE_VIEW_COLS + 1;
+      if ((MAX_ROW - SIZE_VIEW_ROWS + 1) < static_cast<size_t>(row)) G_shared->tr_row = MAX_ROW - SIZE_VIEW_ROWS + 1;
       G_table->damage(FL_DAMAGE_ALL);
     }
    std::string location = Forwards::Types::ValueType::columnToString(G_shared->tr_col) + std::to_string(G_shared->tr_row + 1);
@@ -591,12 +628,12 @@ int main(void)
 
    table.row_header(1);
    table.row_header_width((DEF_COLUMN_WIDTH + 1) * COLUMN_SCALE);
-   table.rows(SIZE_VIEW);
+   table.rows(SIZE_VIEW_ROWS);
    table.row_height_all(20);
    table.col_header(1);
    table.col_header_height(20);
    table.col_resize(1);
-   table.cols(SIZE_VIEW);
+   table.cols(SIZE_VIEW_COLS);
    table.col_width_all(DEF_COLUMN_WIDTH * COLUMN_SCALE);
 
    input.callback(input_cb, &table);

@@ -67,9 +67,11 @@ int main (int argc, char ** argv)
    std::list<std::string> batches;
    std::vector<std::pair<std::string, std::string> > argLibs;
    std::vector<std::pair<std::string, std::string> > fileLibs;
+   std::string import;
 
    int file = PreLoadLibraries(argc, argv, argLibs);
    file = ReadBatches(argc, argv, file, batches);
+   file = CheckForCSVImport(argc, argv, file, import);
 
 
    SharedData state;
@@ -109,6 +111,12 @@ int main (int argc, char ** argv)
        }
 
       LoadFile(argv[file], &sheet, state.col_widths, state.def_col_width, fileLibs);
+    }
+
+
+   if (false == import.empty())
+    {
+      ImportCSV(import, &sheet);
     }
 
 

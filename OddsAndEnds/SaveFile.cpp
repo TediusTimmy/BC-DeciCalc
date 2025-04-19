@@ -206,7 +206,7 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
     }
 
    std::string curCol;
-   
+
    std::getline(file, curCol);
    if ((0U != curCol.size()) && ('\r' == curCol[curCol.size() - 1]))
     {
@@ -361,5 +361,77 @@ void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet* sheet,
        {
          curCol.resize(curCol.size() - 1U);
        }
+    }
+ }
+
+int CheckForCSVImport (int argc, char ** argv, int checkLocation, std::string& fileName)
+ {
+   int i = checkLocation;
+   if (i < argc)
+    {
+      if (std::string("-i") == argv[i])
+       {
+         ++i;
+         if (i < argc)
+          {
+            fileName = argv[i];
+          }
+         ++i; // It doesn't matter if this increment is in the condition or not.
+       }
+    }
+
+   return i;
+ }
+
+void ImportCSV (const std::string& fileName, Forwards::Engine::SpreadSheet* sheet)
+ {
+   std::ifstream file (fileName.c_str(), std::ios::in);
+   if (!file.good())
+    {
+      sheet->initCellAt(0U, 0U);
+      Forwards::Engine::Cell* cell = sheet->getCellAt(0U, 0U);
+      cell->type = Forwards::Engine::LABEL;
+      cell->currentInput = "Failed to open file " + fileName;
+      return;
+    }
+
+   std::string curRow;
+
+   std::getline(file, curRow);
+   if ((0U != curRow.size()) && ('\r' == curRow[curRow.size() - 1]))
+    {
+      curRow.resize(curRow.size() - 1U);
+    }
+   size_t row = 0U;
+   while ((true == file.good()) || (false == curRow.empty()))
+    {
+      size_t col = 0U;
+      size_t n = 0U;
+
+      while (std::string::npos != n)
+       {
+         size_t newn = curRow.find(',', n);
+         if (newn != n)
+          {
+            sheet->initCellAt(col, row);
+            Forwards::Engine::Cell* cell = sheet->getCellAt(col, row);
+            cell->type = Forwards::Engine::LABEL;
+            cell->currentInput = curRow.substr(n, newn - n);
+          }
+         n = newn;
+         if (n != std::string::npos)
+          {
+            ++n;
+          }
+         ++col;
+       }
+
+      curRow = "";
+      std::getline(file, curRow);
+      if ((0U != curRow.size()) && ('\r' == curRow[curRow.size() - 1]))
+       {
+         curRow.resize(curRow.size() - 1U);
+       }
+      ++row;
     }
  }

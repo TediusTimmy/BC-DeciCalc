@@ -42,6 +42,7 @@ Cons:
 
 * The first accepted argument is `-l`, which specifies a Backwards library file to load. There can be a chain of multiple libraries, however: `-l MyBetterLib.txt -l TheBaseLibrarySucks.txt`. These must be at the beginning.
 * The next accepted argument is `-b`, which initiates batch mode. For each `-b` argument, the next argument is expected to be a formula to evaluate. The program will evaluate each batch command and then stop before entering interactive mode. This can be used to: use DeciCalc as a command-line calculator; query the contents of a spreadsheet from a shell script; or output the value of a cell whose contents are too large to see in interactive mode.
+* After that is one-and-only-one `-i` to indicate a csv file to import.
 * The first argument after all explicit arguments is a file to load. If no file is loaded, then an empty spreadsheet is given.
 * The second argument is the file name to use to save files. If no second argument is specified, then the file is saved with the name of the file read in. If NO file name is specified, then the name "untitled.html" is used.
 * Any other arguments are ignored.
@@ -111,6 +112,9 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `or` : open a row after the current row
 * `oc` : open a column after the current column
 * `vv` : replace the current cell with its evaluated value
+* `vm` : replace the cell with its evaluated value for all cells in the rectangle between the current cell and the marker
+* `v=` : flip the current cell between a label and a formula
+* `v+` : flip the cell between a label and a formula for all cells in the rectangle between the current cell and the marker
 * `` ` `` : Reset the screen (for systems that don't have SIGWINCH)
 * `~` : turn line 2 calculation on/off. Line 2 computation automatically shuts itself off after an update that takes over 80 milliseconds.
 

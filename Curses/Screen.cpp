@@ -1474,8 +1474,9 @@ int ProcessInput(SharedData& data)
    case 'v':
       if (false == updateChOrFail(c, data)) break;
       if (true == blinky) break;
-      if ('v' == c)
+      switch (c)
        {
+      case 'v':
          if (nullptr != curCell)
           {
             if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (nullptr != curCell->previousValue.get()))
@@ -1484,7 +1485,77 @@ int ProcessInput(SharedData& data)
                curCell->value.reset();
              }
           }
+         break;
+      case 'm':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         for (size_t _c = bc; _c <= mc; ++_c)
+            for (size_t _r = br; _r <= mr; ++_r)
+             {
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
+               if (nullptr != tempCell)
+                {
+                  if (("" == tempCell->currentInput) && (nullptr != tempCell->value.get()) && (nullptr != tempCell->previousValue.get()))
+                   {
+                     tempCell->currentInput = getStringPreviousValue(tempCell, data);
+                     tempCell->value.reset();
+                   }
+                }
+             }
        }
+         break;
+      case '=':
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
+             {
+               curCell->currentInput = getStringDisplayValue(curCell, data);
+               curCell->value.reset();
+             }
+            if (Forwards::Engine::VALUE == curCell->type)
+             {
+               curCell->type = Forwards::Engine::LABEL;
+             }
+            else if (Forwards::Engine::LABEL == curCell->type)
+             {
+               curCell->type = Forwards::Engine::VALUE;
+             }
+          }
+         break;
+      case '+':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         for (size_t _c = bc; _c <= mc; ++_c)
+            for (size_t _r = br; _r <= mr; ++_r)
+             {
+               Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
+               if (nullptr != tempCell)
+                {
+                  if (("" == tempCell->currentInput) && (nullptr != tempCell->value.get()))
+                   {
+                     tempCell->currentInput = getStringDisplayValue(tempCell, data);
+                     tempCell->value.reset();
+                   }
+                  if (Forwards::Engine::VALUE == tempCell->type)
+                   {
+                     tempCell->type = Forwards::Engine::LABEL;
+                   }
+                  else if (Forwards::Engine::LABEL == tempCell->type)
+                   {
+                     tempCell->type = Forwards::Engine::VALUE;
+                   }
+                }
+             }
+       }
+         break;
+       }
+      blinky = true;
       break;
    case '`':
       endwin();

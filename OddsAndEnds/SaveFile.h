@@ -35,4 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void SaveFile(const std::string& fileName, Forwards::Engine::SpreadSheet*, const std::vector<int>& map, int def, const std::vector<std::pair<std::string, std::string> >& allLibs);
 void LoadFile(const std::string& fileName, Forwards::Engine::SpreadSheet*, std::vector<int>& map, int def, std::vector<std::pair<std::string, std::string> >& fileLibs);
 
+   // Returns the argument after the "-i".
+int CheckForCSVImport (int argc, char ** argv, int checkLocation, std::string& fileName);
+void ImportCSV (const std::string& fileName, Forwards::Engine::SpreadSheet*);
+
 #endif /* SAVEFILE_H */

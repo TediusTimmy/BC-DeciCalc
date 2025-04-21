@@ -1,6 +1,7 @@
 # DeciCalc - BCMath Edition - FLTK front end
 
-This manual is woefully incomplete without the curses version manual.
+This manual is woefully incomplete without the curses version manual.  
+Note that you should close the program between opening different spreadsheet files, because the program state is not correctly cleared between loading files.
 
 ### The Spreadsheet Screen
 The contents of the top line:

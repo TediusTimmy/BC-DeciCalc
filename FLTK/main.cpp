@@ -246,7 +246,7 @@ protected:
 
    static void event_cb(Fl_Widget*, void *v)
     {
-      ((Spreadsheet*)v)->real_callback();
+      static_cast<Spreadsheet*>(v)->real_callback();
     }
 
 public:
@@ -494,6 +494,27 @@ void Spreadsheet::real_callback()
  }
 
 
+void setTableWidths ()
+ {
+   for (int i = 0; i < SIZE_VIEW_COLS; ++i)
+    {
+      int width = getWidth(G_shared->col_widths, G_shared->tr_col + i, G_shared->def_col_width);
+      static_cast<Spreadsheet*>(G_table)->col_width(i, width * COLUMN_SCALE);
+    }
+ }
+
+void saveTableWidths ()
+ {
+   for (int i = 0; i < SIZE_VIEW_COLS; ++i)
+    {
+      int width = static_cast<Spreadsheet*>(G_table)->col_width(i);
+      int residue = width % COLUMN_SCALE;
+      width = width / COLUMN_SCALE + ((0 != residue) ? 1 : 0);
+      setWidth(G_shared->col_widths, G_shared->tr_col + i, width, G_shared->def_col_width);
+    }
+ }
+
+
 
 void lr_cb (Fl_Widget*, void*)
  {
@@ -517,6 +538,7 @@ void open_cb (Fl_Widget*, void*)
       LoadFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, G_shared->fileLibs);
       LoadLibraries(G_shared->fileLibs, *G_shared->context);
       blinky = true;
+      setTableWidths();
       G_table->damage(FL_DAMAGE_ALL);
     }
  }
@@ -590,10 +612,12 @@ void location_cb(Fl_Widget*, void*)
    GetRC(G_location->value(), col, row);
    if ((-1 != col) && (-1 != row))
     {
+      saveTableWidths();
       G_shared->tr_col = col;
       G_shared->tr_row = row;
       if ((MAX_COL - SIZE_VIEW_COLS + 1) < static_cast<size_t>(col)) G_shared->tr_col = MAX_COL - SIZE_VIEW_COLS + 1;
       if ((MAX_ROW - SIZE_VIEW_ROWS + 1) < static_cast<size_t>(row)) G_shared->tr_row = MAX_ROW - SIZE_VIEW_ROWS + 1;
+      setTableWidths();
       G_table->damage(FL_DAMAGE_ALL);
     }
    std::string location = Forwards::Types::ValueType::columnToString(G_shared->tr_col) + std::to_string(G_shared->tr_row + 1);

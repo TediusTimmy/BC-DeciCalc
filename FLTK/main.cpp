@@ -624,6 +624,16 @@ void location_cb(Fl_Widget*, void*)
    G_location->value(location.c_str());
  }
 
+int dontclose_hand(int event)
+ {
+   if ((FL_SHORTCUT == event) && (FL_Escape == Fl::event_key()))
+    {
+      static_cast<Spreadsheet*>(G_table)->cancel_editing();
+      return 1; // Don't close the window when someone presses ESC!
+    }
+   return 0;
+ }
+
 
 
 int main(void)
@@ -703,6 +713,8 @@ int main(void)
 
    updateThread = std::thread(sheetrun);
    updateThread.detach();
+
+   Fl::add_handler(dontclose_hand);
 
    return Fl::run();
  }

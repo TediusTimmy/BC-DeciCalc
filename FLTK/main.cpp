@@ -628,6 +628,11 @@ int dontclose_hand(int event)
  {
    if ((FL_SHORTCUT == event) && (FL_Escape == Fl::event_key()))
     {
+      if (G_shared->inputMode)
+       {
+         G_input->value(G_shared->origString.c_str());
+         G_table->take_focus();
+       }
       static_cast<Spreadsheet*>(G_table)->cancel_editing();
       return 1; // Don't close the window when someone presses ESC!
     }

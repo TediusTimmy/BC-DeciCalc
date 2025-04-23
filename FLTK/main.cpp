@@ -409,6 +409,7 @@ void Spreadsheet::draw_cell(TableContext context, int R, int C, int X, int Y, in
     }
  }
 
+static char hiddenState = '\0';
 // Callback whenever someone clicks on different parts of the table
 void Spreadsheet::real_callback()
  {
@@ -422,6 +423,7 @@ void Spreadsheet::real_callback()
       switch (Fl::event()) // see what FLTK event caused it
        {
       case FL_PUSH:
+         hiddenState = '\0';
          if (blinky) break;
          done_editing();
          take_focus();
@@ -431,53 +433,88 @@ void Spreadsheet::real_callback()
 
       case FL_KEYBOARD:
          done_editing();
-         switch ( Fl::e_text[0] )
+         if ('\0' != hiddenState)
           {
-         case '=':
-            if (blinky) break;
-          {
-            Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
-            if (nullptr == curCell)
+            switch (hiddenState)
              {
-               G_shared->context->theSheet->initCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
-               curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+            case 'd':
+               switch (Fl::e_text[0])
+                {
+               case 'd':
+                  G_shared->context->theSheet->clearCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+                  update_fields(R, C);
+                  damage(FL_DAMAGE_ALL);
+                  break;
+               case 'c':
+                  G_shared->context->theSheet->clearColumn(C + G_shared->tr_col);
+                  update_fields(R, C);
+                  damage(FL_DAMAGE_ALL);
+                  break;
+               case 'r':
+                  G_shared->context->theSheet->clearRow(R + G_shared->tr_row);
+                  update_fields(R, C);
+                  damage(FL_DAMAGE_ALL);
+                  break;
+                }
+               break;
+            default:
+               break;
              }
-            curCell->type = Forwards::Engine::VALUE;
-            curCell->currentInput = "";
-            curCell->value.reset();
-            start_editing(R, C);
+            hiddenState = '\0';
           }
-            break;
-         case '<':
-            if (blinky) break;
+         else
           {
-            Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
-            if (nullptr == curCell)
+            switch (Fl::e_text[0])
              {
-               G_shared->context->theSheet->initCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
-               curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+            case '=':
+               if (blinky) break;
+             {
+               Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+               if (nullptr == curCell)
+                {
+                  G_shared->context->theSheet->initCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+                  curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+                }
+               curCell->type = Forwards::Engine::VALUE;
+               curCell->currentInput = "";
+               curCell->value.reset();
+               start_editing(R, C);
              }
-            curCell->type = Forwards::Engine::LABEL;
-            curCell->currentInput = "";
-            curCell->value.reset();
-            start_editing(R, C);
-          }
-            break;
-         case '!':
-            blinky = true;
-            damage(FL_DAMAGE_ALL);
-            break;
-         case ',':
-            G_shared->useComma = !G_shared->useComma;
-            damage(FL_DAMAGE_ALL);
-            break;
-         case '\r':
-         case '\n':
-            if (!blinky) start_editing(R, C);
-            break;
-         default:
-            update_fields(R, C);
-            break;
+               break;
+            case '<':
+               if (blinky) break;
+             {
+               Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+               if (nullptr == curCell)
+                {
+                  G_shared->context->theSheet->initCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+                  curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
+                }
+               curCell->type = Forwards::Engine::LABEL;
+               curCell->currentInput = "";
+               curCell->value.reset();
+               start_editing(R, C);
+             }
+               break;
+            case 'd':
+               hiddenState = 'd';
+               break;
+            case '!':
+               blinky = true;
+               damage(FL_DAMAGE_ALL);
+               break;
+            case ',':
+               G_shared->useComma = !G_shared->useComma;
+               damage(FL_DAMAGE_ALL);
+               break;
+            case '\r':
+            case '\n':
+               if (!blinky) start_editing(R, C);
+               break;
+            default:
+               update_fields(R, C);
+               break;
+             }
           }
        }
       break;
@@ -485,10 +522,12 @@ void Spreadsheet::real_callback()
    case CONTEXT_TABLE: // A table event occurred on dead zone in table
    case CONTEXT_ROW_HEADER: // A table event occurred on row/column header
    case CONTEXT_COL_HEADER:
+      hiddenState = '\0';
       cancel_editing();
       break;
 
    default:
+      hiddenState = '\0';
       break;
     }
  }
@@ -634,6 +673,7 @@ int dontclose_hand(int event)
          G_table->take_focus();
        }
       static_cast<Spreadsheet*>(G_table)->cancel_editing();
+      static_cast<Spreadsheet*>(G_table)->update_fields(G_shared->c_row - G_shared->tr_row, G_shared->c_col - G_shared->tr_col);
       return 1; // Don't close the window when someone presses ESC!
     }
    return 0;

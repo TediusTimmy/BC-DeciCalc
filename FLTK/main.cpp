@@ -124,6 +124,9 @@ public:
 
    Forwards::Engine::CallingContext* context;
 
+   size_t m_col;
+   size_t m_row;
+
    std::vector<std::pair<std::string, std::string> > fileLibs;
  };
 
@@ -442,20 +445,27 @@ void Spreadsheet::real_callback()
                 {
                case 'd':
                   G_shared->context->theSheet->clearCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
-                  update_fields(R, C);
-                  damage(FL_DAMAGE_ALL);
                   break;
                case 'c':
                   G_shared->context->theSheet->clearColumn(C + G_shared->tr_col);
-                  update_fields(R, C);
-                  damage(FL_DAMAGE_ALL);
                   break;
                case 'r':
                   G_shared->context->theSheet->clearRow(R + G_shared->tr_row);
-                  update_fields(R, C);
-                  damage(FL_DAMAGE_ALL);
+                  break;
+               case 'm':
+                {
+                  size_t bc = std::min(C + G_shared->tr_col, G_shared->m_col);
+                  size_t mc = std::max(C + G_shared->tr_col, G_shared->m_col);
+                  size_t br = std::min(R + G_shared->tr_row, G_shared->m_row);
+                  size_t mr = std::max(R + G_shared->tr_row, G_shared->m_row);
+                  for (size_t _c = bc; _c <= mc; ++_c)
+                     for (size_t _r = br; _r <= mr; ++_r)
+                        G_shared->context->theSheet->clearCellAt(_c, _r);
+                }
                   break;
                 }
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
                break;
             default:
                break;
@@ -498,6 +508,10 @@ void Spreadsheet::real_callback()
                break;
             case 'd':
                hiddenState = 'd';
+               break;
+            case 'm':
+               G_shared->m_row = R + G_shared->tr_row;
+               G_shared->m_col = C + G_shared->tr_col;
                break;
             case '!':
                blinky = true;

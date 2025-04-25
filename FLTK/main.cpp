@@ -464,6 +464,64 @@ void Spreadsheet::real_callback()
                 }
                   break;
                 }
+               blinky = true;
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
+               break;
+            case 'x':
+               switch (Fl::e_text[0])
+                {
+               case 'x':
+                  G_shared->context->theSheet->removeCellShiftUp(C + G_shared->tr_col, R + G_shared->tr_row);
+                  break;
+               case 'z':
+                  G_shared->context->theSheet->removeCellShiftLeft(C + G_shared->tr_col, R + G_shared->tr_row);
+                  break;
+               case 'c':
+                  G_shared->context->theSheet->removeColumn(C + G_shared->tr_col);
+                  removeColumn(G_shared->col_widths, C + G_shared->tr_col);
+                  break;
+               case 'r':
+                  G_shared->context->theSheet->removeRow(R + G_shared->tr_row);
+                  break;
+                }
+               blinky = true;
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
+               break;
+            case 'i':
+               switch (Fl::e_text[0])
+                {
+               case 'i':
+                  G_shared->context->theSheet->insertCellBeforeShiftDown(C + G_shared->tr_col, R + G_shared->tr_row);
+                  break;
+               case 'c':
+                  G_shared->context->theSheet->insertColumnBefore(C + G_shared->tr_col);
+                  insertColumnBefore(G_shared->col_widths, C + G_shared->tr_col, G_shared->def_col_width);
+                  break;
+               case 'r':
+                  G_shared->context->theSheet->insertRowBefore(R + G_shared->tr_row);
+                  break;
+                }
+               blinky = true;
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
+               break;
+            case 'o':
+               switch (Fl::e_text[0])
+                {
+               case 'o':
+                  G_shared->context->theSheet->insertCellBeforeShiftRight(C + G_shared->tr_col, R + G_shared->tr_row);
+                  break;
+               case 'c':
+                  G_shared->context->theSheet->insertColumnBefore(C + G_shared->tr_col + 1U);
+                  insertColumnBefore(G_shared->col_widths, C + G_shared->tr_col + 1U, G_shared->def_col_width);
+                  break;
+               case 'r':
+                  G_shared->context->theSheet->insertRowBefore(R + G_shared->tr_row + 1U);
+                  break;
+                }
+               blinky = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -512,6 +570,15 @@ void Spreadsheet::real_callback()
             case 'm':
                G_shared->m_row = R + G_shared->tr_row;
                G_shared->m_col = C + G_shared->tr_col;
+               break;
+            case 'x':
+               hiddenState = 'x';
+               break;
+            case 'i':
+               hiddenState = 'i';
+               break;
+            case 'o':
+               hiddenState = 'o';
                break;
             case '!':
                blinky = true;

@@ -20,6 +20,21 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `=` : start entering a formula in this cell. Finish by pressing enter.
 * `!` : recalculate the sheet
 * `,` : change between `.` and `,` as the decimal separator
+* `m` : set a copy marker at this cell location
+* `dd` : clear (delete) the current cell
+* `dr` : clear all cells in the current row
+* `dc` : clear all cells in the current column
+* `dm` : clear all cells in the rectangle between the current cell and the marker
+* `xx` : remove the current cell (shifting cells up)
+* `xz` : remove the current cell (shifting cells right)
+* `xr` : remove the current row
+* `xc` : remove the current column
+* `ii` : insert a cell at the current location (shifting cells down)
+* `ir` : insert a row at the current row
+* `ic` : insert a column at the current column
+* `oo` : open a cell at the current location (shifting cells right)
+* `or` : open a row after the current row
+* `oc` : open a column after the current column
 
 ### Background Processing Notes
 

@@ -748,6 +748,100 @@ void Spreadsheet::real_callback()
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
+            case 'v':
+               G_shared->c_col = C + G_shared->tr_col;
+               G_shared->c_row = R + G_shared->tr_row;
+               switch (Fl::e_text[0])
+                {
+               case 'v':
+                {
+                  Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, G_shared->c_row);
+                  if (nullptr != curCell)
+                   {
+                     if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (nullptr != curCell->previousValue.get()))
+                      {
+                        curCell->currentInput = getStringPreviousValue(curCell, *G_shared);
+                        curCell->value.reset();
+                      }
+                   }
+                }
+                  break;
+               case 'm':
+                {
+                  size_t bc = std::min(G_shared->c_col, G_shared->m_col);
+                  size_t mc = std::max(G_shared->c_col, G_shared->m_col);
+                  size_t br = std::min(G_shared->c_row, G_shared->m_row);
+                  size_t mr = std::max(G_shared->c_row, G_shared->m_row);
+                  for (size_t _c = bc; _c <= mc; ++_c)
+                     for (size_t _r = br; _r <= mr; ++_r)
+                      {
+                        Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                        if (nullptr != tempCell)
+                         {
+                           if (("" == tempCell->currentInput) && (nullptr != tempCell->value.get()) && (nullptr != tempCell->previousValue.get()))
+                            {
+                              tempCell->currentInput = getStringPreviousValue(tempCell, *G_shared);
+                              tempCell->value.reset();
+                            }
+                         }
+                      }
+                }
+                  break;
+               case '=':
+                {
+                  Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, G_shared->c_row);
+                  if (nullptr != curCell)
+                   {
+                     if (("" == curCell->currentInput) && (nullptr != curCell->value.get()))
+                      {
+                        curCell->currentInput = getStringDisplayValue(curCell, *G_shared);
+                        curCell->value.reset();
+                      }
+                     if (Forwards::Engine::VALUE == curCell->type)
+                      {
+                        curCell->type = Forwards::Engine::LABEL;
+                      }
+                     else if (Forwards::Engine::LABEL == curCell->type)
+                      {
+                        curCell->type = Forwards::Engine::VALUE;
+                      }
+                   }
+                }
+                  break;
+               case '-':
+                {
+                  size_t bc = std::min(G_shared->c_col, G_shared->m_col);
+                  size_t mc = std::max(G_shared->c_col, G_shared->m_col);
+                  size_t br = std::min(G_shared->c_row, G_shared->m_row);
+                  size_t mr = std::max(G_shared->c_row, G_shared->m_row);
+                  for (size_t _c = bc; _c <= mc; ++_c)
+                     for (size_t _r = br; _r <= mr; ++_r)
+                      {
+                        Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                        if (nullptr != tempCell)
+                         {
+                           if (("" == tempCell->currentInput) && (nullptr != tempCell->value.get()))
+                            {
+                              tempCell->currentInput = getStringDisplayValue(tempCell, *G_shared);
+                              tempCell->value.reset();
+                            }
+                           if (Forwards::Engine::VALUE == tempCell->type)
+                            {
+                              tempCell->type = Forwards::Engine::LABEL;
+                            }
+                           else if (Forwards::Engine::LABEL == tempCell->type)
+                            {
+                              tempCell->type = Forwards::Engine::VALUE;
+                            }
+                         }
+                      }
+                }
+                  break;
+                }
+               blinky = true;
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
+               break;
             default:
                break;
              }
@@ -808,6 +902,9 @@ void Spreadsheet::real_callback()
                break;
             case 'p':
                hiddenState = 'p';
+               break;
+            case 'v':
+               hiddenState = 'v';
                break;
             case '!':
                blinky = true;

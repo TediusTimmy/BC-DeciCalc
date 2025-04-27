@@ -35,6 +35,16 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `oo` : open a cell at the current location (shifting cells right)
 * `or` : open a row after the current row
 * `oc` : open a column after the current column
+* `yy` : copy the current cell
+* `yc` : copy the current column
+* `yr` : copy the current row
+* `ym` : copy the rectangle between the current cell and the marker
+* `yd` : clear the copy buffer
+* `pp` : paste to the current cell
+* `pc` : paste to the current column
+* `pr` : paste to the current row
+* `pm` : paste the copied data as marked with this the top-right corner
+* `pn` : paste the copied data transposed with this the top-right corner
 
 ### Background Processing Notes
 

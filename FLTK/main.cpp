@@ -119,8 +119,9 @@ public:
    size_t def_col_width;
    std::vector<int> col_widths;
 
-   Forwards::Engine::CellType yankedType;
-   std::shared_ptr<Forwards::Engine::Expression> yanked;
+   std::vector<Forwards::Engine::CellType> yankedType;
+   std::vector<std::shared_ptr<Forwards::Engine::Expression> > yanked;
+   size_t yankedCols;
 
    Forwards::Engine::CallingContext* context;
 
@@ -525,6 +526,228 @@ void Spreadsheet::real_callback()
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
+            case 'y':
+               G_shared->c_col = C + G_shared->tr_col;
+               G_shared->c_row = R + G_shared->tr_row;
+               switch (Fl::e_text[0])
+                {
+               case 'y':
+                {
+                  Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, G_shared->c_row);
+                  if ((nullptr != curCell) && (nullptr != curCell->value.get()))
+                   {
+                     G_shared->yankedType.resize(1U);
+                     G_shared->yankedType[0] = curCell->type;
+                     G_shared->yanked.resize(1U);
+                     G_shared->yanked[0] = curCell->value;
+                     G_shared->yankedCols = 1U;
+                   }
+                }
+                  break;
+               case 'c':
+                {
+                  size_t maxRow = 0U;
+                  if (G_shared->c_col < G_shared->context->theSheet->sheet.size())
+                   {
+                     maxRow = G_shared->context->theSheet->sheet[G_shared->c_col].size();
+                   }
+                  while (nullptr == G_shared->context->theSheet->getCellAt(G_shared->c_col, maxRow))
+                   {
+                     if (0 != maxRow)
+                      {
+                        --maxRow;
+                      }
+                     else
+                      {
+                        break;
+                      }
+                   }
+                  G_shared->yankedCols = 1U;
+                  G_shared->yankedType.resize(maxRow + 1U);
+                  G_shared->yanked.resize(maxRow + 1U);
+                  for (size_t i = 0U; i <= maxRow; ++i)
+                   {
+                     Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, i);
+                     if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+                      {
+                        G_shared->yankedType[i] = tempCell->type;
+                        G_shared->yanked[i] = tempCell->value;
+                      }
+                     else
+                      {
+                        G_shared->yankedType[i] = UNREAL_ERROR;
+                      }
+                   }
+                }
+                  break;
+               case 'r':
+                {
+                  size_t maxCol = G_shared->context->theSheet->sheet.size();
+                  while (nullptr == G_shared->context->theSheet->getCellAt(maxCol, G_shared->c_row))
+                   {
+                     if (0U != maxCol)
+                      {
+                        --maxCol;
+                      }
+                     else
+                      {
+                        break;
+                      }
+                   }
+                  G_shared->yankedCols = maxCol + 1U;
+                  G_shared->yankedType.resize(maxCol + 1U);
+                  G_shared->yanked.resize(maxCol + 1U);
+                  for (size_t i = 0U; i <= maxCol; ++i)
+                   {
+                     Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(i, G_shared->c_row);
+                     if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+                      {
+                        G_shared->yankedType[i] = tempCell->type;
+                        G_shared->yanked[i] = tempCell->value;
+                      }
+                     else
+                      {
+                        G_shared->yankedType[i] = UNREAL_ERROR;
+                      }
+                   }
+                }
+                  break;
+               case 'm':
+                {
+                  size_t bc = std::min(G_shared->c_col, G_shared->m_col);
+                  size_t mc = std::max(G_shared->c_col, G_shared->m_col);
+                  size_t br = std::min(G_shared->c_row, G_shared->m_row);
+                  size_t mr = std::max(G_shared->c_row, G_shared->m_row);
+                  G_shared->yankedType.clear();
+                  G_shared->yanked.clear();
+                  for (size_t _c = bc; _c <= mc; ++_c)
+                     for (size_t _r = br; _r <= mr; ++_r)
+                      {
+                        Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                        if ((nullptr != tempCell) && (nullptr != tempCell->value.get()))
+                         {
+                           G_shared->yankedType.push_back(tempCell->type);
+                           G_shared->yanked.push_back(tempCell->value);
+                         }
+                        else
+                         {
+                           G_shared->yankedType.push_back(UNREAL_ERROR);
+                           G_shared->yanked.push_back(std::shared_ptr<Forwards::Engine::Expression>());
+                         }
+                      }
+                  G_shared->yankedCols = mc - bc + 1U;
+                }
+                  break;
+               case 'd':
+                  G_shared->yankedType.clear();
+                  G_shared->yanked.clear();
+                  G_shared->yankedCols = 0U;
+                  break;
+                }
+               break;
+            case 'p':
+               if (0U == G_shared->yankedCols) break;
+               G_shared->c_col = C + G_shared->tr_col;
+               G_shared->c_row = R + G_shared->tr_row;
+               switch (Fl::e_text[0])
+                {
+               case 'p':
+                  if (UNREAL_ERROR != G_shared->yankedType[0])
+                   {
+                     Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, G_shared->c_row);
+                     if (nullptr == curCell)
+                      {
+                        G_shared->context->theSheet->initCellAt(G_shared->c_col, G_shared->c_row);
+                        curCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, G_shared->c_row);
+                      }
+                     curCell->type = G_shared->yankedType[0];
+                     curCell->value = G_shared->yanked[0];
+                   }
+                  break;
+               case 'c':
+                  for (size_t i = 0U; i < G_shared->yanked.size(); ++i)
+                   {
+                     if (UNREAL_ERROR != G_shared->yankedType[i])
+                      {
+                        Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, i);
+                        if (nullptr == tempCell)
+                         {
+                           G_shared->context->theSheet->initCellAt(G_shared->c_col, i);
+                           tempCell = G_shared->context->theSheet->getCellAt(G_shared->c_col, i);
+                         }
+                        tempCell->type = G_shared->yankedType[i];
+                        tempCell->value = G_shared->yanked[i];
+                      }
+                   }
+                  break;
+               case 'r':
+                {
+                  size_t maxCol = std::min(G_shared->yanked.size(), MAX_COL + 1U);
+                  for (size_t i = 0U; i < maxCol; ++i)
+                   {
+                     if (UNREAL_ERROR != G_shared->yankedType[i])
+                      {
+                        Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(i, G_shared->c_row);
+                        if (nullptr == tempCell)
+                         {
+                           G_shared->context->theSheet->initCellAt(i, G_shared->c_row);
+                           tempCell = G_shared->context->theSheet->getCellAt(i, G_shared->c_row);
+                         }
+                        tempCell->type = G_shared->yankedType[i];
+                        tempCell->value = G_shared->yanked[i];
+                      }
+                   }
+                }
+                  break;
+               case 'm':
+                {
+                  size_t rs = G_shared->yanked.size() / G_shared->yankedCols;
+                  size_t i = 0U;
+                  for (size_t _c = G_shared->c_col; _c < G_shared->c_col + G_shared->yankedCols; ++_c)
+                     for (size_t _r = G_shared->c_row; _r < G_shared->c_row + rs; ++_r)
+                      {
+                        if ((UNREAL_ERROR != G_shared->yankedType[i]) && (_c <= MAX_COL) && (_r <= MAX_ROW))
+                         {
+                           Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                           if (nullptr == tempCell)
+                            {
+                              G_shared->context->theSheet->initCellAt(_c, _r);
+                              tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                            }
+                           tempCell->type = G_shared->yankedType[i];
+                           tempCell->value = G_shared->yanked[i];
+                         }
+                        ++i;
+                      }
+                }
+                  break;
+               case 'n':
+                {
+                  size_t rs = G_shared->yanked.size() / G_shared->yankedCols;
+                  size_t i = 0U;
+                  for (size_t _r = G_shared->c_row; _r < G_shared->c_row + G_shared->yankedCols; ++_r)
+                     for (size_t _c = G_shared->c_col; _c < G_shared->c_col + rs; ++_c)
+                      {
+                        if ((UNREAL_ERROR != G_shared->yankedType[i]) && (_c <= MAX_COL) && (_r <= MAX_ROW))
+                         {
+                           Forwards::Engine::Cell* tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                           if (nullptr == tempCell)
+                            {
+                              G_shared->context->theSheet->initCellAt(_c, _r);
+                              tempCell = G_shared->context->theSheet->getCellAt(_c, _r);
+                            }
+                           tempCell->type = G_shared->yankedType[i];
+                           tempCell->value = G_shared->yanked[i];
+                         }
+                        ++i;
+                      }
+                }
+                  break;
+                }
+               blinky = true;
+               update_fields(R, C);
+               damage(FL_DAMAGE_ALL);
+               break;
             default:
                break;
              }
@@ -579,6 +802,12 @@ void Spreadsheet::real_callback()
                break;
             case 'o':
                hiddenState = 'o';
+               break;
+            case 'y':
+               hiddenState = 'y';
+               break;
+            case 'p':
+               hiddenState = 'p';
                break;
             case '!':
                blinky = true;
@@ -831,7 +1060,7 @@ int main(void)
 
    state.def_col_width = DEF_COLUMN_WIDTH;
 
-   state.yankedType = UNREAL_ERROR;
+   state.yankedCols = 0U;
 
    state.context = &context;
 

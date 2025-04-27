@@ -45,6 +45,8 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `pr` : paste to the current row
 * `pm` : paste the copied data as marked with this the top-right corner
 * `pn` : paste the copied data transposed with this the top-right corner
+* `pf` : paste the copied data into the rectangle between the current cell and the marker in column-major order
+* `pt` : paste the copied data into the rectangle between the current cell and the marker in row-major order
 * `vv` : replace the current cell with its evaluated value
 * `vm` : replace the cell with its evaluated value for all cells in the rectangle between the current cell and the marker
 * `v=` : flip the current cell between a label and a formula

@@ -58,6 +58,7 @@ static const Forwards::Engine::CellType UNREAL_ERROR = Forwards::Engine::ERROR;
 #include <FL/Fl_File_Chooser.H>
 
 #include <cstring>
+#include <fstream>
 
 #include <chrono>
 #include <thread>
@@ -74,30 +75,32 @@ std::thread updateThread;
 #define SIZE_VIEW_COLS 100
 #define SIZE_VIEW_ROWS 500
 
-void lr_cb (Fl_Widget*, void*);
-void td_cb (Fl_Widget*, void*);
-void cr_cb (Fl_Widget*, void*);
-void open_cb (Fl_Widget*, void*);
-void import_cb (Fl_Widget*, void*);
-void save_cb (Fl_Widget*, void*);
-void exit_cb (Fl_Widget*, void*);
-void input_cb(Fl_Widget*, void*);
+void lr_cb      (Fl_Widget*, void*);
+void td_cb      (Fl_Widget*, void*);
+void cr_cb      (Fl_Widget*, void*);
+void open_cb    (Fl_Widget*, void*);
+void import_cb  (Fl_Widget*, void*);
+void save_cb    (Fl_Widget*, void*);
+void exit_cb    (Fl_Widget*, void*);
+void input_cb   (Fl_Widget*, void*);
+void library_cb (Fl_Widget*, void*);
 
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 Fl_Menu_Item static_menu_array [] =
  {
-   {"&File",      0, nullptr, nullptr, FL_SUBMENU},
-   {"&Open",      0, open_cb},
-   {"&Import",    0, import_cb},
-   {"&Save",      0, save_cb},
-   {"E&xit",      0, exit_cb},
+   {"&File",         0, nullptr, nullptr, FL_SUBMENU},
+   {"&Open",         0, open_cb},
+   {"&Load Library", 0, library_cb},
+   {"&Import CSV",   0, import_cb},
+   {"&Save",         0, save_cb},
+   {"E&xit",         0, exit_cb},
    {nullptr},
-   {"Settings",   0, nullptr, nullptr, FL_SUBMENU},
-   {"Left-Right", 0, lr_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
-   {"Top-Bottom", 0, td_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
-   {"Column-Row", 0, cr_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
+   {"Settings",      0, nullptr, nullptr, FL_SUBMENU},
+   {"Left-Right",    0, lr_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
+   {"Top-Bottom",    0, td_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
+   {"Column-Row",    0, cr_cb,   nullptr, FL_MENU_TOGGLE | FL_MENU_VALUE},
    {nullptr},
    {nullptr}
  };
@@ -128,6 +131,7 @@ public:
    size_t m_col;
    size_t m_row;
 
+   std::vector<std::pair<std::string, std::string> > otherLibs;
    std::vector<std::pair<std::string, std::string> > fileLibs;
  };
 
@@ -1032,10 +1036,29 @@ void open_cb (Fl_Widget*, void*)
     {
       G_shared->fileLibs.clear();
       LoadFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, G_shared->fileLibs);
-      LoadLibraries(G_shared->fileLibs, *G_shared->context);
+      std::vector<std::pair<std::string, std::string> > allLibs (G_shared->fileLibs);
+      allLibs.insert(allLibs.end(), G_shared->otherLibs.begin(), G_shared->otherLibs.end());
+      LoadLibraries(allLibs, *G_shared->context);
       blinky = true;
       setTableWidths();
       G_table->damage(FL_DAMAGE_ALL);
+    }
+ }
+
+void library_cb (Fl_Widget*, void*)
+ {
+   const char* fileName = fl_file_chooser("Load Library File...", nullptr, nullptr, 0);
+   if (nullptr != fileName)
+    {
+      std::ifstream file (fileName, std::ios_base::in);
+      if (file)
+       {
+         std::string lib {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+         G_shared->otherLibs.push_back(std::make_pair(fileName, lib));
+       }
+      std::vector<std::pair<std::string, std::string> > allLibs (G_shared->fileLibs);
+      allLibs.insert(allLibs.end(), G_shared->otherLibs.begin(), G_shared->otherLibs.end());
+      LoadLibraries(allLibs, *G_shared->context);
     }
  }
 
@@ -1055,7 +1078,9 @@ void save_cb (Fl_Widget*, void*)
    const char* fileName = fl_file_chooser("Save as...", nullptr, nullptr, 0);
    if (nullptr != fileName)
     {
-      SaveFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, G_shared->fileLibs);
+      std::vector<std::pair<std::string, std::string> > allLibs (G_shared->fileLibs);
+      allLibs.insert(allLibs.end(), G_shared->otherLibs.begin(), G_shared->otherLibs.end());
+      SaveFile(fileName, G_shared->context->theSheet, G_shared->col_widths, G_shared->def_col_width, allLibs);
     }
  }
 
@@ -1136,6 +1161,17 @@ int dontclose_hand(int event)
    return 0;
  }
 
+void close_cb(Fl_Widget*, void*)
+ {
+   if (FL_REASON_CLOSED == Fl::callback_reason())
+    {
+      if (fl_choice("Did you mean to click exit?", "No", "Yes", NULL))
+       {
+         std::exit(0);
+       }
+    }
+ }
+
 
 
 int main(void)
@@ -1175,6 +1211,7 @@ int main(void)
    input.callback(input_cb, &table);
    input.when(FL_WHEN_CHANGED);
 
+   win.callback(close_cb);
    win.end();
    win.resizable(&table);
    win.show();

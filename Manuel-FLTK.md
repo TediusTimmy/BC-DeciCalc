@@ -11,7 +11,7 @@ The contents of the top line:
 
 The second line is either: the formula in the current cell, or the computed value of the cell (if one is modifying the cell).  
 The third line is the modification line: the formula or string in the current cell.  
-Below this is the sheet proper. Hopefully, navigating the sheet proper is intuitive.
+Below this is the sheet proper. Hopefully, navigating the sheet proper is intuitive (except for that it is a view). Remember that the input box at the top-left corner can change where in the sheet you are viewing.
 
 ### Commands
 * Arrow keys : navigate.

@@ -1253,6 +1253,58 @@ int ProcessInput(SharedData& data)
          blinky = true;
        }
          break;
+      case 'f':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         size_t i = 0U;
+         for (size_t _c = bc; (_c <= mc) && (i < data.yankedType.size()); ++_c)
+            for (size_t _r = br; (_r <= mr) && (i < data.yankedType.size()); ++_r)
+             {
+               if (Forwards::Engine::ERROR != data.yankedType[i])
+                {
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
+                  if (nullptr == tempCell)
+                   {
+                     data.context->theSheet->initCellAt(_c, _r);
+                     tempCell = data.context->theSheet->getCellAt(_c, _r);
+                   }
+                  tempCell->type = data.yankedType[i];
+                  tempCell->value = data.yanked[i];
+                }
+               ++i;
+             }
+         blinky = true;
+       }
+         break;
+      case 't':
+       {
+         size_t bc = std::min(data.c_col, data.m_col);
+         size_t mc = std::max(data.c_col, data.m_col);
+         size_t br = std::min(data.c_row, data.m_row);
+         size_t mr = std::max(data.c_row, data.m_row);
+         size_t i = 0U;
+         for (size_t _r = br; (_r <= mr) && (i < data.yankedType.size()); ++_r)
+            for (size_t _c = bc; (_c <= mc) && (i < data.yankedType.size()); ++_c)
+             {
+               if (Forwards::Engine::ERROR != data.yankedType[i])
+                {
+                  Forwards::Engine::Cell* tempCell = data.context->theSheet->getCellAt(_c, _r);
+                  if (nullptr == tempCell)
+                   {
+                     data.context->theSheet->initCellAt(_c, _r);
+                     tempCell = data.context->theSheet->getCellAt(_c, _r);
+                   }
+                  tempCell->type = data.yankedType[i];
+                  tempCell->value = data.yanked[i];
+                }
+               ++i;
+             }
+         blinky = true;
+       }
+         break;
        }
       break;
    case 'e':

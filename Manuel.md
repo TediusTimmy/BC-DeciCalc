@@ -90,6 +90,8 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `pr` : paste to the current row
 * `pm` : paste the copied data as marked with this the top-right corner
 * `pM` : paste the copied data transposed with this the top-right corner
+* `pf` : paste the copied data into the rectangle between the current cell and the marker in column-major order
+* `pt` : paste the copied data into the rectangle between the current cell and the marker in row-major order
 * `e` : edit the current cell's contents
 * Shift left/right (also F9/F12) : widen or narrow the current column. Columns can be between 1 and 40 cells wide.
 * `#` : Switch between column-major and row-major recalculation.

@@ -249,7 +249,7 @@ void sheetrun (void)
 class Spreadsheet : public Fl_Table
  {
 protected:
-   void draw_cell(TableContext context, int, int, int, int, int, int);
+   void draw_cell(TableContext context, int, int, int, int, int, int) override;
    void real_callback();
 
    static void event_cb(Fl_Widget*, void *v)

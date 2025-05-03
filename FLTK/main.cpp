@@ -1075,6 +1075,7 @@ void import_cb (Fl_Widget*, void*)
 
 void save_cb (Fl_Widget*, void*)
  {
+   saveTableWidths();
    const char* fileName = fl_file_chooser("Save as...", nullptr, nullptr, 0);
    if (nullptr != fileName)
     {

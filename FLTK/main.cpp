@@ -1164,13 +1164,17 @@ int dontclose_hand(int event)
 
 void close_cb(Fl_Widget*, void*)
  {
+#if FL_MINOR_VERSION > 3
    if (FL_REASON_CLOSED == Fl::callback_reason())
     {
+#endif
       if (fl_choice("Did you mean to click exit?", "No", "Yes", NULL))
        {
          std::exit(0);
        }
+#if FL_MINOR_VERSION > 3
     }
+#endif
  }
 
 

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 #include "Forwards/Engine/CallingContext.h"
 #include "Forwards/Engine/Cell.h"
@@ -60,6 +61,7 @@ std::atomic<bool> blinky {true};
 std::thread updateThread1;
 std::thread updateThread2;
 std::atomic<bool> stinky {false};
+std::mutex funk;
 std::shared_ptr<std::string> funky;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)
@@ -167,7 +169,10 @@ void linerun (SharedData& data)
     {
       if (true == stinky)
        {
-         funky.reset();
+          {
+            std::scoped_lock lock (funk);
+            funky.reset();
+          }
          const Forwards::Engine::Cell* const curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
          std::string result;
          if (nullptr != curCell)
@@ -178,7 +183,10 @@ void linerun (SharedData& data)
                result = getStringPreviousValuePtr(curCell, temp, data);
              }
           }
-         std::make_shared<std::string>(std::move(result)).swap(funky);
+          {
+            std::scoped_lock lock (funk);
+            std::make_shared<std::string>(std::move(result)).swap(funky);
+          }
          stinky = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
@@ -236,7 +244,11 @@ void UpdateScreen(SharedData& data)
             printw("LABEL ");
           }
 
-         std::shared_ptr<std::string> temp = funky;
+         std::shared_ptr<std::string> temp;
+          {
+            std::scoped_lock lock (funk);
+            temp = funky;
+          }
          if (nullptr != temp.get())
           {
             std::string content = *temp;

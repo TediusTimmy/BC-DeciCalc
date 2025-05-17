@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <thread>
 #include <atomic>
-#include <mutex>
 
 #include "Forwards/Engine/CallingContext.h"
 #include "Forwards/Engine/Cell.h"
@@ -61,7 +60,6 @@ std::atomic<bool> recalcSheet {true};
 std::thread updateThreadRecalcSheet;
 std::thread updateThreadRecalcLine2;
 std::atomic<bool> recalcLine2 {false};
-std::mutex line1Lock;
 std::shared_ptr<std::string> line1;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)
@@ -169,10 +167,7 @@ void linerun (SharedData& data)
     {
       if (true == recalcLine2)
        {
-          {
-            std::scoped_lock lock (line1Lock);
-            line1.reset();
-          }
+         std::atomic_exchange(&line1, std::shared_ptr<std::string>());
          const Forwards::Engine::Cell* const curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
          std::string result;
          if (nullptr != curCell)
@@ -183,10 +178,7 @@ void linerun (SharedData& data)
                result = getStringPreviousValuePtr(curCell, temp, data);
              }
           }
-          {
-            std::scoped_lock lock (line1Lock);
-            std::make_shared<std::string>(std::move(result)).swap(line1);
-          }
+         std::atomic_exchange(&line1, std::make_shared<std::string>(std::move(result)));
          recalcLine2 = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
@@ -244,11 +236,7 @@ void UpdateScreen(SharedData& data)
             printw("LABEL ");
           }
 
-         std::shared_ptr<std::string> temp;
-          {
-            std::scoped_lock lock (line1Lock);
-            temp = line1;
-          }
+         std::shared_ptr<std::string> temp = std::atomic_load(&line1);
          if (nullptr != temp.get())
           {
             std::string content = *temp;

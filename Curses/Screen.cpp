@@ -58,8 +58,8 @@ const size_t MAX_COL = 18277U;
 
 std::atomic<bool> recalcSheet {true};
 std::thread updateThreadRecalcSheet;
-std::thread updateThreadRecalcLine2;
-std::atomic<bool> recalcLine2 {false};
+std::thread updateThreadRecalcLine1;
+std::atomic<bool> recalcLine1 {false};
 std::shared_ptr<std::string> line1;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)
@@ -150,10 +150,10 @@ void sheetrun (SharedData& data)
     {
       if (true == recalcSheet)
        {
-         recalcLine2 = true;
+         recalcLine1 = true;
          data.context->theSheet->recalc(*data.context);
          recalcSheet = false;
-         recalcLine2 = true;
+         recalcLine1 = true;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -165,7 +165,7 @@ void linerun (SharedData& data)
    std::chrono::system_clock::time_point last;
    for (;;)
     {
-      if (true == recalcLine2)
+      if (true == recalcLine1)
        {
          std::atomic_exchange(&line1, std::shared_ptr<std::string>());
          const Forwards::Engine::Cell* const curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
@@ -179,7 +179,7 @@ void linerun (SharedData& data)
              }
           }
          std::atomic_exchange(&line1, std::make_shared<std::string>(std::move(result)));
-         recalcLine2 = false;
+         recalcLine1 = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -205,8 +205,8 @@ void InitScreen(SharedData& data)
 
    updateThreadRecalcSheet = std::thread(sheetrun, std::ref(data));
    updateThreadRecalcSheet.detach();
-   updateThreadRecalcLine2 = std::thread(linerun, std::ref(data));
-   updateThreadRecalcLine2.detach();
+   updateThreadRecalcLine1 = std::thread(linerun, std::ref(data));
+   updateThreadRecalcLine1.detach();
  }
 
 void UpdateScreen(SharedData& data)
@@ -839,7 +839,7 @@ int ProcessInput(SharedData& data)
        {
          ++data.c_row;
          if ((static_cast<int>(data.c_row - data.tr_row)) >= (y - 4)) ++data.tr_row;
-         recalcLine2 = true;
+         recalcLine1 = true;
        }
       break;
    case 'k':
@@ -848,7 +848,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_row;
          if (data.c_row < data.tr_row) --data.tr_row;
-         recalcLine2 = true;
+         recalcLine1 = true;
        }
       break;
    case 'h':
@@ -857,7 +857,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_col;
          if (data.c_col < data.tr_col) --data.tr_col;
-         recalcLine2 = true;
+         recalcLine1 = true;
        }
       break;
    case 'l':
@@ -870,7 +870,7 @@ int ProcessInput(SharedData& data)
             size_t cl = CountColumnsLeft(data, data.c_col, x);
             data.tr_col = data.c_col - cl + 1U;
           }
-         recalcLine2 = true;
+         recalcLine1 = true;
        }
       break;
    case 'J':
@@ -885,7 +885,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row = MAX_ROW - y + 5;
        }
-      recalcLine2 = true;
+      recalcLine1 = true;
       break;
    case 'K':
    case KEY_PPAGE:
@@ -905,7 +905,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row -= (y - 4);
        }
-      recalcLine2 = true;
+      recalcLine1 = true;
       break;
    case 'H':
     {
@@ -920,7 +920,7 @@ int ProcessInput(SharedData& data)
          data.c_col = 0;
          data.tr_col = 0;
        }
-      recalcLine2 = true;
+      recalcLine1 = true;
     }
       break;
    case 'L':
@@ -932,14 +932,14 @@ int ProcessInput(SharedData& data)
          data.c_col = MAX_COL;
          data.tr_col = MAX_COL - cl + 1;
        }
-      recalcLine2 = true;
+      recalcLine1 = true;
       break;
    case KEY_HOME:
       data.c_col = 0U;
       data.tr_col = 0U;
       data.c_row = 0U;
       data.tr_row = 0U;
-      recalcLine2 = true;
+      recalcLine1 = true;
       break;
    case '<':
       if (true == recalcSheet) break;

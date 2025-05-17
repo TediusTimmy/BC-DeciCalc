@@ -41,8 +41,8 @@ enum MODE
 class SharedData final
  {
 public:
-   size_t c_col;
-   size_t c_row;
+   std::atomic<size_t> c_col;
+   std::atomic<size_t> c_row;
    size_t tr_col;
    size_t tr_row;
 

@@ -1019,10 +1019,10 @@ int ProcessInput(SharedData& data)
          break;
       case 'm':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          for (size_t _c = bc; _c <= mc; ++_c)
             for (size_t _r = br; _r <= mr; ++_r)
                data.context->theSheet->clearCellAt(_c, _r);
@@ -1120,10 +1120,10 @@ int ProcessInput(SharedData& data)
          break;
       case 'm':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          data.yankedType.clear();
          data.yanked.clear();
          for (size_t _c = bc; _c <= mc; ++_c)
@@ -1255,10 +1255,10 @@ int ProcessInput(SharedData& data)
          break;
       case 'f':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          size_t i = 0U;
          for (size_t _c = bc; (_c <= mc) && (i < data.yankedType.size()); ++_c)
             for (size_t _r = br; (_r <= mr) && (i < data.yankedType.size()); ++_r)
@@ -1281,10 +1281,10 @@ int ProcessInput(SharedData& data)
          break;
       case 't':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          size_t i = 0U;
          for (size_t _r = br; (_r <= mr) && (i < data.yankedType.size()); ++_r)
             for (size_t _c = bc; (_c <= mc) && (i < data.yankedType.size()); ++_c)
@@ -1540,10 +1540,10 @@ int ProcessInput(SharedData& data)
          break;
       case 'm':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          for (size_t _c = bc; _c <= mc; ++_c)
             for (size_t _r = br; _r <= mr; ++_r)
              {
@@ -1579,10 +1579,10 @@ int ProcessInput(SharedData& data)
          break;
       case '+':
        {
-         size_t bc = std::min(data.c_col, data.m_col);
-         size_t mc = std::max(data.c_col, data.m_col);
-         size_t br = std::min(data.c_row, data.m_row);
-         size_t mr = std::max(data.c_row, data.m_row);
+         size_t bc = std::min(data.c_col.load(), data.m_col);
+         size_t mc = std::max(data.c_col.load(), data.m_col);
+         size_t br = std::min(data.c_row.load(), data.m_row);
+         size_t mr = std::max(data.c_row.load(), data.m_row);
          for (size_t _c = bc; _c <= mc; ++_c)
             for (size_t _r = br; _r <= mr; ++_r)
              {

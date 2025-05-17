@@ -57,12 +57,12 @@ const int AUTO_DISABLE_MILLIS = 80; // If it takes longer than this to compute l
 const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
 
-std::atomic<bool> blinky {true};
-std::thread updateThread1;
-std::thread updateThread2;
-std::atomic<bool> stinky {false};
-std::mutex funk;
-std::shared_ptr<std::string> funky;
+std::atomic<bool> recalcSheet {true};
+std::thread updateThreadRecalcSheet;
+std::thread updateThreadRecalcLine2;
+std::atomic<bool> recalcLine2 {false};
+std::mutex line1Lock;
+std::shared_ptr<std::string> line1;
 
 void GetRC(const std::string& from, int64_t& col, int64_t& row)
  {
@@ -150,12 +150,12 @@ void sheetrun (SharedData& data)
    std::chrono::system_clock::time_point last;
    for (;;)
     {
-      if (true == blinky)
+      if (true == recalcSheet)
        {
-         stinky = true;
+         recalcLine2 = true;
          data.context->theSheet->recalc(*data.context);
-         blinky = false;
-         stinky = true;
+         recalcSheet = false;
+         recalcLine2 = true;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -167,11 +167,11 @@ void linerun (SharedData& data)
    std::chrono::system_clock::time_point last;
    for (;;)
     {
-      if (true == stinky)
+      if (true == recalcLine2)
        {
           {
-            std::scoped_lock lock (funk);
-            funky.reset();
+            std::scoped_lock lock (line1Lock);
+            line1.reset();
           }
          const Forwards::Engine::Cell* const curCell = data.context->theSheet->getCellAt(data.c_col, data.c_row);
          std::string result;
@@ -184,10 +184,10 @@ void linerun (SharedData& data)
              }
           }
           {
-            std::scoped_lock lock (funk);
-            std::make_shared<std::string>(std::move(result)).swap(funky);
+            std::scoped_lock lock (line1Lock);
+            std::make_shared<std::string>(std::move(result)).swap(line1);
           }
-         stinky = false;
+         recalcLine2 = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -211,10 +211,10 @@ void InitScreen(SharedData& data)
    init_pair(4, COLOR_BLUE, COLOR_BLACK);
    init_pair(5, COLOR_WHITE, COLOR_RED);
 
-   updateThread1 = std::thread(sheetrun, std::ref(data));
-   updateThread1.detach();
-   updateThread2 = std::thread(linerun, std::ref(data));
-   updateThread2.detach();
+   updateThreadRecalcSheet = std::thread(sheetrun, std::ref(data));
+   updateThreadRecalcSheet.detach();
+   updateThreadRecalcLine2 = std::thread(linerun, std::ref(data));
+   updateThreadRecalcLine2.detach();
  }
 
 void UpdateScreen(SharedData& data)
@@ -246,8 +246,8 @@ void UpdateScreen(SharedData& data)
 
          std::shared_ptr<std::string> temp;
           {
-            std::scoped_lock lock (funk);
-            temp = funky;
+            std::scoped_lock lock (line1Lock);
+            temp = line1;
           }
          if (nullptr != temp.get())
           {
@@ -271,7 +271,7 @@ void UpdateScreen(SharedData& data)
        {
          for (int i = x - 16; i > 0; --i) addch(' ');
        }
-      if (true == blinky)
+      if (true == recalcSheet)
        {
          addch('#');
        }
@@ -297,7 +297,7 @@ void UpdateScreen(SharedData& data)
        {
          std::chrono::system_clock::time_point last = std::chrono::system_clock::now() + std::chrono::milliseconds(AUTO_DISABLE_MILLIS);
             // unfinished VALUE : parse current contents
-         if ((false == blinky) && (Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
+         if ((false == recalcSheet) && (Forwards::Engine::VALUE == curCell->type) && (nullptr == curCell->value))
           {
             data.context->inUserInput = true;
             --data.context->generation;
@@ -789,7 +789,7 @@ int ProcessInput(SharedData& data)
             curCell->currentInput = data.tempString;
             curCell->value.reset();
             curCell->previousValue.reset();
-            blinky = true;
+            recalcSheet = true;
           }
          else if (GOTO_CELL == data.mode)
           {
@@ -806,7 +806,7 @@ int ProcessInput(SharedData& data)
             curCell->currentInput = data.tempString;
             data.tempString = "";
             data.origString = "";
-            blinky = true;
+            recalcSheet = true;
             done = false;
             if (KEY_NPAGE == c)
              {
@@ -851,7 +851,7 @@ int ProcessInput(SharedData& data)
        {
          ++data.c_row;
          if ((static_cast<int>(data.c_row - data.tr_row)) >= (y - 4)) ++data.tr_row;
-         stinky = true;
+         recalcLine2 = true;
        }
       break;
    case 'k':
@@ -860,7 +860,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_row;
          if (data.c_row < data.tr_row) --data.tr_row;
-         stinky = true;
+         recalcLine2 = true;
        }
       break;
    case 'h':
@@ -869,7 +869,7 @@ int ProcessInput(SharedData& data)
        {
          --data.c_col;
          if (data.c_col < data.tr_col) --data.tr_col;
-         stinky = true;
+         recalcLine2 = true;
        }
       break;
    case 'l':
@@ -882,7 +882,7 @@ int ProcessInput(SharedData& data)
             size_t cl = CountColumnsLeft(data, data.c_col, x);
             data.tr_col = data.c_col - cl + 1U;
           }
-         stinky = true;
+         recalcLine2 = true;
        }
       break;
    case 'J':
@@ -897,7 +897,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row = MAX_ROW - y + 5;
        }
-      stinky = true;
+      recalcLine2 = true;
       break;
    case 'K':
    case KEY_PPAGE:
@@ -917,7 +917,7 @@ int ProcessInput(SharedData& data)
        {
          data.tr_row -= (y - 4);
        }
-      stinky = true;
+      recalcLine2 = true;
       break;
    case 'H':
     {
@@ -932,7 +932,7 @@ int ProcessInput(SharedData& data)
          data.c_col = 0;
          data.tr_col = 0;
        }
-      stinky = true;
+      recalcLine2 = true;
     }
       break;
    case 'L':
@@ -944,17 +944,17 @@ int ProcessInput(SharedData& data)
          data.c_col = MAX_COL;
          data.tr_col = MAX_COL - cl + 1;
        }
-      stinky = true;
+      recalcLine2 = true;
       break;
    case KEY_HOME:
       data.c_col = 0U;
       data.tr_col = 0U;
       data.c_row = 0U;
       data.tr_row = 0U;
-      stinky = true;
+      recalcLine2 = true;
       break;
    case '<':
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
     {
       if (nullptr == curCell)
        {
@@ -977,7 +977,7 @@ int ProcessInput(SharedData& data)
     }
       break;
    case '=':
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
     {
       if (nullptr == curCell)
        {
@@ -1013,11 +1013,11 @@ int ProcessInput(SharedData& data)
        }
       break;
    case '!':
-      blinky = true;
+      recalcSheet = true;
       break;
    case 'd':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'd':
@@ -1041,7 +1041,7 @@ int ProcessInput(SharedData& data)
        }
          break;
        }
-      blinky = true;
+      recalcSheet = true;
       break;
    case 'm':
       data.m_row = data.c_row;
@@ -1049,7 +1049,7 @@ int ProcessInput(SharedData& data)
       break;
    case 'y':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'y':
@@ -1165,7 +1165,7 @@ int ProcessInput(SharedData& data)
       break;
    case 'p':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       if (0U == data.yankedCols) break;
       switch (c)
        {
@@ -1179,7 +1179,7 @@ int ProcessInput(SharedData& data)
              }
             curCell->type = data.yankedType[0];
             curCell->value = data.yanked[0];
-            blinky = true;
+            recalcSheet = true;
           }
          break;
       case 'c':
@@ -1197,7 +1197,7 @@ int ProcessInput(SharedData& data)
                tempCell->value = data.yanked[i];
              }
           }
-         blinky = true;
+         recalcSheet = true;
          break;
       case 'r':
        {
@@ -1216,7 +1216,7 @@ int ProcessInput(SharedData& data)
                tempCell->value = data.yanked[i];
              }
           }
-         blinky = true;
+         recalcSheet = true;
        }
          break;
       case 'm':
@@ -1239,7 +1239,7 @@ int ProcessInput(SharedData& data)
                 }
                ++i;
              }
-         blinky = true;
+         recalcSheet = true;
        }
          break;
       case 'M':
@@ -1262,7 +1262,7 @@ int ProcessInput(SharedData& data)
                 }
                ++i;
              }
-         blinky = true;
+         recalcSheet = true;
        }
          break;
       case 'f':
@@ -1288,7 +1288,7 @@ int ProcessInput(SharedData& data)
                 }
                ++i;
              }
-         blinky = true;
+         recalcSheet = true;
        }
          break;
       case 't':
@@ -1314,13 +1314,13 @@ int ProcessInput(SharedData& data)
                 }
                ++i;
              }
-         blinky = true;
+         recalcSheet = true;
        }
          break;
        }
       break;
    case 'e':
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
     {
       if (nullptr != curCell)
        {
@@ -1375,7 +1375,7 @@ int ProcessInput(SharedData& data)
       data.useComma = !data.useComma;
       break;
    case '+':
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
     {
       if (nullptr == curCell)
        {
@@ -1480,7 +1480,7 @@ int ProcessInput(SharedData& data)
       break;
    case 'x':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'x':
@@ -1497,11 +1497,11 @@ int ProcessInput(SharedData& data)
          data.context->theSheet->removeRow(data.c_row);
          break;
        }
-      blinky = true;
+      recalcSheet = true;
       break;
    case 'i':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'i':
@@ -1515,11 +1515,11 @@ int ProcessInput(SharedData& data)
          data.context->theSheet->insertRowBefore(data.c_row);
          break;
        }
-      blinky = true;
+      recalcSheet = true;
       break;
    case 'o':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'o':
@@ -1533,11 +1533,11 @@ int ProcessInput(SharedData& data)
          data.context->theSheet->insertRowBefore(data.c_row + 1U);
          break;
        }
-      blinky = true;
+      recalcSheet = true;
       break;
    case 'v':
       if (false == updateChOrFail(c, data)) break;
-      if (true == blinky) break;
+      if (true == recalcSheet) break;
       switch (c)
        {
       case 'v':
@@ -1619,7 +1619,7 @@ int ProcessInput(SharedData& data)
        }
          break;
        }
-      blinky = true;
+      recalcSheet = true;
       break;
    case '`':
       endwin();
@@ -1635,7 +1635,7 @@ int ProcessInput(SharedData& data)
 void WaitToSave(void)
  {
    std::chrono::system_clock::time_point last;
-   while (true == blinky)
+   while (true == recalcSheet)
     {
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);

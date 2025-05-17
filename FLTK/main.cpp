@@ -68,7 +68,7 @@ const int RECALC_POLL_MILLIS = 40; // 25 Hz
 const size_t MAX_ROW = 999999998U; // Yes, minus one.
 const size_t MAX_COL = 18277U;
 
-std::atomic<bool> blinky {true};
+std::atomic<bool> recalcSheet {true};
 std::thread updateThread;
 
 #define COLUMN_SCALE 8
@@ -232,12 +232,12 @@ void sheetrun (void)
    std::chrono::system_clock::time_point last;
    for (;;)
     {
-      if (true == blinky)
+      if (true == recalcSheet)
        {
          G_shared->context->theSheet->recalc(*G_shared->context);
          G_table->damage(FL_DAMAGE_ALL);
          Fl::awake();
-         blinky = false;
+         recalcSheet = false;
        }
       last = std::chrono::system_clock::now() + std::chrono::milliseconds(RECALC_POLL_MILLIS);
       std::this_thread::sleep_until(last);
@@ -305,7 +305,7 @@ public:
          curCell->previousValue.reset();
          G_shared->inputMode = false;
          damage(FL_DAMAGE_ALL);
-         blinky = true;
+         recalcSheet = true;
        }
     }
 
@@ -319,7 +319,7 @@ public:
          curCell->previousValue.reset();
          G_shared->inputMode = false;
          damage(FL_DAMAGE_ALL);
-         blinky = true;
+         recalcSheet = true;
        }
     }
 
@@ -432,7 +432,7 @@ void Spreadsheet::real_callback()
        {
       case FL_PUSH:
          hiddenState = '\0';
-         if (blinky) break;
+         if (recalcSheet) break;
          done_editing();
          take_focus();
          update_fields(R, C);
@@ -469,7 +469,7 @@ void Spreadsheet::real_callback()
                 }
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -490,7 +490,7 @@ void Spreadsheet::real_callback()
                   G_shared->context->theSheet->removeRow(R + G_shared->tr_row);
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -508,7 +508,7 @@ void Spreadsheet::real_callback()
                   G_shared->context->theSheet->insertRowBefore(R + G_shared->tr_row);
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -526,7 +526,7 @@ void Spreadsheet::real_callback()
                   G_shared->context->theSheet->insertRowBefore(R + G_shared->tr_row + 1U);
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -798,7 +798,7 @@ void Spreadsheet::real_callback()
                 }
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -892,7 +892,7 @@ void Spreadsheet::real_callback()
                 }
                   break;
                 }
-               blinky = true;
+               recalcSheet = true;
                update_fields(R, C);
                damage(FL_DAMAGE_ALL);
                break;
@@ -906,7 +906,7 @@ void Spreadsheet::real_callback()
             switch (Fl::e_text[0])
              {
             case '=':
-               if (blinky) break;
+               if (recalcSheet) break;
              {
                Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
                if (nullptr == curCell)
@@ -921,7 +921,7 @@ void Spreadsheet::real_callback()
              }
                break;
             case '<':
-               if (blinky) break;
+               if (recalcSheet) break;
              {
                Forwards::Engine::Cell* curCell = G_shared->context->theSheet->getCellAt(C + G_shared->tr_col, R + G_shared->tr_row);
                if (nullptr == curCell)
@@ -961,7 +961,7 @@ void Spreadsheet::real_callback()
                hiddenState = 'v';
                break;
             case '!':
-               blinky = true;
+               recalcSheet = true;
                damage(FL_DAMAGE_ALL);
                break;
             case ',':
@@ -970,7 +970,7 @@ void Spreadsheet::real_callback()
                break;
             case '\r':
             case '\n':
-               if (!blinky) start_editing(R, C);
+               if (!recalcSheet) start_editing(R, C);
                break;
             default:
                update_fields(R, C);
@@ -1039,7 +1039,7 @@ void open_cb (Fl_Widget*, void*)
       std::vector<std::pair<std::string, std::string> > allLibs (G_shared->fileLibs);
       allLibs.insert(allLibs.end(), G_shared->otherLibs.begin(), G_shared->otherLibs.end());
       LoadLibraries(allLibs, *G_shared->context);
-      blinky = true;
+      recalcSheet = true;
       setTableWidths();
       G_table->damage(FL_DAMAGE_ALL);
     }
@@ -1068,7 +1068,7 @@ void import_cb (Fl_Widget*, void*)
    if (nullptr != fileName)
     {
       ImportCSV(fileName, G_shared->context->theSheet);
-      blinky = true;
+      recalcSheet = true;
       G_table->damage(FL_DAMAGE_ALL);
     }
  }

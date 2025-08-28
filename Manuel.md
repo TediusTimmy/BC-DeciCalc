@@ -69,7 +69,7 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * Page Up / Page Down : move to the next screen of rows. One can also use `JK`.
 * `H` / `L` : move to the next screen of columns.
 * Home : goto cell A1
-* `g` : type in a cell name, then enter, and the current cell cursor will be moved to that cell. Note that you cannot see the cell name that you are typing.
+* `g` : type in a cell name, then enter, and the current cell cursor will be moved to that cell.
 * `<` : start entering a label in this cell. Finish by pressing enter. (There are no centered or right-justified labels.)
 * `=` : start entering a formula in this cell. Finish by pressing enter.
 * `q` or F7 : exit. You must next press either 'y' to save and exit, or 'n' to not save and exit, in order to actually exit.

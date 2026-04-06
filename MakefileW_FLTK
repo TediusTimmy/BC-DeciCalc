@@ -36,10 +36,10 @@ debug: all
 
 
 bin/DeciCalc.exe: lib/libbcnum.a lib/Backwards.a lib/Forwards.a obj/main.o obj/GetAndSet.o obj/LibraryLoader.o obj/SaveFile.o obj/StdLib.o | bin
-	$(CCP) $(CFLAGS) $(BFLAGS) $(FLTK_COMP_FLAGS) -o bin/DeciCalc-FLTK.exe obj/*.o lib/Forwards.a lib/*.a $(FLTK_LINK_FLAGS) -lgmp
+	$(CCP) $(CFLAGS) $(BFLAGS) -o bin/DeciCalc-FLTK.exe obj/*.o lib/Forwards.a lib/*.a $(FLTK_LINK_FLAGS) -lgmp
 
 obj/main.o: FLTK/main.cpp
-	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/main.o FLTK/main.cpp
+	$(CCP) $(CFLAGS) $(F_INCLUDE) $(FLTK_COMP_FLAGS) -c -o obj/main.o FLTK/main.cpp
 
 obj/GetAndSet.o: OddsAndEnds/GetAndSet.cpp
 	$(CCP) $(CFLAGS) $(F_INCLUDE) -c -o obj/GetAndSet.o OddsAndEnds/GetAndSet.cpp

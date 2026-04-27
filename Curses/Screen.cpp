@@ -1606,6 +1606,56 @@ int ProcessInput(SharedData& data)
              }
        }
          break;
+      case 'R':
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (Forwards::Engine::VALUE == curCell->type))
+             {
+               size_t ur = data.c_row + 1U;
+               if (ur > MAX_ROW) ur = 0U;
+               curCell->currentInput = curCell->value->toString(data.c_col, ur);
+               curCell->value.reset();
+             }
+          }
+         break;
+      case 'r':
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (Forwards::Engine::VALUE == curCell->type))
+             {
+               size_t ur = data.c_row;
+               if (0U == ur) ur = MAX_ROW;
+               else ur -= 1U;
+               curCell->currentInput = curCell->value->toString(data.c_col, ur);
+               curCell->value.reset();
+             }
+          }
+         break;
+      case 'C':
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (Forwards::Engine::VALUE == curCell->type))
+             {
+               size_t uc = data.c_col + 1U;
+               if (uc > MAX_COL) uc = 0U;
+               curCell->currentInput = curCell->value->toString(uc, data.c_row);
+               curCell->value.reset();
+             }
+          }
+         break;
+      case 'c':
+         if (nullptr != curCell)
+          {
+            if (("" == curCell->currentInput) && (nullptr != curCell->value.get()) && (Forwards::Engine::VALUE == curCell->type))
+             {
+               size_t uc = data.c_col;
+               if (0U == uc) uc = MAX_COL;
+               else uc -= 1U;
+               curCell->currentInput = curCell->value->toString(uc, data.c_row);
+               curCell->value.reset();
+             }
+          }
+         break;
        }
       recalcSheet = true;
       break;

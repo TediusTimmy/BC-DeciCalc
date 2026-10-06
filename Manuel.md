@@ -117,6 +117,10 @@ Below this is the sheet proper. Hopefully, navigating the sheet proper is intuit
 * `vm` : replace the cell with its evaluated value for all cells in the rectangle between the current cell and the marker
 * `v=` : flip the current cell between a label and a formula
 * `v+` : flip the cell between a label and a formula for all cells in the rectangle between the current cell and the marker
+* `vR` : reinterpret the current formula as being one row higher, wrapping around
+* `vr` : reinterpret the current formula as being one row lower, wrapping around
+* `vC` : reinterpret the current formula as being one column higher, wrapping around
+* `vc` : reinterpret the current formula as being one column lower, wrapping around
 * `` ` `` : Reset the screen (for systems that don't have SIGWINCH)
 * `~` : turn line 2 calculation on/off. Line 2 computation automatically shuts itself off after an update that takes over 80 milliseconds.
 
